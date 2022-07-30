@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1624052069 source:d:\projetos\coyote\fibonacci3\main.cpp
+	<iostream>
+	<graphics.h>
+	<math.h>
+

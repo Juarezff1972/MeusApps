@@ -1,0 +1,6 @@
+format 223
+
+artifactcanvas 128251 artifact_ref 128123 // artif_fib
+  xyz 105 43 2000
+end
+end

@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1615242015 source:d:\projetos\coyote\jogosenha\main.cpp
+	<iostream>
+	<windows.h>
+

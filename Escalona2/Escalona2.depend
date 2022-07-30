@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1621623683 source:d:\projetos\coyote\escalona2\main.c
+	<stdio.h>
+	<conio.h>
+	<stdlib.h>
+	<math.h>
+	<process.h>
+

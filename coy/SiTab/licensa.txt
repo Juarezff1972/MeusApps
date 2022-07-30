@@ -1,0 +1,6 @@
+Este software é de propriedade de Juarez Fioravanti Filho e 
+de Gustavo Henrique Busnardo, desenvolvido e apresentado para 
+o Projeto Final do curso de Bacharelado em Ciência da Computação, da
+Pontifícia Universidade Católica do Paraná, no dia 19/12/1997, às
+12h00m.
+

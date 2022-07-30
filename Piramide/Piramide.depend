@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1622249486 source:d:\projetos\coyote\piramide\main.cpp
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<graphics.h>
+	"conio.h"
+	"math.h"
+

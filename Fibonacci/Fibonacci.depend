@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1606839218 source:d:\projetos\coyote\fibonacci\resource.rc
+	<windows.h>
+	<commctrl.h>
+	<richedit.h>
+	"resource.h"
+
+1606839218 d:\projetos\coyote\fibonacci\resource.h
+
+1606858487 source:d:\projetos\coyote\fibonacci\main.cpp
+	<tchar.h>
+	<windows.h>
+	<commctrl.h>
+	<iostream>
+	<cstdio>
+	<assert.h>
+	<gdiplus.h>
+	"resource.h"
+	"calcfib.h"
+
+1606788820 source:d:\projetos\coyote\fibonacci\src\fibgen.cpp
+	"FibGen.h"
+
+1606788820 d:\projetos\coyote\fibonacci\include\fibgen.h
+
+1606857538 source:d:\projetos\coyote\fibonacci\calcfib.cpp
+	"calcfib.h"
+
+1606857476 d:\projetos\coyote\fibonacci\calcfib.h
+

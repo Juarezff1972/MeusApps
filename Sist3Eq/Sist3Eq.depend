@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1621909720 source:d:\projetos\coyote\sist3eq\main.c
+	<stdio.h>
+	<stdlib.h>
+

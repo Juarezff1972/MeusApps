@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1626205670 source:d:\projetos\coyote\stars\main.cpp
+	<iostream>
+	<process.h>
+	<graphics.h>
+	<conio.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<math.h>
+	<malloc.h>
+

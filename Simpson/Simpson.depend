@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1621628675 source:d:\projetos\coyote\simpson\main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+

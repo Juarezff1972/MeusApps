@@ -1,0 +1,38 @@
+# depslib dependency file v1.0
+1614810186 source:d:\projetos\coyote\sortingexperiments\array_of_doubles,c.c
+	"array_of_doubles.h"
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	<assert.h>
+
+1614819691 d:\projetos\coyote\sortingexperiments\array_of_doubles.h
+	<stdbool.h>
+
+1614858002 source:d:\projetos\coyote\sortingexperiments\sorting_algorithms.c
+	"sorting_algorithms.h"
+	<stdlib.h>
+	<assert.h>
+	"array_of_doubles.h"
+
+1614819690 d:\projetos\coyote\sortingexperiments\sorting_algorithms.h
+	<stdbool.h>
+
+1614858002 source:d:\projetos\coyote\sortingexperiments\array_of_doubles.c
+	"array_of_doubles.h"
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	<assert.h>
+
+1614858002 source:d:\projetos\coyote\sortingexperiments\main.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	<math.h>
+	<assert.h>
+	"array_of_doubles.h"
+	"sorting_algorithms.h"
+

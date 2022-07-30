@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1621942440 source:d:\projetos\coyote\lematesp\main.c
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<process.h>
+

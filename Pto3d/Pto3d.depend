@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1624379861 source:d:\projetos\coyote\pto3d\main.cpp
+	<iostream>
+	<graphics.h>
+	<math.h>
+

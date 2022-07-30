@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1622082260 source:d:\projetos\coyote\fibonacci2\sequence_of_longs.c
+	"sequence_of_longs.h"
+	<stdio.h>
+	<stdlib.h>
+
+1622082260 d:\projetos\coyote\fibonacci2\sequence_of_longs.h
+

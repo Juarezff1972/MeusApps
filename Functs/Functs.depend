@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1624373513 source:d:\projetos\coyote\functs\main.cpp
+	<iostream>
+	<graphics.h>
+	<math.h>
+	<malloc.h>
+

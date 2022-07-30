@@ -1,0 +1,16 @@
+window_sizes 1920 1027 450 1465 877 104
+
+diagrams
+  active  classdiagram_ref 128123 // fib
+    1345 766 100 A4 0 0
+  deploymentdiagram_ref 134651 // fib_diag
+    1172 701 100 A4 0 0
+end
+show_stereotypes
+selected operation_ref 128123 // getValor
+open
+  class_ref 128123 // calcfib
+  deploymentview_ref 128123 // fib01
+end
+end
+verbose

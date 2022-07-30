@@ -1,0 +1,18 @@
+# depslib dependency file v1.0
+1628275852 source:d:\projetos\coyote\matrix1\main.cpp
+	<iostream>
+	<stdlib.h>
+	<conio.h>
+	<time.h>
+	<string.h>
+	<math.h>
+	<ctype.h>
+	<stdio.h>
+	<conio.h>
+	<malloc.h>
+	<process.h>
+	<errno.h>
+	<windows.h>
+	<direct.h>
+	<io.h>
+

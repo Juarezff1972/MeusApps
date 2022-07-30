@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1622748721 source:d:\projetos\coyote\testegetcharat\main.cpp
+	<iostream>
+	<windows.h>
+	<conio.h>
+	<stdio.h>
+	<unistd.h>
+

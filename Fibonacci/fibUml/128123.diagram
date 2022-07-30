@@ -1,0 +1,12 @@
+format 223
+
+classcanvas 128635 class_ref 128123 // calcfib
+  classdiagramsettings hide_attributes no hide_operations no hide_getset_operations no show_members_full_definition yes show_members_visibility yes show_members_initialization yes show_attribute_modifiers yes member_max_width 0 show_parameter_dir yes show_parameter_name yes end
+  visible_operations
+    operation_ref 128123 // getValor
+    operation_ref 128251 // setValor
+    operation_ref 128379 // calcula
+    operation_ref 128507 // calcfib
+  xyz 525 172 2000
+end
+end

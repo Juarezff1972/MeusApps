@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1621620468 source:d:\projetos\coyote\escalonamentopivoteamento\main.c
+	<math.h>
+	<stdio.h>
+	<conio.h>
+	<stdlib.h>
+	<process.h>
+

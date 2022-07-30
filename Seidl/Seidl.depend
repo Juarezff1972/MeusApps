@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1621629203 source:d:\projetos\coyote\seidl\main.c
+	<stdio.h>
+	<process.h>
+	<math.h>
+	<conio.h>
+
