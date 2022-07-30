@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1621957162 source:d:\projetos\coyote\ajuste\main.c
+	<string.h>
+	<math.h>
+	<ctype.h>
+	<stdio.h>
+	<conio.h>
+	<stdlib.h>
+	<malloc.h>
+	<process.h>
+	<errno.h>
+	<conio.h>
+	<windows.h>
+	<direct.h>
+	<io.h>
+
