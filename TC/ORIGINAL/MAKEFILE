@@ -1,0 +1,26 @@
+#
+# Makefile for Soundblaster DAC sample programs
+# Comments to cejjb@marlin.jcu.edu.au (Jeff Bird)
+#
+
+CC=bcc
+
+.c.obj:
+	$(CC) -v -ml -c $<
+
+.asm.obj:
+	tasm /zi /ml /l $<
+
+all: dacdma.exe dacdir.exe driver.exe getvol.exe
+
+dacdma.exe: dacdma.obj sbp.obj
+	$(CC) -v -ml dacdma.obj sbp.obj
+
+dacdir.exe: dacdir.obj sbp.obj
+	$(CC) -v -ml dacdir.obj sbp.obj
+
+driver.exe: driver.obj
+	$(CC) -v -ml driver.obj
+
+getvol.exe: getvol.obj
+	$(CC) -v -ml getvol.obj
