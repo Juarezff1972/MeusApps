@@ -17,50 +17,58 @@ float d=1200.0;                          /* Fator de perspectiva angular */
 double r1=0;                                     /* Angulo X em radianos */
 double r2=0;                                     /* Angulo Y em radianos */
 double r3=0;                                     /* Angulo Z em radianos */
-double sr1=0.0,sr2=0.0,sr3=0.0;               /* Fatores de rotacao Seno */
-double cr1=0.0,cr2=0.0,cr3=0.0;            /* Fatores de rotacao Cosseno */
-float mx=0.0,my=0.0,mz=-350.0;                /* Posicao de visualizacao */
-int maxx=638,minx=1,maxy=198,miny=1;     /* Limitacao da area de desenho */
-float screen_x=639,screen_y=199;                    /* Dimensoes da tela */
+double sr1=0.0, sr2=0.0, sr3=0.0;             /* Fatores de rotacao Seno */
+double cr1=0.0, cr2=0.0, cr3=0.0;          /* Fatores de rotacao Cosseno */
+float mx=0.0, my=0.0, mz=-350.0;              /* Posicao de visualizacao */
+int maxx=638, minx=1, maxy=198, miny=1;  /* Limitacao da area de desenho */
+float screen_x=639, screen_y=199;                   /* Dimensoes da tela */
 float c=0.0;                             /* Usada na rotina de limitacao */
-float rx=0.0,ry=0.0; /* Valores de escala usados na rotina de mapeamento */
-int t1=0,t2=0;                                     /* Contadores de loop */
+float rx=0.0, ry=0.0; /* Valores de escala usados na rotina de mapeamento */
+int t1=0, t2=0;                                    /* Contadores de loop */
 int p1=0;                                            /* Indice de matriz */
 /*************************************************************************/
 /*  Banco de dados das coordenadas  cartesianas globais xyz para o cubo  */
 
-int array1[][3]={
-30,-30,30,    30,-30,30,    30,30,30,     30,-30,30,    30,-30,-30,
-30,30,-30,    30,-30,-30,  -30,-30,-30,   -30,30,-30,  -30,-30,-30,
--30,-30,30,  -30,30,30,    -30,-30,30,    30,-30,30,    30,30,30,
-30,30,-30,   -30,30,-30,   -30,30,30,     30,30,30,     30,30,-30,
--30,30,-30,   30,-30,-30,   30,30,-30,   -30,-30,-30,  -30,-30,30,
-30,-30,-30,   30,30,30,     30,30,-30,   -30,30,-30,   -30,30,30
+int array1[][3]=
+{
+    30, -30, 30,    30, -30, 30,    30, 30, 30,     30, -30, 30,    30, -30, -30,
+    30, 30, -30,    30, -30, -30,  -30, -30, -30,   -30, 30, -30,  -30, -30, -30,
+    -30, -30, 30,  -30, 30, 30,    -30, -30, 30,    30, -30, 30,    30, 30, 30,
+    30, 30, -30,   -30, 30, -30,   -30, 30, 30,     30, 30, 30,     30, 30, -30,
+    -30, 30, -30,   30, -30, -30,   30, 30, -30,   -30, -30, -30,  -30, -30, 30,
+    30, -30, -30,   30, 30, 30,     30, 30, -30,   -30, 30, -30,   -30, 30, 30
 };
 /*************************************************************************/
 /*            Declaracao das variaveis auxiliares                        */
 
-int c0=0,c1=1,c2=2,c3=3,c4=4,c5=5,c6=6,c7=7,c8=8,c9=9,c10=10,
-    c11=11,c12=12,c13=13,c14=14,c15=15;
-float sx1,sy1,sx2,sy2;
-float x_res,y_res;
+int c0=0, c1=1, c2=2, c3=3, c4=4, c5=5, c6=6, c7=7, c8=8, c9=9, c10=10,
+    c11=11, c12=12, c13=13, c14=14, c15=15;
+float sx1, sy1, sx2, sy2;
+float x_res, y_res;
 int cor;
 char ch;
-float rotacaoX=0.0,rotacaoY=0.0,vira=0.0,moveX=0.0,moveY=0.0,moveZ=0.0;
+float rotacaoX=0.0, rotacaoY=0.0, vira=0.0, moveX=0.0, moveY=0.0, moveZ=0.0;
 const pi=3.1415926535897932384654;
 /*************************************************************************/
 /* Declaracao das subrotinas globais                                     */
 
-void quit_pgm(void);void calc_3d(void);
-void rotation(void);void windows(void); void viewport(void);
-void graphics_setup(void);void coords(void);char get_key(void);
+void quit_pgm(void);
+void calc_3d(void);
+void rotation(void);
+void windows(void);
+void viewport(void);
+void graphics_setup(void);
+void coords(void);
+char get_key(void);
 /*************************************************************************/
 /* Le tecla pressionada                                                  */
 
 char get_key(void)
 {
-	union REGS regs; regs.h.ah=0;int86(0x16,&regs,&regs);
-	return regs.h.al;
+    union REGS regs;
+    regs.h.ah=0;
+    int86(0x16, &regs, &regs);
+    return regs.h.al;
 }
 /*************************************************************************/
 /* Bloco principal                                                       */
