@@ -1,0 +1,126 @@
+CD Player is an audio CD player for DOS
+    Version:  2.25e
+     Author:  Ben Lunt (Forever Young Software(R))
+       Date:  29 April 1997
+
+Type CDPlayer at the DOS prompt:
+   CDPlayer [/D:n] [/S] <ENTER>
+
+ - All parameters (in brackets) are optional:
+     /D:n  where n = drive (2 = C:, 3 = D:, 4 = E:, etc)
+     /S    start CD but don't start GUI
+ - <ENTER> is the enter key.
+         
+
+ CDPlayer assumes that drive D: is your cd drive
+    (you can change it by giving a parameter at the DOS prompt (see above))
+ CDPlayer assumes that MSCDEX or a compatible driver
+    is already installed and activated.
+    (use autoexec.bat and config.sys)
+ CDPlayer assumes that you have a Microsoft compatible Mouse
+    installed and functioning normaly.
+
+
+You can use the following keys to use CDPlayer or just use the MOUSE:
+  Press <P> to Play.
+  Press <a> to Pause (Press P to resume).
+  Press <S> for Stop.
+  Press <n> for Next track.
+  Press <f> for 'forward' track.
+  Press <p> for Previos track.
+  Press <r> for 'rewind' track.
+  Press <X> to Exit (without stoping).
+  Press <ESC> to Stop and Exit.
+  Press <E> to Eject Disk.
+  Press <C> to Close the tray.
+
+Version History:
+-----------------------------------
+CDPlayer    v1.03    released on 04/13/97      (a.k.a  CDP)
+    This was the DOS command line version (No GUI)
+    This version was released with the assembly code
+
+CDPlayer    v2.00    released on 05/26/97  (beta version)
+    This version had a Graphic User Interface (GUI), which includes
+      mouse support.
+    This version also allowed you to pick-up where you left off without
+      reseting the Player.  (prevoius version did not)
+    This version was not quite finished.  It doesn't allow command-line
+      parameters yet.  It also doesn't have the two skip-forward and
+      skip-backward buttons working correctly.  (both due to be in next
+      version which is coming out soon)
+
+CDPlayer    v2.02e   released on 05/27/97
+    Notice the 'e' on the version number.  I added a small 'easter egg'
+      in the program.  Can you find it?  Let me know and you will have
+      credit for it on my web page.
+    Added the command line parameters.
+      /D:n - n=2-9 where 2 = C:, 3 = D:, etc.  (n = 3 is default)
+      /S  starts the CD on the first track and then exits to DOS (no GUI)
+         (see above for more)
+    As v2.00, this version is not quite finished.  It doesn't have the two
+      skip-forward and skip-backward buttons working correctly.
+      (due to be in next version which is coming out soon)
+
+CDPlayer    v2.12e   released on 04/28/97
+    -Final Beta version-
+    Now has the two skip-forward and skip-backward buttons working correctly.
+    Probably will add Continous Play (continue with 1st track when done with
+      last track) in next version.
+
+CDPlayer    v2.14e   released on 04/28/97
+    Fixed the bug where if hit << or >> key will not playing.
+    Also fixed the two << >> buttons so they skip more prec.ly.
+
+CDPlayer    v2.15e   released on 04/29/97
+    Reset to first track when hit STOP
+
+CDPlayer    v2.25e   released on 05/11/97
+    Revamped error checking.  Much better error checking was installed.
+     
+
+Description:
+  CD Player v2.x is an audio CD player for DOS.
+  You may run CDPlayer in a Windoze 95 DOS session.
+  Please Note:  If you insert a disk in the drive and the 'insert CD
+notification' tag is check in the Control Panel-Multimeadia window then
+Windoze 95 will start the Windoze CD player associated to the audio CD.
+
+Errors Returned:
+   Error:
+    No Mouse            - There is not a mouse installed
+    Device error        - This means that the drive was not closed, or that
+                            drive is not an audio CD compatible drive
+    Device busy         - Another program is using the CD drive
+IOCTL_OUT returned busy - Another program is using the CD drive
+  SEEK returned error # - See below for numbers returned
+     SEEK returned busy - Another program is using the CD drive
+  PLAY returned error # - See below for numbers returned
+     PLAY returned busy - Another program is using the CD drive
+  Returned error number - See below for numbers returned
+
+Returned error numbers:
+  0  Write-protect violation
+  1  Unknown unit
+  2  Drive not ready
+  3  Unknown command
+  4  CRC error
+  5  Bad drive request structure length
+  6  Seek error
+  7  Unknown media
+  8  Sector not found
+ 10  Write fault
+ 11  Read fault
+ 12  General failure
+ 15  Invalid disk change
+
+
+This program is shareware.  You may use this program as you wish, but PLEASE
+leave me the credit if you distribute it anywhere.  Also, (for my own
+protection), if this program, in any way, does bad things to your machine,
+I am not responsable.
+
+  e-mail:  blunt@zekes.com
+ webpage:  http://www.zekes.com/~blunt/index.html
+
+     Forever Young Software(R) (C)1984 - 1998     All rights reserved

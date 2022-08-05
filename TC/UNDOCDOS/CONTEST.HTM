@@ -1,0 +1,216 @@
+<HTML>
+<HEAD>
+<TITLE>Current Contest</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<H2>Current Contest</H2>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+(Please Note:  There is no "prize" for the winner.  Only the glory of being the winner, while having
+your name as the winner next to the <i>previous contests</i> list.)<br>
+Last Updated:  <b>18 Jan 1999</b><br>
+<i>Current contest will end around <strike>Jan 15th</strike>.</i> <b>Until I think of another one</b><br>
+<hr color="#BBBBBB" size="3">
+
+<!-- ********** Current Assembler Contest ************* -->
+The current contest, <i>attrib</i>, is very similar to the DOS utility of the same name.  You write a program that will 'switch' the attributes of a file for the attribute(s) specified.<br>
+Here are the rules:<br>
+<br>
+<b>The Objective:</b><br>
+To get the smallest executable file obeying all of the rules below.<br>
+<br>
+<b>The Rules:</b>
+<ol>
+<li TYPE="i">
+You can assume the screen will be in text mode 03h.  (though not applicable here)</li><br>
+<li>Your program will assume the following will be on the command line:<br>
+<b>filename.ext ar</b><br>
+Where the <b>a</b> and the <b>r</b> specify to 'switch' the archive and/or readonly attributes.  There can be any kind of combination of these two and can be more than one of the same letter on the command line.<br>
+For instance, if there is an even amount of <b>r</b>'s on the command line, the readonly attribute must be unchanged.  Same with the <b>a</b> for archive.  However, if there is an odd amount of a letter on the command line, this attribute must switch from on to off or off to on.<br></li>
+<li>Note: If there is not an <b>a</b> on the command line, the archive attribute must be unchanged.  Same for the <b>r</b> (readonly) attribute.</li>
+<li>You can assume there will be at least one letter (either 'a' or 'r') on the command line. (all lowercase letters)</li>
+<li>The filename will be before the <b>a</b> or the <b>r</b> and there will be only one space between the filename and the first letter.  However there will be no spaces between the letters.<br></li>
+<li>Your code can not crash the computer in any way.  It must start and exit leaving the system "stable".</li><br>
+<li>You can assume that the command line will be entered correctly.</li>
+</ol>
+<br>
+<br>
+<b>The Rules For Your Submission:</b><br>
+You must include all source(s) and the executable with your submission.<br>
+<ol>
+<li TYPE="i">If your email software does not have an attachment utility, include your code at the bottom of your email message (do not attached executable in this way).</li><br>
+<li>You must include comments at the top of your code in the following format:  (variants are OK)<br>
+ &nbsp; &nbsp; NAME:  <i>your name or alias.  <b>If no name is given here, I use up to 8 chars of your first or last name</b>. </i><br>
+ &nbsp; &nbsp; WEB PAGE:  <i>If you have a Web Page, include it here and I will include it with your entry below</i><br>
+ &nbsp; &nbsp; DATE:  <i>the date submitted</i><br>
+ &nbsp; &nbsp; ASSEMBLER:  <i>the "brand" and version of the assembler</i><br>
+ &nbsp; &nbsp; SPECIAL NOTES:  <i>any special notes on how to assemble or execute your submission</i><br>
+ &nbsp; &nbsp; YOUR CODE starts here.</li><br>
+<li>Your code must be for DOS 5.0 or before, on an INTeL based CPU and can use any advantages/commands/services (following the rules above) up to and including the 80386.  You can <b>NOT</b> use any instructions/services of the 80486 and higher.</li><br>
+<li>You must include comments with your code.  If you do something "unreal", comment it.  Don't assume anything.  You must verify (with comments) everything "unreal" you do.</li><br>
+</ol>
+<br><br>
+<b>Notes/FAQs:</b><br>
+Feel free to ask any questions pertaining to the contest.<br>
+<pre><font size=2>The following can be assumed:  (ask for others)
+ax ........................... 0000h
+bx ........................... 0000h
+cx ........................... 00ffh
+dx ........................... == cs
+di ........................... fffeh
+si ........................... 0100h
+ip ........................... 0100h
+ds ........................... == cs
+es ........................... == cs
+ss ........................... == cs
+sp ........................... fffeh
+direction flag ............... 0
+PSP[00]....................... CD20h
+[SP].......................... 00h
+</font></pre>
+<br><br>
+<hr width="75%">
+Send your entry/comment <A HREF="MAILTO:blunt@zekes.com?subject=Current Assembler contest">here</A><br>
+<br>
+<b>Current submissions:</b><br>
+("attrib")<br>
+</font>
+<font size=2 face="">
+<table border width="85%" bgcolor="white" cols=4>
+  <tr>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>rank</td>
+    <td align=center bgcolor="#BBBBBB" width="30%"><b>name</td>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>size (bytes)</td>
+    <td align=center bgcolor="#BBBBBB" width="50%"><b>web page address</td>
+  <tr>
+    <td align=center>1</td>
+    <td>Olsson</td>
+    <td align=right>32</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=center>1</td>
+    <td>Ruud Gessel</td>
+    <td align=right>32</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=center>3</td>
+    <td>Flynn</td>
+    <td align=right>43</td>
+    <td align=right><a HREF="http://www.ctv.es/USERS/guino/contests.htm"> http://www.ctv.es/USERS/guino/contests.htm</a></td>
+</table>
+</font>
+<br>
+<br>
+<br>
+<hr color="#BBBBBB" size="3">
+<b>Previous Contest Winners</b><br>
+("Week Day")<br>
+<font face="">
+<table border width="85%" bgcolor="white" cols=4>
+  <tr>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>rank</td>
+    <td align=center bgcolor="#BBBBBB" width="30%"><b>name</td>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>size (bytes)</td>
+    <td align=center bgcolor="#BBBBBB" width="50%"><b>web page address</td>
+  <tr>
+    <td align=center>1</td>
+    <td>Ioura</td>
+    <td align=right>79</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=center>2</td>
+    <td>Riksa</td>
+    <td align=right>80</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=center>3</td>
+    <td>Olsson</td>
+    <td align=right>96</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=center>4</td>
+    <td>Flynn</td>
+    <td align=right>97</td>
+    <td align=right><a HREF="http://www.ctv.es/USERS/guino/contests.htm"> http://www.ctv.es/USERS/guino/contests.htm</a></td>
+</table>
+</font>
+<hr width="75%">
+("Fading Colors")<br>
+<font face="">
+<table border width="85%" bgcolor="white" cols=4>
+  <tr>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>rank</td>
+    <td align=center bgcolor="#BBBBBB" width="30%"><b>name</td>
+    <td align=center bgcolor="#BBBBBB" width="10%"><b>size (bytes)</td>
+    <td align=center bgcolor="#BBBBBB" width="50%"><b>web page address</td>
+  <tr>
+    <td align=right>1</td>
+    <td>Olsson</td>
+    <td align=right>79</td>
+    <td align=right>Unknown</td>
+  <tr>
+    <td align=right>2</td>
+    <td>Iustus</td>
+    <td align=right>82</td>
+    <td align=right><a HREF="http://lyseolukio2.kajaani.fi/~tanelir">http://lyseolukio2.kajaani.fi/~tanelir</a></td>
+  <tr>
+    <td align=right>3</td>
+    <td>Flynn</td>
+    <td align=right>92</td>
+    <td align=right><a HREF="http://www.ctv.es/USERS/guino/contests.htm"> http://www.ctv.es/USERS/guino/contests.htm</a></td>
+  <tr>
+    <td align=right>4</td>
+    <td>RayMan</td>
+    <td align=right>106</td>
+    <td align=right>Unknown</td>
+  </tr>
+</table>
+</font>
+<br>
+<br>
+For another great assembler contest, check out 
+<a HREF="http://www.geocities.com/SiliconValley/Bay/6062/compo.htm">Hugi Size Coding Compo</a>.  About once a month there is a new assembler size coding compo here.  The first compo had ranks from 1 to 71 where most of those where ties.  It is great compo'en and is updated 'daily' so that you can see where you are ranked.  You can always send in your updated entry.<br>
+<br>
+And more great assembler contests, check out 
+<a HREF="http://www.ctv.es/USERS/guino/contests.htm"> http://www.ctv.es/USERS/guino/contests.htm</a>
+who is also the webring master of:<br>
+<br>
+
+<center>
+<font face="">
+<br>
+<table border width="50%" bgcolor="white" cols=3>
+  <tr>
+    <td align=center colspan=3>
+      <font face="Comic Sans MS" color="purple">
+        The assembler programming contest ring
+      </font>
+    </td>
+  <tr>
+    <td align=center>
+       <a href="http://www.webring.org/cgi-bin/webring?ring=asm_contests;list">Ring sites list</a></td>
+    <td align=center>
+       <a href="http://www.ctv.es/USERS/guino/contests/ringhome.htm">Ring homepage</a></td>
+    <td align=center>
+       <a href="http://www.webring.org/cgi-bin/webring?ring=asm_contests;addform">Add your site</a></td>
+  </tr>
+</table>
+<br>
+</font>
+</center>
+
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</td>
+</table>
+</BODY>
+</HTML>

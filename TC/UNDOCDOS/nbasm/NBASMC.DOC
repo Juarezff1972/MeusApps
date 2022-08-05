@@ -1,0 +1,37 @@
+This is the documentation for the NBASMC library (version 00.00.00)
+
+This library is for use with the NBasm assembler in the tiny model
+using the .external directive.
+
+For now, and for beta testing purposes, this library only contains
+5 routines.  prtdec, prthex, prtbin, prtoct, and prtstring.
+
+You call each of these with a parameter on the stack.
+
+For example:
+- if you want to print 1234d, you would (no negative numbers)
+
+           push 1234        or   mov  ax,1234
+           call prtdec           push ax
+                                 call prtdec
+
+(same for prthex, prtbin, and prtoct)
+
+- if you want to print 'hello world', you would
+
+           push offset msg1   or   mov  bx,offset msg1
+           call prtstring          push bx
+                                   call prtstring
+msg1  db  'Hello world',0
+
+
+Each routine cleans the stack on return.
+
+Please note that the 'prtstring' routine requires a null terminated string,
+or an asciiz string as we should call it.
+
+After a while of beta testing, I will release the full library NBASMC.LIB,
+along with complete documentation for each routine in the library.
+
+Thanks for your beta testing,
+Forever Young Software

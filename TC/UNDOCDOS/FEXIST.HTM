@@ -1,0 +1,265 @@
+<HTML>
+<HEAD>
+<TITLE>File Exist routine (with in-line assembly for basic)</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>File Exist</H1>
+<H2>A small example to show how to call an assembly routine in Quick Basic.  (assembly code included)</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+See <a href="#below">below</a> for an example on <i>in-line</i> assembly in basic.<br>
+<br>
+This file is distributed to show how to use assembly and
+QB together.  It is a simple file exist program.  The code
+starts with QB code, defines vars, calls assembly, returns
+and does some more code in QB according to what was in the
+return code.<br>
+<br>
+When you call an assembly routine through QB, you must tell the QB
+that there will be a standard function call.  It is the same as if you
+had a sub or a function in QB code.  All you do is declare the function
+and then link the compiled object code together.<br>
+<br>
+<form><TEXTAREA NAME="Src1" ROWS=13 COLS=100 WRAP=off>
+'Example  (QB45 code):
+
+DECLARE FUNCTION FExist% (FileName$)
+
+FileName$ = "Fexist.bas" + CHR$(0)
+IF NOT FExist%(FileName$) THEN
+  PRINT "You are missing the file: "; FileName$
+ELSE
+  PRINT "Found the file: "; FileName$
+END IF
+</textarea></form>
+<br>
+First we declared the function.  BE SURE TO DECLARE THE FUNCTION NAME AS
+INTEGER.  The percent sign (%) after the name works nicely.  Also, make
+sure that you declare the variable in the parameter list as string.<br>
+<br>
+Next we declared the vars.  Filename as a string (notice the $)<br>
+<br>
+Then we call the Function.  You should know that you have to call
+a function with an argument.  IF..THEN does just fine.   The name of
+the function is the var at this point.  It is also the RC (return code).
+The NOT command means: if not true (-1) then... (see your quick QB book
+for more info)  Notice that the parameter, Filename$, is an asciiZ
+string (ends with CHR$(0)).  For most interrupts using strings, the
+string must be an asciiZ string. (see below for more).<br>
+<br>
+We call the function and get an RC.  If the RC = -1 (true) then the file
+exists.  If the RC = 0 (false) then the file does not exist.  Print
+accordingly with the ELSE command of the IF..THEN..ELSE nest.<br>
+<br>
+The below code has comments for each line.  I will explain some of the major
+parts any way.<br>
+<br>
+The DOSSEG directive is used because I have had errors if it is not
+there.  It tells DOS to use standard DOS segment addressing.<br>
+<br>
+The MODEL medium, basic directive says to use medium model memory and
+make the code QB compatible.<br>
+<br>
+The 286 directive says to use 16 bit processes.  No 32 bit stuff needed
+here.<br>
+<br>
+The STACK directive says use this amount for the stack.  If there is no
+amount after the directive, then use the default stack size (1k).<br>
+<br>
+The DATA directive says to put the following data in the data segment.<br>
+<br>
+The CODE directive says to put the following code in the code segment.<br>
+<br>
+PUBLIC says to make the procedure public to external sources.<br>
+<br>
+FExist  PROC  far basic uses bp bx cx dx di, FILENAME:word<br>
+<br>
+FExist is the name.<br>
+PROC says start here with this proc.<br>
+far means far addressing<br>
+basic means code to QB compatible<br>
+uses means save these registers (save all used registers including bp)<br>
+FILENAME is a parameter as type word<br>
+<br>
+When saving registers, always save the bp (base pointer) register.  QB
+uses the bp register when accessing memory.  If you don't save it, QB most
+likely will lock up.<br>
+<br>
+Next, save the registers that you want saved on return to QB.  Don't
+save the ax (accumulative) register when using a function call.  If you do
+this then the return code will not be correct (see below for more info.).
+Also, don't save the dx (data) register if using a long integer function.<br>
+<br>
+Vars that where strings in QB are declared as a WORD in assembly.  When
+you send the parameter as a string, the WORD that gets sent is the offset
+of the strings' descriptor.  The string itself is not sent.  That is why
+a WORD is to be used to tell where the string is located in memory.
+(see next for QBs' string descriptors)<br>
+<br>
+QB saves strings in memory with a 4 byte descriptor at the first of the
+string.  The first WORD (2 bytes) in this descriptor is the length of the
+string.  The second WORD (2 bytes) is the offset in DS (data segment) that
+this string is located.  Keep in mind that this WORD points to the first
+char in the string, not the descriptor header.<br>
+<br>
+The return code is put into the ax register and then a ret command is
+executed.  When the program is back at the QB code, it takes the
+function as the RC.  If the function you defined is an integer, then
+the ax register is the RC only.  If you declare the function as a long
+integer then both the ax and dx registers are used.  dx as the high
+order word and ax as the low order word.<br>
+<br>
+<br>
+<form><TEXTAREA NAME="Src2" ROWS=15 COLS=100 WRAP=off>
+DOSSEG					; Use standard segment allocation
+.MODEL medium, basic			; Medium mod, and basic caller
+.286					;
+.STACK					; Default stack is OK (1k)
+.DATA					; DATA SEG
+					; If any data, it would go here.
+					; If you don't have any, leave
+					;   out the .DATA Segment Command
+.CODE					; CODE SEG
+Even					; align on even byte (word)
+		PUBLIC	FExist		; Make FExist public to QuickBasic
+FExist	PROC far basic uses bp bx cx dx di, FILENAME:word ; Save registers
+
+		mov	ah,19h		; Get current drive (Default)
+		int	21h		; Call interrupt
+		cmp	al,01h		;    00h = A:, 01h = B:
+		jle	NumOk		; If > 01h then
+		mov	al,80h		;    make it 80h
+NumOk:					; 00h = A:, 01h = B:
+		call	TestDiskD	; 80h = C: or first hard drive
+		or	al,al		; If RC = 0 then no error
+		jz	DiskOK		;
+		xor	ax,ax		; Disk is not ready?
+		jmp	short DONE1	; Return w/RC in ax
+DiskOK:	mov	bx,offset FILENAME 	; BX = start of FILENAMEs' descriptor
+		mov	dx,[bx+2]		; inc past length (WORD)
+		mov	ah,4Eh		; Find first matching directory entry
+		mov	cx,39		; All attributes
+		int	21h		; Call interrupt
+		or	ax,ax		; See if any found
+		jz	DONE		; RC = 0 then make RC -1 (true)
+		mov	ax,01h		; RC <> 0 then make RC 0 (false)
+DONE:		dec	ax		;
+DONE1:		ret			; R2QB
+FExist	ENDP				; End of Procedure
+
+Even					; align on even byte (word)
+TestDiskD  	PROC near uses bx cx dx	; Save registers
+
+		mov	dl,al		; Put AL in DL   00h = A:, 01h = B:
+					;                80h = C: or first hard drive
+		mov	ah,04h		; Verify Disk Sectors
+		mov	al,01h		; Amount to verify
+		mov	ch,01h		; High order cylinder number (8 bits)
+		mov	cl,01h		; Sector Number in bits 0-5
+		xor	dh,dh		;    remaining 6-7 bits are low order for CH
+		int	13h		; DH is the head number
+
+		xchg	al,ah		; RC
+		xor	ah,ah		; Clear out AH
+		ret			; R2 caller
+TestDiskD  	ENDP			; End of Procedure
+		END			; End of assembly code
+</textarea></form><br>
+<hr>
+<a name="below"></a>
+<H3>A small example to show how to have in-line assembly in Quick Basic.</H3>
+We can have in-line assembly in our Basic programs by defining the assembler code using DATA statements, copying this data to an array, and then CALL ABSOLUTE the array.<br>
+<br>
+Here is an example:<br>
+<form><TEXTAREA NAME="Src3" ROWS=15 COLS=100 WRAP=off>
+' load the QB.QLB at start up:
+'   QB INLINE.BAS /L
+
+DECLARE SUB ABSOLUTE (Par1 AS INTEGER, address AS INTEGER)
+
+CONST LenOfAsmCode = 24		' length of asm code
+
+Filename$ = "inline.bas" + CHR$(0)	' filename to check for
+
+' basic moves arrays around in memory, so lets allocate all vars
+'  before we allocate the array.  This way the array will stay put.
+X% = 0: P% = 0: I% = 0: J% = 0
+
+' An array of large enough to hold asm code
+DIM Fexist%(1 TO ((LenOfAsmCode / 2) + 1))
+
+P% = VARPTR(Fexist%(1))		' point to this array
+X% = SADD(Filename$)		' point to the address of the string holding filename
+DEF SEG = VARSEG(Fexist%(1))	' point DS to the array
+RESTORE Fexist			' start 'reading' DATA at our asm code section
+FOR I% = 0 TO LenOfAsmCode - 1	' and put it in the array a byte at a time
+  READ J%
+  POKE (P% + I%), J%
+NEXT I%
+CALL ABSOLUTE(X%, VARPTR(Fexist%(1)))  ' now call it
+DEF SEG                   ' restore DS
+
+SELECT CASE (X%)          ' X% is returned as RC
+  CASE 0
+    PRINT "File exists"
+  CASE &H12
+    PRINT "File does NOT exist"
+  CASE &H3
+    PRINT "Path not found"
+  CASE ELSE
+    PRINT "Error"
+END SELECT
+
+END
+
+' our asm code to check for file exist in current dir.
+'  on entry:
+'   X% = address of filename (asciiz)
+'  on return:
+'   X% = RC
+
+Fexist:
+DATA &H55		: '  PUSH BP		; let's set up our own BP
+DATA &H8B,&HEC		: '  MOV  BP,SP		; 
+DATA &H8B,&H5E,&H06	: '  MOV  BX,[BP+06]	; [bp+06] points to first param passed
+DATA &H8B,&H17		: '  MOV  DX,[BX]		; address of string passed
+DATA &HB4,&H4E		: '  MOV  AH,4Eh		; service (find first)
+DATA &HB9,&H39,&H00	: '  MOV  CX,0039h		; attribute
+DATA &HCD,&H21		: '  INT  21h		; do it
+DATA &H8B,&H5E,&H06	: '  MOV  BX,[BP+06]	; put RC = first param passed
+DATA &H89,&H07		: '  MOV  [BX],AX		;
+DATA &H5D		: '  POP  BP		; restore base pointer
+DATA &HCB,&H02,&H00	: '  RET  2		; Restore stack for 1 param passed
+</textarea></form><br>
+<br>
+Remember to load the 'QB.QLB' at start up:<br>
+ <i>QB INLINE.BAS /L</i><br>
+<br>
+To pass more than one parameter at a time, you can add then to the DELCARE statement before the address parameter (the last param)<br>
+ <i>DECLARE SUB ABSOLUTE (Par1 AS INTEGER, Par2 AS INTEGER, address AS INTEGER)</i><br>
+<br>
+In the in-line assembly, [bp+6] points to the first parameter (par1), [bp+8] points to the second parameter (par2), etc.<br>
+<br>
+Remember to clear the stack when returning from the in-line assembly for each parameter passed (not counting <i>address AS INTEGER</i>).<br>
+i.e.:  <i>RET 2</i> for one parameter, <i>RET 4</i> for two parameters, <i>RET 6</i> for three parameters, etc.<br>
+<br>
+Make sure the array is large enough to hold all the data (assembled code).
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

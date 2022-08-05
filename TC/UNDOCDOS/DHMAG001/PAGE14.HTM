@@ -1,0 +1,181 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 01, November 1998, Page 14</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page13.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="bcover.htm">Turn the page ---> </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Mixed-Language Programming</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+In <i>mixed language programming</i>, most of the time you would call an assembler routine from a high level language.  However you can still call Basic code from C or visa versa.  In this article, I will explain how to call assembler routines from Basic, C, and Pascal. If you would like to know how to call a high level language from another high level language, send us some mail.<br>
+<br>
+<b>Assembler from Basic, C, or Pascal</b>:<br>
+Basic and Pascal by default pushes the parameters on the stack in <i>forward</i> order.  i.e.: Pushes Parm1 then Parm2 then etc..  C, however, pushes then in <i>backward</i> order.  Parm4, Parm3, Parm2, and Parm1.<br>
+<br>
+Basic pushes a near address of size WORD (2 bytes) for each parameter.  C and Pascal push the value of each parameter.  Then each push the return address with Basic, Pascal, and C (in medium or larger) pushing a far address (4 bytes) and C (small) pushing a near address (2 bytes).  Finally, each push a copy of the BP register.<br>
+<br>
+Here is a stack frame after an assembler call is made for each high level language (Remember that the stack grows down for each push and up for each pop):<br>
+<table align=left border=0 width="90%" cols=3>
+ <tr>
+  <td align=center bgcolor="#bbbbbb" width="30%">Basic</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">C</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Pascal</td>
+ <tr>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 1 address <br> (BP + 8)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 2 address <br> (BP + 6)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 1 address <br> (BP + 8)</td>
+ <tr>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 2 address <br> (BP + 6)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 1 address <br> (BP + 4)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Arg 2 address <br> (BP + 6)</td>
+ <tr>
+  <td align=center bgcolor="#bbbbbb" width="30%">Return address <br> (BP + 4)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Return address <br> (BP + 2)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Return address <br> (BP + 4)</td>
+ <tr>
+  <td align=center bgcolor="#bbbbbb" width="30%">Saved BP <br> (BP + 0)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Saved BP <br> (BP + 0)</td>
+  <td align=center bgcolor="#bbbbbb" width="30%">Saved BP <br> (BP + 0)</td>
+</table>
+<br clear=left>
+<br>
+Basic uses the MEDIUM model, Pascal uses the LARGE model, and C uses whatever model the C source is using, when calling the assembler routine.<br>
+<br>
+<b>Basic</b>:<br>
+<pre>'The basic code
+DECLARE FUNCTION ProcName%
+        (parm1 as interger, parm2 as interger)
+
+RC% = ProcName%(parm1%, Parm2%)
+
+
+
+; the assembler code
+.MODEL Medium
+.CODE
+            PUBLIC  ProcName
+ProcName    PROC
+            push bp
+            mov  bp,sp
+            mov  bx,[bp+8] ; pushed near pointers.
+            mov  ax,[bx]   ; first parameter
+            mov  bx,[bp+6] ; 
+            mov  dx,[bx]   ; second parameter
+
+            .... do something with them
+
+       ; if a FUNCTION then Basic uses dx:ax as RC
+            pop  bp
+            ret  4         ; 4 = bytes used in params
+                           ; 2 parms of 2 bytes each
+ProcName    ENDP
+            END</pre>
+<br>
+
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+
+<b>C</b>:<br>
+<pre> /* The C code */
+extern int ProcName(int, int);
+
+main() {
+  printf("The RC = %i", ProcName(parm1,parm2));
+}
+
+
+; the assembler code
+.MODEL Small 
+.CODE
+            PUBLIC  ProcName
+ProcName    PROC
+            push bp
+            mov  bp,sp
+            mov  ax,[bp+4] ; first parameter
+            mov  dx,[bp+6] ; second parameter
+
+            .... do something with them
+
+            ; C uses dx:ax as RC
+            pop  bp
+            ret
+ProcName    ENDP
+            END</pre>
+<br>
+<b>Pascal</b>:<br>
+<pre> {Here is the Pascal code}
+program demo;
+function ProcName(parm1,parm2:integer):integer; extern;
+begin
+  writeln('The RC = ',ProcName(parm1,parm2));
+end.
+
+
+; the assembler code
+.MODEL Large
+.CODE
+            PUBLIC  ProcName
+ProcName    PROC
+            push bp
+            mov  bp,sp
+            mov  ax,[bp+8] ; first parameter
+            mov  dx,[bp+6] ; second parameter
+
+            .... do something with them
+
+            ; if a function then Pascal uses dx:ax as RC
+            pop  bp
+            ret  4
+ProcName    ENDP
+            END</pre>
+<br>
+If you have any questions, please let us know.
+<font color="blue">&#165;</font><br>
+<br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page13.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="bcover.htm">Turn the page ---> </a><br>
+<p align=right><font color="black" size=2>Page 14
+
+</BODY>
+</HTML>

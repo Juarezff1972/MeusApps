@@ -1,0 +1,118 @@
+<HTML>
+<HEAD>
+<TITLE>Programming Long File Names in DOS (and TRUE DOS)</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Long Filenames in DOS (and TRUE DOS)</H1>
+<H2>Use only in DOS 6.2 or better</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+*Description<br>
+These files are distributed to show how to use Long File names In DOS and True DOS<br>
+<br>
+<b>DOS Session</b> (only)<br>
+Make sure to use service 71A0h to make sure that the current system will allow  long file names.<br>
+ -If the system does not support long filenames, then AL will be zero on return<br>
+<br>
+NEVER uses these services on a system that does not support long file names.<br>
+<br>
+The AH register is 71h while the AL register contains the old DOS AH registers' setting.  All other registers have the same use.<br>
+<br>
+Use these services just like the older INT 21h services, but replace AH with 71h, and put in AL the old AH value.<br>
+<br>
+<font face="" size=3><pre>
+   service # (AX)		  Function name
+	710Dh			Reset Drive
+	7139h			Create Directory
+	713Ah			Remove Directory
+	713Bh			Set Current Directory
+	7141h			Delete File
+	7143h			Get/Set File Attrbs.
+	7147h			Get Current Directory
+	714Eh			Find First File
+	714Fh			Find Next File
+	7156h			Move or Rename File
+	7160h			Get Truename (get shortname)
+	716Ch			Extended Open/Create File
+	71A0h			Get Volume Info
+	71A1h			Find Close
+	71A6h			Get File Info
+	71A7h			Time Conversion
+	71A8h			Generate Short Name
+	71A9h			Server Create Open
+	71AAh			Create/Terminate SUBST
+</pre></font>
+See '<a href="http://www.amazon.com/exec/obidos/ASIN/0672306026/foreveryoungsoft">
+Programming Windows 95 Unleashed</a>' by SAMS publishing 
+and <a href="http://www.cs.cmu.edu/afs/cs.cmu.edu/user/ralf/pub/WWW/files">Ralf Browns Interrupt lists</a>
+for more info on long file names.<br>
+<br>
+Get an example program in C from <a href="longdemo.c">here</a> (3k)<br>
+Get an example program in Pascal from <a href="longdemo.pas">here</a> (3k)<br>
+<hr align=center width="75%">
+<b>How to get the short file name of a long file name:</b><br>
+<font face="" size=3><pre>
+; you must have a file named "thisisalongfilename.extension"
+; for this demo to work
+
+Assemble with <a href="newbasic.htm">NBASM 00.23.xx</a>
+
+.model tiny
+.code
+            push cs                     ; make sure es=ds=cs
+            push cs
+            pop  ds
+            pop  es
+            mov  ax,714Eh
+            mov  dx,offset FileName
+            mov  di,offset FDRec
+            xor  cx,cx
+            mov  si,01h
+            int  21h
+
+            mov  si,offset ShortName
+PLoop1:     lodsb
+            or   al,al
+            jz   short PLoopD
+            int  29h
+            jmp  short PLoop1
+PLoopD:     ret
+
+FileName    db  'thisisalongfilename.extension',0
+FDRec       dw  00h,00h          ; File attribs
+FileCrt     dw  00h,00h,00h,00h  ; File Creation date
+LastAcc     dw  00h,00h,00h,00h  ; Last Access
+LastMod     dw  00h,00h,00h,00h  ; Last Modified
+FileSizeH   dw  00h,00h          ; File Size Hi
+FileSizeL   dw  00h,00h          ; File Size Lo
+            dup 8,0              ; reserved
+FullName    dup 260,0            ; Full Long name
+ShortName   dup 14,0             ; Short name
+
+.end
+</pre></font>
+<hr>
+<b>True DOS</b><br>
+View long filenames <b>without Windoze 95</b>.  The included C souce code, written by the people from <i>PC Magazine</i>, shows how to view long filenames in True DOS mode.  Not a Windoze 95 DOS session.<br>
+<br>
+I found it on the <i>ZD-NET</i> web site, cleaned it up, ported it to MS Quick C 2.5 (Small model) and
+now am including it <a href="lfndir.zip">here</a> (22k) for your benefit.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

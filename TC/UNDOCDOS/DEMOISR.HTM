@@ -1,0 +1,232 @@
+<HTML>
+<HEAD>
+<TITLE>Creating your own Interrupt Handle in C.  Forever Young Software</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Creating your own Interrupt Handle in C</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+See <a href="#below">below</a> for a keyboard interrupt handler to allow more than one keystroke at a time.<br>
+<br>
+To do this, we must pick an Interrupt that is called quite often.  The "TIME KEEPER" interrupt (1CH) is called about 18.2 times a second, so let's use it?<br>
+<br>
+C will do all of the dirty work for us if we use the _interrupt keyword.<br>
+<br>
+All we have to do is declare it like a normal function/sub (notice the _interrupt _far keywords).<br>
+<font face="" size=3>
+<pre>
+void _interrupt _far Timer(void)
+{
+
+// your code goes here.
+// see notes below
+
+} // end Timer
+</pre>
+</font>
+<br>
+NOTE:  Inside this interrupt call we must be very careful on what we do.  We can not call major interrupts or procedures.  The simpler the better.<br>
+<br>
+Now that we have our ISR written, we need to install it.  We must install it and still allow DOS to run the original interrupt.   (If DOS doesn't allow INT 1Ch to run, you will mess up allot of things....)<br>
+<br>
+To install it:<br>
+<font face="" size=3>
+<pre>
+void (_interrupt _far old_isr) ();   // Function pointer to save old ISR
+
+old_isr = _dos_getvect(0x1C);  // Save old timekeeper ISR
+
+_dos_setvect(0x1C,Timer);   // Install our new ISR
+</pre>
+</font>
+<br>
+That's it.  Once you are done with your program, on exit you must uninstall it.<br>
+<font face="" size=3>
+<pre>
+_dos_setvect(0x1C, old_isr);
+</pre>
+</font>
+<br>
+I got this info from "Tricks of the Game Programming Gurus".  This is not a plug, but you should get this book.  It has complete source on how to create a communications link for online gaming using this procedure.<br>
+<br>
+<br>
+The following code, when ran, will noticeably do nothing.  But press the left ALT key and notice a smiley face appear in the top left corner of the screen.  Release the key and it will restore the original character.  Quite simple, but it gets the point across.<br>
+<br>
+<font face="" size=3>
+<pre>
+/***************************************************************************************
+   This is a demo ISR to show how to create an ISR in C using the
+   _interrupt keyword. */
+
+#include "dos.h"
+
+// pointer to shift status
+#define ISLEFTALT   (*(unsigned char _far *)0x00400018)
+// pointer to screen memory pos 0,0
+#define OURSCRNPOS  (*(unsigned char _far *)0xB8000000)
+
+char orgchar;    // orig. char
+
+void (_interrupt _far *old_isr)();   // holds old interrupt handler
+
+void _interrupt _far Timer()
+{
+
+  if ((ISLEFTALT & 0x02) != 0)
+    OURSCRNPOS = 0x01;   // smiley face
+	else
+    OURSCRNPOS = orgchar;  // orig. char
+
+}
+
+void main(void)
+{
+  printf("\nPress the ESC key to exit"
+	       "\nPress the Left ALT key");
+  orgchar = OURSCRNPOS;                // get the current char
+
+  old_isr = _dos_getvect(0x1C);        // install our ISR
+  _dos_setvect(0x1C, Timer);           // Put our ISR in 0x1C
+
+  while (getch() != 0x1B); {}          // wait for user to hit a key
+
+  _dos_setvect(0x1C, old_isr);         // replace old ISR
+
+  exit(0);
+}
+</pre>
+</font>
+<br>
+<hr>
+<a name="below"></a>
+<br>
+<h3>Keyboard ISR demo</h3>
+This handler example shows how to check for more than one keystroke at a time.  For example; Have you ever wanted to check for two arrow keys pressed at the same time and only get the first one pressed?  This example will show you how to test and use more than one arrow key at a time.<br>
+<font face="" size=3>
+<pre>
+/***************************************************************************************
+   This is a demo ISR to show how to use more than one keystroke
+   at a time. 
+   
+   Press ESC key to exit demo .EXE
+
+   I have added some code to slow it down for fast machines.  If this code is to slow,
+     change the value of SDAMOUNT to a smaller value.  (I ran this on a Pentium 133mhz)
+
+*/
+
+#include "dos.h"
+#include "graph.h"
+
+#define SDAMOUNT        0x2FFFF       // Slow down amount
+#define COLOR           0x05          // color for dot
+
+#define KEYBOARD_INT    0x09
+#define KEY_BUFFER      0x60
+#define KEY_CONTROL     0x61
+#define INT_CONTROL     0x20
+
+#define MAKE_RIGHT      77   // make and break codes for the arrow keys
+#define MAKE_LEFT       75   //
+#define MAKE_UP         72   //
+#define MAKE_DOWN       80   //
+#define BREAK_RIGHT     205  //
+#define BREAK_LEFT      203  //
+#define BREAK_UP        200  //
+#define BREAK_DOWN      208  //
+
+#define INDEX_UP        0    // indices into arrow key state table
+#define INDEX_DOWN      1    //
+#define INDEX_RIGHT     2    //
+#define INDEX_LEFT      3    //
+
+void (_interrupt _far *Old_Isr)();   // holds old interrupt handler
+unsigned char far *video_buffer = (char far *)0xA0000000L; // vram byte ptr
+int raw_key;                         // the global raw keyboard data
+int key_table[4] = {0,0,0,0};        // the arrow key state table
+
+void _interrupt _far New_Key_Int()
+{
+  _asm {
+    sti                     ; re-enable interrupts
+    in   al,KEY_BUFFER      ; get the key that was pressed
+    xor  ah,ah              ; zero out upper 8 bits of AX
+    mov  raw_key,ax         ; store the key in global
+    in   al,KEY_CONTROL     ; set the control register
+    or   al,82h             ; set the proper bits to reset the FF
+    out  KEY_CONTROL,al     ; send the new data back to the control register
+    and  al,7Fh
+    out  KEY_CONTROL,al     ; complete the reset
+    mov  al,20h
+    out  INT_CONTROL,al     ; re-enable interrupts
+  }
+
+  switch(raw_key)  {
+    case MAKE_UP: key_table[INDEX_UP] = 1;
+      break;
+    case MAKE_DOWN: key_table[INDEX_DOWN] = 1;
+      break;
+    case MAKE_RIGHT: key_table[INDEX_RIGHT] = 1;
+      break;
+    case MAKE_LEFT: key_table[INDEX_LEFT] = 1;
+      break;
+    case BREAK_UP: key_table[INDEX_UP] = 0;
+      break;
+    case BREAK_DOWN: key_table[INDEX_DOWN] = 0;
+      break;
+    case BREAK_RIGHT: key_table[INDEX_RIGHT] = 0;
+      break;
+    case BREAK_LEFT: key_table[INDEX_LEFT] = 0;
+      break;
+    default:
+      break;
+  }
+}
+
+main()
+{
+  int x=160, y=100;
+  unsigned long slowdown = 0;           // slow down fast machines
+
+  _setvideomode(_MRES256COLOR);
+
+  Old_Isr = _dos_getvect(KEYBOARD_INT);     // install our ISR
+  _dos_setvect(KEYBOARD_INT, New_Key_Int);
+
+  while(raw_key != 1) {              // if raw_key = 1 then ESC key (done)
+    slowdown++;
+    if (slowdown > SDAMOUNT) {
+      slowdown = 0;
+      if (key_table[INDEX_RIGHT]) x++;
+      if (key_table[INDEX_LEFT]) x--;
+      if (key_table[INDEX_UP]) y--;
+      if (key_table[INDEX_DOWN]) y++;
+      video_buffer[((y<<8) + (y<<6)) + x] = COLOR;
+    }
+  }
+
+  _dos_setvect(KEYBOARD_INT, Old_Isr);   // replace old ISR
+  _setvideomode(_DEFAULTMODE);           // set to text mode
+}
+</pre>
+</font>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

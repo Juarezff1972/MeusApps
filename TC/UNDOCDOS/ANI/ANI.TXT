@@ -1,0 +1,31 @@
+ANI.EXE  is an animation expample in screen mode 13h
+     Author:  Ben Lunt (Forever Young Software(R))
+       Date:  24 Oct 1998
+  Assembler:  MASM 5.10
+
+Type ANI at the prompt
+
+ Note:  ANI assumes that you have a VGA
+ Also:  ANI assumes that all files need are in the current dir.
+
+** The background bitmap is from the following book.  It is a game
+**   programmers paradise.  I take no credit for drawing or editing the
+**   bitmap.  All rights reserved.
+**
+** Tricks of the Game Programming Gurus
+**  LaMothe, Ratcliff, Seminatore & Tylor
+**  SAMS Publishing
+
+This code is freeware.  You may use this code as you wish, but PLEASE
+leave me the credit if you distribute it anywhere.  Also, (for my own
+protection), if this code, in any way, does bad things to your machine,
+I am not responsable.
+
+PLEASE DO NOT PUT YOUR FIXED VERSION ON THE WEB.  E-MAIL ME WITH
+YOUR FIXED CODE AND LET ME PUT IT ON THE WEB IN ITS' ORIGONAL PLACE
+AND IN ITS' ENTIRETY.
+
+  e-mail:  blunt@zekes.com
+ webpage:  http://www.zekes.com/~blunt/index.html
+
+     Forever Young Software(R) (C)1984 - 1998     All rights reserved

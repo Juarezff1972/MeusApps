@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>Getting the command line contents</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Getting the command line contents</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The command line contents are located in the Program Segment Prefix (PSP) that DOS puts just below your program when it allocates memory for your program.  The PSP is 256 bytes in length and contains some information about your program and as talked about here, the <i>Command Line</i> parameters.<br>
+<br>
+When your program receives control, DS and ES point to the beginning of the PSP.  We will be using a different way to get the PSP address so we don't have to worry about remembering what is in DS (or ES).  We will use service 62h of INT 21h  (DOS 3.0 and later).  Example:<br>
+<br>
+mov  ah,62h<br>
+int  21h<br>
+<br>
+After calling service 62h, DOS returns the segment (paragraph) address of the PSP in BX.  We want to use what is at offset 80h and 81h - FFh.  Everything before this is either used by DOS or not used at all, namely the two FCB sections and the reserved section.<br>
+<br>
+The byte at offset BX:80h is the length of the command line including the first space and does NOT include the CR at the end.  The actual command line starts at offset BX:81h with is usually the space right after the program name.  Starting with DOS 2.0, the command line was stripped of all the redirection symbols (<, >, |, etc. if any).  Also, this method left no way for the program to find its' own name.<br>
+<br>
+NOTE:  DOS also uses this area for the default disk transfer area (DTA).  So if you use one of the DOS services that use a DTA without setting up a different DTA, DOS will wipe out the data at offset 80h and you can no longer find out what was in the command line.<br>
+<br>
+<i>If you have any more questions or comments, please e-mail me and I will see what I can do.<br></i>
+<br>
+<b>Just a hint</b>:  Rather than relying on the value at bx:80h for finding the end of the command line, just test to see if the char is the CR (enter key (0Dh)).  DOS will always put this char at the end of the line, because at the DOS prompt (except for extreme hacking) there is no other way to execute a command with out hitting the enter key at the end of the command line.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

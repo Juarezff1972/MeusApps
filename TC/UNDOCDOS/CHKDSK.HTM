@@ -1,0 +1,103 @@
+<HTML>
+<HEAD>
+<TITLE>A Check Disk routine</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Check Disk</H1>
+<H2>Checks a disk drive for ready (undocumented) returns error in DOS' ERRORLEVEL for use in batch files.<br>
+</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+This file is distributed to show how to check for disk ready
+using a verify-sector routine.  This technique is undocumented
+in most DOS programming books or manuals.<br>
+<br>
+*Programming description<br>
+Out of most all DOS interrupts, only READ, WRITE, and VERIFY
+DISK SECTORS or the only interrupt services that won't call DOS'
+Critical Error Handler.<br>
+<br>
+So we will take advantage of the VERIFY service.  All this
+service does is verifies the contents of one or more disk
+sectors.  This service simply checks the sectors can be found
+and read and that the CRC is correct.  If a disk is not found
+in the drive, then this service returns an error in AH, while
+not letting DOS know about the error.<br>
+<br><pre><font size=2>
+*Registers used:  (F)loppy  (H)ard drive
+          AL - number of sectors to verify
+          AH - (04h) service number for interrupt 13h
+          CH - cylinder number (F)
+                 low-order 8 bits of cylinder number (H)
+          CL - sector number (F)
+                 high-order 2 bits of cylinder number,
+                 plus 6 bit sector number (H)
+          DL - drive number
+                 0 - A:, 1 - B:, 80h - first hard drive (C:)
+          DH - head number
+          BX - not used for verifing sectors
+
+        On return, if carry flag then error.
+
+*Using in a .bat file
+          You can use this in a batch file.
+          Chkdsk returns a 0 in DOS' ERRORLEVEL if disk ready
+          Chkdsk returns a 1 in DOS' ERRORLEVEL if disk NOT ready
+        Example:
+
+          Chkdsk
+          @if ErrorLevel == 1 goto error
+           .
+           .do normal disk operation
+           .
+          goto end
+          :error
+            .
+            .do what ever error handling wanted
+            .
+          :end
+
+
+Assemble with <a href="newbasic.htm">NBASM 00.23.xx</a>
+
+
+.MODEL tiny
+.CODE
+	org 100h
+	
+	mov	ah,04h			; Verify Disk Sectors
+	mov	al,01h			; Amount to verify
+	mov	ch,01h			; High order cylinder number (8 bits)
+	mov	cl,01h			; Sector Number in bits 0-5
+	xor	dl,dl			; use drive A:
+	xor	dh,dh			;    remaining 6-7 bits are low order for CH
+	int	13h			; DH is the head number
+	xor	al,al 			; DOS' ERRORLEVEL
+	jnc	Done			;
+	mov	dl,07h			; simple beep
+	mov	ah,02h			;
+	int	21h			;
+	mov	al,01h			; DOS' ERRORLEVEL
+Done:	mov	ah,4Ch			; exit to DOS
+	int	21h			;
+.end					; End of assembly code
+</font></pre>
+<br><br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

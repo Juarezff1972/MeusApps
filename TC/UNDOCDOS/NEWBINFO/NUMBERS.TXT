@@ -1,0 +1,232 @@
+Explanation of the four most used number formats
+Benjamin David Lunt
+by Forever Young Software
+(C)opyright 1984-1998
+Revised: 12 June 1998
+
+There are four number formats that most programmers use.  I will list them
+in order of most used, give a brief description, and then give a detailed
+description.  When you see a number in parenthesis () it will most likely
+be the decimal representation of the other type of number used for the
+convenience of the reader.  If this number has a digit after it, then it
+is represented as that type.  (d = decimal, h = hexadecimal, b = binary,
+and o = octal).
+
+Decimal: (part 1)
+  Decimal (10d) is the widely used number format.  Obviously, this is so
+   because this is the format we use in every day life.
+    (digits 0 - 9 are used)
+
+Hexadecimal: (part 2)
+  Hexadecimal (16d) is used in programming when you have a higher know-how
+   of how the bytes are represented and needed.  This does not necessary
+   mean that you can't use this format for anything else.
+    (digits 0 - F are used)
+
+Binary: (part 3)
+  Binary (2d) is used when Bit representation is needed.  For instance, the
+   8 bits in a byte could be represented as 00000000b (0d) with each bit
+   cleared, or 11111111b (255d) with each bit set, or a mixed combination
+   of 10101010b (170d) with some set and some cleared.
+    (digits 0 - 1 are used)
+
+Octal: (part 4)
+  Octal (8d) is used the least amount.  In fact it is not used enough to
+   give a full description.  So I will just give a short description.
+    (digits 0 - 7 are used)
+
+Part 5 describes where this info came from and the distribution rights
+  and copyrights.
+
+
+Description of Decimal Numbers:
+------------------------------------------------------------------- Part 1
+  There is not much needed to say about decimal numbers.  With most compilers,
+   interpreters, and assemblers, a decimal can be represented with the
+   following digits of 0 through 9 and usually has no ending denominator.
+
+  A decimal number can have a minus sign (-) in front of it denoting a
+   negative number, and the plus sign (+) denoting a positive number (though
+   positive is assumed if no sign is given).
+
+  A decimal number can also be represented as real numbers (fractions of an
+   integer) with the period (.) called floating or fixed point decimal
+   numbers.
+    Some Examples:
+       Number = -127               (8  bit number)
+       Number =  255               (8  bit number)
+       Number = -32767             (16 bit number)
+       Number =  32767             (16 bit number)
+       Number =  524272            (32 bit number)
+       Number =  3.141592654       (32 bit number depending on compiler)
+       Number = -3.141592654       (32 bit number depending on compiler)
+
+ Notes:
+  Not all compilers/interpreters/assemblers have 32 bit capabilities for
+   the use of LONG (32 bit) numbers.  Check your manual.
+  Also, not all support fixed or floating point decimal numbers.
+
+
+Description of Hexadecimal Numbers:
+------------------------------------------------------------------- Part 2
+  Hexadecimal numbers are probably the most used format when low level
+   or 'delicate' programming is be used.  Hexadecimal (further stated
+   as Hex) uses 16 digits, 0 through 9 and A through F. 0 through 9 are
+   represented same as Decimal numbers, and A through F are extensions
+   to give the Hex numbering system a base of 16.
+
+  Hex numbers also are conveniently setup for use with binary form.  Each
+   hex number has a bit representation of 4 bits (a nibble) and when two
+   hex digits are used can represent a single byte (8 bits).
+    Hex Digit definition:
+      Hex  Binary    Hex  Binary
+       0 = 0000       8 = 1000
+       1 = 0001       9 = 1001
+       2 = 0010       A = 1010
+       3 = 0011       B = 1011
+       4 = 0100       C = 1100
+       5 = 0101       D = 1101
+       6 = 0110       E = 1110
+       7 = 0111       F = 1111
+   
+   Notice that each digit represents a nibble, two digits - a byte, four
+   digits - a word (16 bits), and 8 digits - a double word (32 bits).
+
+  For this reason, hex numbering is easy to use when you want to put a number
+   in a register (or register pair).  For example, if I wanted to put the
+   decimal number 4660 into the AX register:
+     mov  ax,4660    would work great.  But ax is a register pair divided
+                     into AH and AL.  Just by looking at the assembler
+                     line (to the right) what is in AH and what is in AL?
+                     With decimal, you can not tell just by looking at it.
+                     (Please note: AH does not equal 46d and AL does not
+                      equal 60d)
+   With Hexadecimal I now can see what is in AH and AL when I put the same
+   number in AX, but as a Hex representation:
+     mov  ax,1234h   Notice that by remembering that Hex digits are
+                     represented as 4 bit binary numbers, I can now split
+                     the register pair apart and get 12h (18d) in AH and
+                     34h (52d) in AL.  Notice that the 18d and 52d in each
+                     register pair does not equal the above 46d and 60d that
+                     one might think.
+
+  Hex numbers can also include negative and positive numbers, though they
+   are NOT represented as -1234h.  The way a hex number is represented as
+   a negative or positive number is quite simple once you learn the
+   technique.  Basic assumes that all Hex numbers can be negative and uses
+   the following technique.  C (and Pascal) can use this technique to
+   found out if it is negative, but also allow a number to always be positive
+   allowing for larger (positive) numbers in a single byte, word, or double
+   word.  (see below for more details)
+
+  If the first bit from the left of the number is set (1), then this
+   number is thought of to be negative.  For instance:
+     1d (01h) is represented as 00000001b  and
+    -1d (FFh) is represented as 11111111b.
+   and
+     10d (0Ah) is represented as 00000101b  and
+    -10d (F6h) is represented as 11110110b.
+   Notice that the processor takes the left most bit as the denotor and
+   then sets to pos or neg.  Then take the amount away from 0 and that is
+   the number represented.
+
+  Some compilers/interpreters have an operand that allows you to have
+   signed and unsigned numbers.  ie. To tell the compiler/interpreter
+   to use the left most bit as the denotor (signed numbers) or not to
+   use this bit as a pos/neg denotor (unsigned numbers).  If you have
+   signed numbers, you can only have a pos or neg number with the value
+   of half or less than the total numbers allowed in that size of memory,
+   whereas if you have an unsigned number, you can now have a pos number
+   that can be a value of or less than the total allowed numbers, BUT can
+   no longer be a negative number.
+   Examples:
+    (signed numbers)
+             Min         Max     Size
+            -128         127     (8 bits)
+          -32768       32767    (16 bits)
+     -2147483648  2147483647    (32 bits)
+    (unsigned numbers)
+             Min         Max     Size
+              0          255     (8 bits)
+              0        65535    (16 bits)
+              0   4294967295    (32 bits)
+
+  Quick Basic 4.5 does not allow unsigned numbers.  All numbers are
+   considered signed and should be thought of as this way.  This means
+   that the largest number that you can put in a byte is 127d, word is
+   32767d, and long is 2147483647d.  *Most C and Pascal compilers allow
+   both signed and unsigned numbers, while all assemblers allow both.
+
+  Hex numbers can also be fixed or floating point numbers.  Remembering
+   that Hex digits are representations of 4 bit binary numbers, we can
+   represent a negative number with Hex.  Please note that all negative
+   numbers are represented in either IEEE format or old IBM format.
+   The IEEE format is the one that is used now so I won't describe the
+   other format.  The IEEE format is represented as so many bits as the
+   exponent (usually 8 bits), and one bit as the sign, and the rest as
+   the mantissa (the larger the memory operand the more precision (the
+   larger the mantissa))  With this in mind, we now can represent a real
+   number in hex format.
+
+
+Description of Binary Numbers:
+------------------------------------------------------------------- Part 3
+  Binary number notation is the low level programming usage.  You
+   represent a binary number with a 0 or a 1 for each bit.  A byte
+   has 8 bits, a word has 16, a double word has 32, and a quad word
+   has 64.  Binary is quite simple.  You set or clear the corresponding
+   to create a value in the corresponding operand.
+     Examples:
+       00000001b =   1d
+       00000010b =   2d
+       00000100b =   4d
+       00001000b =   8d
+       00010000b =  16d
+       00100000b =  32d
+       01000000b =  64d
+       10000000b = 128d
+
+       11000000b = 192d
+       10101010b = 170d
+
+  There are a few tricks and techniques to use with binary:
+    To Multiply by two, shift the bits left 1 pos, and to Divide by two
+     shift them right 1 pos.
+       00000100b (4d)  X  2d = 00001000b (8d)
+       00000100b (4d)  /  2d = 00000010b (2d)
+    If the right most bit is set, then the number is always odd, if this
+     bit is clear, then number is always even.
+
+  There are many more, but you must no assembler to really use them.
+
+
+Description of Octal Numbers:
+------------------------------------------------------------------- Part 4
+  Octal numbers use the 8 digits of 0 through 7, and are identical
+   to hexadecimal numbers in this aspect.
+
+      Oct  Binary    Oct  Binary
+       0 = 0000       4 = 0100
+       1 = 0001       5 = 0101
+       2 = 0010       6 = 0110
+       3 = 0011       7 = 0111
+
+  This format is not used vary often so I will not go any further on it.
+
+
+
+
+Where this info came from:
+------------------------------------------------------------------- Part 5
+This info is distributed as freeware.  If you distribute this documentation,
+please distribute it as you got it, in its' whole, and unmodified.  If you
+see an error, please let me know so that I can fix it and distribute it
+to the correct places.
+
+Forever Young Software
+Benjamin David Lunt
+(C)opyright 1984-1997
+
+    email:  blunt@zekes.com
+ web page:  http://www.zekes.com/~blunt/index.html
+

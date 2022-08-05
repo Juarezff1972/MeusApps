@@ -1,0 +1,73 @@
+n dr.com
+a 100
+; This is the script file for DR.COM  A simple directory lister.
+; See DR.TXT for the discussion on how the file is created and full
+;  comments.
+; Start of full listing for DR.COM version 1.00
+jmp 01ED
+db 0D,0A,'DR.COM v1.00'
+db 0D,0A,'A simple directory lister to show how to program in DEBUG'
+db 0D,0A,'(c)opyright 1997   Forever Young Software'
+db 0D,0A,0A,'$'
+db 0D,0A,'Current Directory:   '
+db 0
+db ':\'
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0D,0A,'$'
+db '*.*',0
+db 'An error occured$'
+mov  ah,09                  ; print our header text
+mov  dx,0103                ;
+int  21                     ;
+mov  ah,19                  ; get current drive letter
+int  21                     ;
+add  al,41                  ; add 'A' to it (for printing ascii letter)
+mov  [0192],al              ; put it at front of path
+mov  ah,47                  ; get current directory
+xor  dl,dl                  ; current drive
+mov  si,0195                ; put in our buffer above
+int  21                     ;
+jc   024B                   ; if error
+mov  ah,09                  ; print the current full path
+mov  dx,017B                ;
+int  21                     ;
+mov  dx,0195                ; prepare to create a new dta temporarily
+mov  ah,1A                  ; "set dta addr" service of int 21h
+int  21                     ;
+mov  di,01B3                ; put '$' in filename area for our printing
+mov  cx,14                  ;
+mov  al,24                  ;
+rep                         ;
+stosb                       ;
+mov  ah,4E                  ; find first dir entry
+mov  dx,01D8                ;
+mov  cx,0020                ; archive only (no dirs, etc.)
+int  21                     ;
+jc   024A                   ; if carry - done (no more found)
+mov  ah,09                  ; else print the filename
+mov  dx,01B3                ;
+int  21                     ;
+mov  ah,09                  ; and a CRLF
+mov  dx,01D5                ;
+int  21                     ;
+mov  di,01B3                ; put '$' in filename area for our printing
+mov  cx,14                  ;
+mov  al,24                  ;
+rep                         ;
+stosb                       ;
+mov  ah,4F                  ; find next directory entry
+int  21                     ;
+jnc  022C                   ; if no carry, cont. with find next
+ret                         ; if carry - done (no more found)
+mov  ah,09                  ; was an error so print error message
+mov  dx,01DC                ;
+int  21                     ;
+ret                         ;
+
+rcx
+0253
+w
+q
+

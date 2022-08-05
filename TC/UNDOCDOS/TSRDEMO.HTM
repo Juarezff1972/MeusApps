@@ -1,0 +1,366 @@
+<HTML>
+<HEAD>
+<TITLE>Terminate and Stay Resident Programming</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Terminate and Stay Resident Programming</H1>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+See <a href="#below">below</a> for another example of TSR programming.  This one turns off the internal speaker.<br>
+See <a href="#below1">below</a> for another example of TSR programming.  This one sends the current DOS screen contents to the Windoze Clipboard.<br>
+See <a href="#below2">below</a> for another example of TSR programmingto hook INT 21h.<br>
+<br>
+Terminate and Stay Resident (TSR) programming <i>is one of the most interesting
+services provided by MS-DOS</i>. (Norton's Programming Bible)<br>
+<br>
+I agree, but it is very sophisticated and can be disastrous if not programmed
+correctly.  <b>So be warned now.  The following code can mess up a system if
+not correctly entered.  It will not work the same on all systems.  Be careful.</b><br>
+<br>
+The following code does a simple routine.  All it does; installs the TSR, invokes the
+TSR service (which removes the installation code form memory but not the TSR code).
+Then when installed, it hooks into the keyboard interrupt and looks to see if the
+Ctrl-Del sequence was entered.  If it wasn't, it sends control to the keyboard interrupt
+and allows it and DOS to function normally.  If the Ctrl-Del sequence has been entered,
+then it prints an 'A' to the screen, tells the keyboard hardware that a key has been
+aknowledged and then exits the interrupt.<br>
+<br>
+You can put <i>almost</i> any code in the section where it prints the 'A'.<br>
+<b>You can not however</b> put code in this interrupt routine that calls another
+interrupt except the most basic of the INT 21h services (print string, print char,
+etc.)<br>
+<br>
+This DOS service restores the interrupt vectors for 22h, 23h, and  24h to the defaults,
+so changing their vector interrupt address' will not do you any good.<br>
+<br>
+When using the TSR service, you should release the memory of the environment block
+that your installation program has.<br>
+<br>
+Also, this DOS service does not work in DOS 1.0<br>
+<br>
+<br>
+<b>THE CODE:</b> (assemble with MASM)
+<pre><font size=2>.MODEL small, basic
+.386
+.stack
+.code
+
+start:	jmp  install
+
+  Copyright	db 'Copyright  1997  Forever Young Software    Ben Lunt',0
+  Old9Adr	dw 00h			; these remember the original Int 9 address
+  Old9Seg	dw 00h			; they must be in the code segment
+
+NewInt9:	sti			; enable further interrupts
+		push	ax		; save the registers we'll be using
+		push	es
+
+		in	al,60h
+		cmp	al,83		; is it the &lt;del&gt; key?
+		jne	Continue	; no, continue on to BIOS interrupt 9
+		xor	ax,ax		; get the shift status at 0000:0417h
+		mov	es,ax		;
+		mov	al,es:[0417h]	; 
+		test	al,04h		; is Ctrl key depressed?
+		jz	Continue	; no, continue on to BIOS interrupt
+
+		in	al,61h		; send an acknowledge to keyboard
+		mov	ah,al		; otherwise the Ctrl-del keystroke
+		or	al,80h		; will still be hanging around the
+		out	61h,al		; next time a program goes to get a key
+		mov	al,ah
+		out	61h,al
+		mov	al,20h		; indicate end of interrupt to 8259
+		out	20h,al		; interrupt controller chip
+
+		push	dx
+		mov	ah,02		; This is where you would put the routine
+		mov	dl,65		;  to do what you want it to do if the
+		int	21h		;  user presses the CTRL-del sequ.
+		pop	dx
+
+Continue:	pop	es		; restore the saved registers
+		pop	ax
+		jmp	dword ptr cs:Old9Adr
+
+
+Install:	mov	ax,DGROUP	; .STARTUP  (6.1)
+		mov	ds,ax		;
+		mov	bx,ss		;
+		sub	bx,ax		;
+		shl	bx,04		;
+		mov	ss,ax		;
+		add	sp,bx		;
+
+		mov	ah,62h		; free environment string
+		int	21h		;
+		mov	es,bx		;
+		mov	bx,2Ch		;
+		mov	ax,es:[bx]	;
+		mov	es,ax		;
+		mov	ah,49h		;
+		int	21h		;
+
+		mov	ax,3509h	; ask DOS for the existing Int 9 vector address
+		int	21h		; DOS returns the segment:address in ES:BX
+		mov	cs:Old9Adr,bx	; save it locally
+		mov	cs:Old9Seg,es
+
+		mov	ax,2509h	; point Interrupt 9 to our own handler
+		mov	dx,offset NewInt9
+		push	cs		; copy CS into DS
+		pop	ds
+		int	21h
+
+		mov	dx,(install - start + 256 + 15) ; save all TSR code + PSP
+		shr	dx,04h		;   + 15 bytes to make sure we get all of TSR
+		mov	ax,3100h	; exit to DOS but stay resident
+		int	21h		;
+
+		end	start
+</font></pre>
+<br><br>
+<b>Again, be careful with this code if you do any modifications, or the such.</b><br>
+<br>
+If you have any other questions or see a mistake that I made, please e-mail me and I will
+do my best to help out.<br>
+<br>
+<hr>
+<a name="below"></a>
+<h3>Another TSR demo that turns off the PC internal speaker (on older machines)</h3>
+The following code creates a 316 byte .COM file and when installed will take up only 464 bytes in memory.<br>
+<br>
+When ran for the first time, this code "hooks" in to two interrupts.  Interrupt 16h (the keyboard interrupt) and Interrupt 1Ch (the timer interrupt).  The reason why we hook in to the keyboard interrupt is that it is an easy way to check for our TSR in memory.<br>
+<br>
+What we do is involk INT 16h with a subservice of 66h and a job number (0 or 1) in AL.  (Service 66h is not included with the BIOS keyboard interrupt service, it is one we install the first time NOSOUND is ran).  If a 66h is returned in AL then we have already installed NOSOUND.<br>
+<br>
+If AL does not = 66h, then we must install NOSOUND:
+<li>We first "hook" in to the timer interrupt (1Ch).
+<li>We then "hook" in to the keyboard interrupt (16h).
+<li>We then install the TSR.
+Now once the TSR is installed, the hook to INT 1Ch will check the flag that we have set and
+either "stop" the speaker, or skip it.<br>
+When the INT 16h, service 66h (our service) is called, it checks for installation, and if so sets the flag to the passed AL (on or off).<br>
+<br>
+Being that we hooked in to INT 16h, we can call it everytime NOSOUND is ran to check for installation.  This way we won't install more than one TSR at a time.<br>
+<br>
+On faster machines (386 and up) the IN (port) and OUT (port) instructions are very slow (take between 8 and 12 clock ticks) so this TSR will make your machine lose time.  i.e.:  Your time of day clock will run 'slower'. :~{<br>
+<br>
+This code is for learning purposes only.<br>
+'NOSOUND off' turns sound off, 'NOSOUND on' turns sound on.   (assemble with MASM)
+<pre><font size=2>CodeSeg	segment public byte
+		assume  cs:CodeSeg, ds:CodeSeg, es:CodeSeg
+
+		org 100h
+start:		jmp	install
+
+  Copyright	db  13,10,'NOSOUND  Quiets the hardware speaker.'
+		db  13,10,'Copyright  1997  Forever Young Software',13,10,36
+  AllowY		db  13,10,'  Allowing Sound$'
+  AllowN		db  13,10,'  Not Allowing Any Sound$'
+  Old1CAdr	dw  00h		; these remember the original Int 1Ch address
+  Old1CSeg	dw  00h		; they must be in the code segment
+  Old16Adr	dw  00h		; these remember the original Int 16h address
+  Old16Seg	dw  00h		; they must be in the code segment
+  job		db  00h		; 0 = sound off, else sound on
+
+NewInt1Ch:	cli			; disable interrupts
+		mov	al,cs:job		; if job != 0 then skip ours
+		or	al,al		; (need to use fast intructions)
+		jnz	short SoundOn	; ('cmp mem,immed' is just to slow)
+		push	dx		;
+
+; the in and out instructions are extremly slow on so-called
+;'faster' machines (386, 486, 586 (pentiums)) so this is why you
+; still hear a little bit of sound at first.
+
+		mov	dx,61h		; turn sound off
+		in	al,dx		;  .
+		and	al,0FCh		; clear bits 1 & 0
+		out	dx,al		;  .
+		pop	dx		;
+SoundOn:	sti			; reenable interrupts
+		jmp	dword ptr cs:Old1CAdr
+
+NewInt16h:	cli			; disable interrupts
+		cmp	ah,66h		; if our service number
+		jne	short SkipOurs
+		mov	cs:job,al		; then put 'job' in job above
+		mov	al,ah		; send installed flag
+		sti			; and return to NOSOUND.COM
+		iret			;
+SkipOurs:		sti			; reenable interrupts
+		jmp	dword ptr cs:Old16Adr ;
+
+Install:		mov	dx,offset Copyright	; print message
+		mov	ah,09h		;
+		int	21h		;
+		mov	ah,62h		; get PSP segment
+		int	21h		;
+		mov	es,bx		;
+		xor	al,al		; assume no sound
+		mov	dx,offset AllowN	; print message
+		mov	ah,es:[0083h]	; get command line 'n' or 'f'
+		cmp	ah,'n'		; if 'n' then job != 0
+		jne	short SoundOff1	;
+		mov	al,0FFh		;
+		mov	dx,offset AllowY	; print message
+SoundOff1:	push	ax		; save al
+		mov	ah,09h		;
+		int	21h		;
+		pop	ax		; restore al
+		mov	ah,66h		; call interrupt 16h w/our service #
+		int	16h		; on return:
+		cmp	al,66h		; 
+		jne	short NotInstld	; if al = 66h, then is installed
+		mov	ah,4Ch		; and exit (no TSR it)
+		int	21h			;
+
+NotInstld:		mov	ah,62h		; free environment string
+		int	21h		;
+		mov	es,bx		;
+		mov	bx,2Ch		;
+		mov	ax,es:[bx]		;
+		mov	es,ax		;
+		mov	ah,49h		;
+		int	21h		;
+
+		mov	ax,351Ch		; ask DOS for the existing Int 1Ch vector address
+		int	21h		; DOS returns the segment:address in ES:BX
+		mov	cs:Old1CAdr,bx	; save it locally
+		mov	cs:Old1CSeg,es
+
+		mov	ax,251Ch		; point Interrupt 1Ch to our own handler
+		mov	dx,offset cs:NewInt1Ch
+		push	cs		; copy CS into DS
+		pop	ds
+		int	21h
+
+		mov	ax,3516h		; ask DOS for the existing Int 16h vector address
+		int	21h		; DOS returns the segment:address in ES:BX
+		mov	cs:Old16Adr,bx	; save it locally
+		mov	cs:Old16Seg,es
+
+		mov	ax,2516h		; point Interrupt 16h to our own handler
+		mov	dx,offset cs:NewInt16h
+		push	cs		; copy CS into DS
+		pop	ds
+		int	21h
+
+		mov	dx,(install - start + 256 + 15) ; save all TSR code + PSP
+		mov	cl,04h		;   + 15 bytes to make sure we get all of TSR
+		shr	dx,cl		; (paragraphs)
+		mov	ax,3100h		; exit to DOS but stay resident
+		int	21h		;
+
+CodeSeg		ends
+		end	start
+</font></pre>
+<br>
+<hr>
+<a name="below1"></a>
+<h3>Another TSR demo that sends the current DOS screen contents to the clipboard.</h3>
+This TSR sends the characters stored in screen mode 03h's memory at 0B800h to the Windoze clipboard.<br>
+<br>
+I created this because there were times that I wanted to send some info from a file I was viewing in DOS's EDIT to the Windoze clipboard. (Sure I could have just pressed <i>Alt-PrtScr</i> but then I couldn't have created another TSR demo source for you.)<br>
+<br>
+This TSR works fairly good on most machines.  However, it does not like DOSKEY at all.  If you know how to alter my code to make it work better please let me know.  Please do not "fix" the code and redistribute it.  Let me know how to fix it and I will redistribute it here and give you credit.  Thanks.<br>
+<br>
+You can get the zip file <a href="dos2winc.zip">here</a> (3k) which includes both ASM and COM files.<br>
+<br>
+<hr>
+<a name="below2"></a>
+The following code hooks into INT 21h and allows you to do a little bit of code before and a little bit after each time the original INT 21h gets called.  Remember, you can only do a little bit of stuff.  Nothing major and <b>absolutely nothing that calles INT 21h</b> or you will be in an endless loop (unless you add code to make it recursive).  <i>Be careful</i>, this is for example purposes only.<br>
+<br>
+This TSR hooks into INT 21h.  When the processor calls INT 21h, this code prints a '1' to row 6, col 1 of the screen, calls the original 21h interrupt, and then prints a '2' to the screen just after the 1.  <pre><font size=2>; Assemble with <a href="newbasic.htm">NBASM</a>
+
+.model tiny
+.186
+.code
+           org  100h
+start:     jmp  short Install
+
+olddosint  dw 00h,00h
+
+newDOSInt:
+           cli                          ; put TODO stuff here
+           push es                      ; .
+           push 0B800h                  ; .
+           pop  es                      ; .
+           mov  byte es:[1920],'1'      ; .   row 6, col 1 : print '1'
+           pop  es                      ; .
+           sti                          ; end TODO stuff here
+        
+           pushf                        ; create our own discriptor
+           push cs                      ;
+           push offset cs:Back          ;
+           jmp  far cs:olddosint        ; jmp to old interrupt
+
+Back:
+           pushf                        ; save flags returned by orig int 21h
+           cli                          ; put TODO stuff here
+           push es                      ; .
+           push 0B800h                  ; .
+           pop  es                      ; .
+           mov  byte es:[1922],'2'      ; .   row 6, col 2 : print '2'
+           pop  es                      ; .
+           sti                          ; end TODO stuff here
+        
+           cli                          ; clean up the stack
+           push ax                      ; so that it will ret to the
+           push bp                      ; correct place
+           mov  bp,sp                   ; 
+           mov  ax,[bp-6]               ;
+           mov  [bp-8],ax               ;
+           mov  ax,[bp-4]               ;
+           mov  [bp-6],ax               ;
+           pop  bp                      ;
+           pop  ax                      ;
+           popf                         ; restore flags ret'd by orig 21h
+           sti                          ;
+           retf 2                       ;
+
+Install:   mov  ax,3521h                ; get old interrupt vector
+           int  21h
+
+           mov  [olddosint],bx
+           mov  [olddosint+2],es
+
+           push cs
+           pop  ds
+           mov  dx,offset cs:newdosint  ; set new interrupt vector
+           mov  ax,2521h
+           int  21h
+
+           mov  es,cs:[002Ch]           ; free evironment block
+           mov  ah,49h
+           int  21h
+
+           mov  dx,offset cs:Install     ; get paragraphs needed
+           sub  dx,offset cs:Start
+           shr  dx,04
+           add  dx,17                   ; add 16 paras for PSP + 1 extra
+           mov  ax,3100h                ; termination and stay resident
+           int  21h
+
+.end       start
+</font></pre>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

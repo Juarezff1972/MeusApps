@@ -1,0 +1,190 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 4</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align="center"><font size=2 face="Comic Sans MS">
+<a href="page3.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page5.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">The Program Segment Prefix</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<font color="black" face="" size=3>
+<br>
+<! - column one starts here ****************** >
+The Program Segment Prefix or PSP is what DOS uses to save information about a program just before it loads and runs it.<br>
+<br>
+When DOS loads a program in to memory, it needs a place to store a copy of the environment, the command line, a few interrupt vectors, as well as a few other items.  To do this, DOS creates a PSP of 256 bytes at the first position in the memory allocated for the program and then places the program just after these 256 bytes.<br>
+<br>
+The layout of this PSP is as follows:<br>
+<br clear=left>
+<table align=left border=1 width="100%" bgcolor="white" cols=3>
+  <tr>
+    <td align=center bgcolor="#BBBBBB" width="14%"><b>Offset</td>
+    <td align=center bgcolor="#BBBBBB" width="14%"><b>Size (bytes)</td>
+    <td align=center bgcolor="#BBBBBB" width="72%"><b>Description</td>
+  <tr>
+    <td align=center>00h</td>
+    <td align=center>002</td>
+    <td align=left>INT 20h instruction</td>
+  <tr>
+    <td align=center>02h</td>
+    <td align=center>002</td>
+    <td align=left>Address of paragraph following this program</td>
+  <tr>
+    <td align=center>04h</td>
+    <td align=center>001</td>
+    <td align=left> &nbsp; reserved</td>
+  <tr>
+    <td align=center>05h</td>
+    <td align=center>005</td>
+    <td align=left>Call to MS-DOS Function Dispatcher</td>
+  <tr>
+    <td align=center>0Ah</td>
+    <td align=center>004</td>
+    <td align=left>Interrupt 22h (termination) address</td>
+  <tr>
+    <td align=center>0Eh</td>
+    <td align=center>004</td>
+    <td align=left>Interrupt 23h (Ctrl-C) address</td>
+  <tr>
+    <td align=center>12h</td>
+    <td align=center>004</td>
+    <td align=left>Interrupt 24h (Critical Error) address</td>
+  <tr>
+    <td align=center>16h</td>
+    <td align=center>002</td>
+    <td align=left>Segment of Parent Program &#134;</td>
+  <tr>
+    <td align=center>18h</td>
+    <td align=center>020</td>
+    <td align=left>File Handle Array &#134;</td>
+  <tr>
+    <td align=center>2Ch</td>
+    <td align=center>002</td>
+    <td align=left>Segment address of environment block</td>
+  <tr>
+    <td align=center>2Eh</td>
+    <td align=center>004</td>
+    <td align=left>SS:SP on entry to last INT 21h Function &#134;</td>
+  <tr>
+    <td align=center>32h</td>
+    <td align=center>002</td>
+    <td align=left>Handle array Size &#135;</td>
+  <tr>
+    <td align=center>34h</td>
+    <td align=center>004</td>
+    <td align=left>Handle array pointer &#135;</td>
+  <tr>
+    <td align=center>38h</td>
+    <td align=center>004</td>
+    <td align=left>Pointer to previous PSP</td>
+  <tr>
+    <td align=center>3Ch</td>
+    <td align=center>004</td>
+    <td align=left> &nbsp; reserved</td>
+  <tr>
+    <td align=center>40h</td>
+    <td align=center>002</td>
+    <td align=left>DOS version to return &#163;</td>
+  <tr>
+    <td align=center>42h</td>
+    <td align=center>014</td>
+    <td align=left> &nbsp; reserved</td>
+  <tr>
+    <td align=center>50h</td>
+    <td align=center>003</td>
+    <td align=left>INT 21h, RETF instructions</td>
+  <tr>
+    <td align=center>53h</td>
+    <td align=center>009</td>
+    <td align=left> &nbsp; reserved</td>
+  <tr>
+    <td align=center>5Ch</td>
+    <td align=center>016</td>
+    <td align=left>FCB #1</td>
+  <tr>
+    <td align=center>6Ch</td>
+    <td align=center>020</td>
+    <td align=left>FCB #1</td>
+  <tr>
+    <td align=center>80h</td>
+    <td align=center>128</td>
+    <td align=left>Command line and DTA</td>
+  </tr>
+</table>
+<br clear=left>
+<font size=2 face="">
+&#134; = Undocumented 2.x+<br>
+&#135; = Undocumented 3.x+<br>
+&#163; = Undocumented 5.x+<br>
+</font>
+<br>
+
+</font>
+</td>
+<td width="48%" valign=top>
+<br>
+<! - column two starts here ****************** >
+The word at offset 00h is so that if you have a .com file, you can use the RET instruction to exit the program.<br>
+<br>
+The word at offset 02h is the address of the next free paragraph following the program.  This usually points to 0A000h because DOS allocates all available memory for the program.<br>
+<br>
+The 3 words at offset 0Ah are used to store the current 22h, 23h, and 24h interrupts so that when your program is done, DOS can set these interrupts back to their original locations (vectors).<br>
+<br>
+At offset 18h there is 20 bytes for 20 file handles.  If a handle is 0FFh, then it is free (closed).<br>
+<br>
+The word at offset 2Ch is the address of the copy of the environment that DOS allocated for this program.<br>
+<br>
+The word at offset 32h is the size of the file handle array.<br>
+<br>
+The dword at offset 34h is the address to this file handle array.<br>
+<br>
+The 36 bytes at offset 5Ch are the two FCB's (File Control Blocks).  DOS 1.0 used FCB's while later versions used Handles.<br>
+<br>
+The 128 bytes at offset 80h is filled with the command line of the program loaded and then if needed, used at the DTA (Disk Transfer Area).  If you use a DOS function that uses this DTA and you need the command line, you will need to either change the DTA address or save the command line somewhere else.<br>
+<br>
+Offset 80h holds the byte count of the command line length not including the CR (13d), while the byte at offset 81h is usually a space if a command line is used.
+<font color="blue">&#165;</font><br>
+<br>
+
+<br>
+</font>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page3.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page5.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 4
+
+</BODY>
+</HTML>

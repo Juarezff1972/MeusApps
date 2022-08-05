@@ -1,0 +1,94 @@
+This is the second step of the game tutorial by Forever Young Software.
+I can be reached at blunt@zekes.com
+Previous and future steps can be seen from http://www.zekes.com/~blunt
+
+Let us continue.
+
+We will now include some of the keyboard code to navigate throughout the
+grid.  It is faily simple.  All we have to do is:
+- check for a key press
+  - if it is a key we want
+    - set direction flags (x and y)
+  - if it is not a key we want
+    - ignore it
+- now in the main loop, we check the direction flags to see if we are
+  "moving".  If so
+   - check if we can move to the next block
+     - if so
+       - move to the next pos in that direction
+     - else
+       - stop
+
+That is all there is to it.
+
+Now how about those darn ghosts?  They are suppose to chase you aren't they?
+
+When we load in the screen data, all we have to do is wait for a ghost
+char (if we remember from tutor1.txt, a ghost is a 'y' or 24).
+When one is found, save its location in a struct.
+
+struct {
+		int curr_x;
+		int curr_y;
+} ghost[0x000F];
+
+Notice I put 0x000F (15d) as the 'array amount'.  You should put more than
+about 15 ghosts.  However, this code will do as many as you want with a few
+modifications.
+
+Now that we have all the locations of these ghosts...
+
+All we have to do is check to see if a particular ghost is above or below
+'burfman'.  If he is, and he can go in that direction, the go up or down
+respectively.  It works the same for the left and right directions.
+
+		// do ghost stuff
+		for (g=0; g<max_g+1; g++) {
+			if (ghost[g].curr_x < curr_x) {
+				if ((scrn_grid[ghost[g].curr_y][ghost[g].curr_x+1] == 00) ||
+						(scrn_grid[ghost[g].curr_y][ghost[g].curr_x+1] == 17)) {
+					scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 00;
+					ghost[g].curr_x++;
+					scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 24;
+				} else {
+					 goto checky;
+				}
+			} else if (ghost[g].curr_x > curr_x) {
+					if ((scrn_grid[ghost[g].curr_y][ghost[g].curr_x-1] == 00) ||
+							(scrn_grid[ghost[g].curr_y][ghost[g].curr_x-1] == 17)) {
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 00;
+						ghost[g].curr_x--;
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 24;
+					} else {
+						goto checky;
+					}
+			} else
+checky:
+				if (ghost[g].curr_y < curr_y) {
+					if ((scrn_grid[ghost[g].curr_y+1][ghost[g].curr_x] == 00) ||
+							(scrn_grid[ghost[g].curr_y+1][ghost[g].curr_x] == 17)) {
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 00;
+						ghost[g].curr_y++;
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 24;
+					}
+			} else if (ghost[g].curr_y > curr_y) {
+					if ((scrn_grid[ghost[g].curr_y-1][ghost[g].curr_x] == 00) ||
+							(scrn_grid[ghost[g].curr_y-1][ghost[g].curr_x] == 17)) {
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 00;
+						ghost[g].curr_y--;
+						scrn_grid[ghost[g].curr_y][ghost[g].curr_x] = 24;
+					}
+			}
+		}
+
+Now, I know this isn't a great method of doing it.  Maybe I can use
+a different, better method in a different version.
+
+
+What's next?  Character animation.  Hummm?
+In step 3 we will make burfman 'chomp' and the ghost 'glow'.
+(It really is quite simple.  A few memory modifications and copies.  Well
+lets leave it for next time.)
+
+BL
+

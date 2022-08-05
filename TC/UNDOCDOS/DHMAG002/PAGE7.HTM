@@ -1,0 +1,123 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 7</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page6.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page8.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Questions and Answers</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=8>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+<i>How do you pause your program and make it pause the same amount on a fast or slow machine?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; A DOS User</i><br>
+<br>
+You have to pause using the internal clock rather than looping so many times.  DOS provides a misc interrupt service just to do this.  It is INT 15h, service 86h.
+<pre>
+  ; CX:DX = milliseconds
+  mov  ah,86h
+  mov  cx,???
+  mov  dx,???
+  int  15h
+</pre>
+<br>
+<i>How do I use variables in my Batch files?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; Charles</i><br>
+<pre>  To set a variable in a batch file:
+  SET VAR1 = 1
+  To change this variable:
+  SET VAR1 = 2
+  To delete this variable:
+  SET VAR1=
+  To check this variable:
+  if %Var1% == "1" then goto do1
+</pre>
+<br>
+
+<i>What are the register values on entry to a .COM file?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; Another DOS User</i><br>
+<pre>  AX,BX       = 0000h
+  CX          = 00FFh
+  DX,SS,DS,ES = CS
+  SP,DI       = FFFEh
+  SI,IP       = 0100h
+  BP          = 09xxh (the lower byte is unknown)
+</pre>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<p align=left><font color="black" size=3>
+<br>
+<! - column two starts here >
+<i>Where are the command line parameters located?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; [FAQ]</i><br>
+<br>
+The command line is located at offset 82h in the PSP with the count located at offset 80h.  Be sure to check the count before you get the command line.  Even though the count might be zero, there is usually something in the command line area.<br>
+<br>
+<br>
+<i>How can I tell if the ALT key has been pressed?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; [FAQ]</i><br>
+<br>
+There are two bytes in memory that have bit representations of each of these type keys.<pre>
+<pre>0040:0017h 76543210
+           X         Insert state 1=active
+            X        Caps Lock 1=active
+             X       Num Lock  1=active
+              X      Scroll Lock 1=active
+               X     1 = alt pressed
+                X    1 = Ctrl pressed
+                 X   1 = L shift pressed
+                  X  1 = R shift pressed
+0040:0018h 76543210
+           X         1 = Ins Pressed
+            X        1 = Caps Lock pressed
+             X       1 = Num Lock pressed
+              X      1 = Scroll Lock pressed
+               X     1 = pause pressed (Ctrl num lock)
+                X    1 = Sys Req pressed
+                 X   1 = L Alt pressed
+                  X  1 = L Ctrl pressed
+</pre>
+<font color="blue">&#165;</font><br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page6.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page8.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 7
+
+</BODY>
+</HTML>

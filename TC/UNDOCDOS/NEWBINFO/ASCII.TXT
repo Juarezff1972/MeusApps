@@ -1,0 +1,79 @@
+Explanation of the ASCII char table
+Benjamin David Lunt
+by Forever Young Software
+(C)opyright 1984-1998
+Revised: 19 Dec 1998
+
+
+The ascii character table contains 256 (0-255) characters.
+
+The first 33 (0 through 32) are special characters used for different things
+ such as tab, space, enter, esc, pagebreak, etc.
+
+ 0 = null
+ 7 = beep (bell)
+ 8 = backspace
+ 9 = tab
+10 = LF
+12 = Page Break
+13 = CR
+27 = ESC
+
+Ascii characters 33 through 47 are the 'puncutation' chars.  Most sentence
+ puncutaion and the normal math symbols (+ - / *).
+
+Ascii characters 48 through 57 are the numberals '0' through '9'.
+
+Ascii characters 58 through 64 are more of the 'puncutation' chars.
+
+Ascii characters 65 through 90 are the capt. letters 'A' though 'Z'.
+
+Ascii characters 91 through 96 are more of the 'puncutation' chars.
+
+Ascii characters 97 through 122 are the small letters 'a' though 'z'.
+
+Ascii characters 123 through 255 are the rest of the chars and are all
+ different types of symbols which inlcude the box drawing symbols.
+  *see below*
+
+The ascii table:
+  (Note that 9 = tab, 10 = LF, and 32 = space)
+
+ 0 = null
+ 1  21  41 ) 61 =  81 Q 101 e 121 y 141 ç 161 ° 181 µ 201 … 221 › 241 Ò
+ 2  22  42 * 62 >  82 R 102 f 122 z 142 é 162 ¢ 182 ∂ 202   222 ﬁ 242 Ú
+ 3  23  43 + 63 ?  83 S 103 g 123 { 143 è 163 £ 183 ∑ 203 À 223 ﬂ 243 Û
+ 4  24  44 , 64 @  84 T 104 h 124 | 144 ê 164 § 184 ∏ 204 Ã 224 ‡ 244 Ù
+ 5  25  45 - 65 A  85 U 105 i 125 } 145 ë 165 • 185 π 205 Õ 225 · 245 ı
+ 6  26  46 . 66 B  86 V 106 j 126 ~ 146 í 166 ¶ 186 ∫ 206 Œ 226 ‚ 246 ˆ
+ 7  27  47 / 67 C  87 W 107 k 127  147 ì 167 ß 187 ª 207 œ 227 „ 247 ˜
+ 8  28  48 0 68 D  88 X 108 l 128 Ä 148 î 168 ® 188 º 208 – 228 ‰ 248 ¯
+ 9   29  49 1 69 E  89 Y 109 m 129 Å 149 ï 169 © 189 Ω 209 — 229 Â 249 ˘
+10   30  50 2 70 F  90 Z 110 n 130 Ç 150 ñ 170 ™ 190 æ 210 “ 230 Ê 250 ˙
+11  31  51 3 71 G  91 [ 111 o 131 É 151 ó 171 ´ 191 ø 211 ” 231 Á 251 ˚
+12  32   52 4 72 H  92 \ 112 p 132 Ñ 152 ò 172 ¨ 192 ¿ 212 ‘ 232 Ë 252 ¸
+13  33 ! 53 5 73 I  93 ] 113 q 133 Ö 153 ô 173 ≠ 193 ¡ 213 ’ 233 È 253 ˝
+14  34 " 54 6 74 J  94 ^ 114 r 134 Ü 154 ö 174 Æ 194 ¬ 214 ÷ 234 Í 254 ˛
+15  35 # 55 7 75 K  95 _ 115 s 135 á 155 õ 175 Ø 195 √ 215 ◊ 235 Î 255 ˇ
+16  36 $ 56 8 76 L  96 ` 116 t 136 à 156 ú 176 ∞ 196 ƒ 216 ÿ 236 Ï
+17  37 % 57 9 77 M  97 a 117 u 137 â 157 ù 177 ± 197 ≈ 217 Ÿ 237 Ì
+18  38 & 58 : 78 N  98 b 118 v 138 ä 158 û 178 ≤ 198 ∆ 218 ⁄ 238 Ó
+19  39 ' 59 ; 79 O  99 c 119 w 139 ã 159 ü 179 ≥ 199 « 219 € 239 Ô
+20  40 ( 60 < 80 P 100 d 120 x 140 å 160 † 180 ¥ 200 » 220 ‹ 240 
+
+The Box Drawing characeters:  (numbers are the ascii char)
+  218 196  194  191     201 205  203  187
+  ⁄    ƒ    ¬    ø       …   Õ    À    ª
+  ≥ 179                  ∫ 186
+ 195       197  180     204      206  185
+  √         ≈    ¥       Ã        Œ    π
+  ¿         ¡    Ÿ       »             º
+  192      193  217     200      202  188
+
+  213 205  209  184     214 196  210  183
+  ’    Õ    —    ∏       ÷   ƒ    “    ∑
+  ≥ 179                  ∫ 186
+ 198       216  181     199      215  182
+  ∆         ÿ    µ       «        ◊    ∂
+  ‘         œ    æ       ”        –    Ω
+  212      207  190     211      208  189

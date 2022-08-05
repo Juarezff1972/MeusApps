@@ -1,0 +1,248 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 14</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page13.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="bcover.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Detecting the ANSI screen driver</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+This months column comes from <a href="mailto:hendry_lee@yahoo.com">Hendry Lee</a> with three ways to detect the ANSI screen driver.<br>
+<br>
+The first technique shown uses a batch file and the DOS MEM, FIND, and COPY commands.  It first does a listing (not listed to the screen) of the memory control blocks, then PIPEs this to FIND which looks for "ansi".  Then it redirects the output from FIND to a file.  Now it tries to copy the file.  The internal DOS COPY command fails when trying to copy a zero byte length file.  Now the batch file checks to see if the second file exists.  If so, ANSI is installed because the FIND command sent output to the STDOUT device.  If the file does not exist, ANSI is not installed because FIND did not find anything named ANSI.<br>
+<br>
+The second technique shown uses a small .COM file and the multiplex interrupt 2Fh, service 1Ah.  This service returns 0FFh in AL if ANSI detected.  Quite simple and small while returning TRUE or FALSE in ERRORLEVEL for batch files.<br>
+<br>
+The third technique shown also uses a small .COM file but sends a "cursor report" string code to the screen.  If ANSI is installed, it will grab this code and return the cursor position in STDIN.  Also quite simple and small while returning TRUE or FALSE in ERRORLEVEL for batch files.<br>
+<br>
+<b>The first technique</b> is from a batch file that uses the DOS MEM, FIND, and COPY commands to detect ANSI.SYS. There may be another way to do the same thing faster, but this will do just well:<br>
+<pre><font size =2>::Detect if ANSI.SYS is installed on the system
+::Runs nicely under MS COMMAND.COM, but 
+:: failed under 4DOS.
+::MS-DOS internal command COPY can not
+:: copy a 0 byte sized file, while
+:: the 4DOS COPY will.
+
+@echo off
+mem /c | find /i "ansi" > isthere.$$$
+copy isthere.$$$ ishere.$$$ > nul
+if exist ishere.$$$ goto Yes
+goto No
+:Yes
+echo.
+echo ANSI.SYS installed.
+echo.
+goto End
+:No
+echo.
+echo ANSI.SYS not installed.
+echo.
+:End
+if exist isthere.$$$ del isthere.$$$ > nul
+if exist ishere.$$$ del ishere.$$$  > nul
+</font></pre>
+<br>
+<b>The second technique</b> is a small .COM file.  This .COM file can be execute from a batch file and on return, the errorlevel will be 0 if not detected and 1 if detected.
+<pre><font size =2>;----------------------------------------------;
+; Utility to detect if ANSI.SYS is already     ;
+; installed on the system.                     ;
+;                                              ;
+; Uses INT 2Fh, AX=1A00h.                      ;
+; Note from Ralf Brown Interrupt List:         ;
+;  "AVATAR.SYS also responds to this call      ;
+;   documented for DOS 5+, but undocumented    ;
+;   for DOS 4.x"                               ;
+;                                              ;
+; - use nbasm to assemble this source          ;
+;                                              ;
+; Support batch file:                          ;
+;  Returned errorlevel 0 if not detected.      ;
+;  Returned errorlevel 1 if detected           ;
+;                                              ;
+; by Hendry Lee                                ;
+;----------------------------------------------;
+
+.model tiny
+.code
+           org 100h
+
+; installation check
+           mov  ax,1A00h 
+           int  2Fh
+           cmp  al,0FFh  ; 0FFh = installed
+           jz   short Detected
+
+Not_Detected:       ; display not_installed
+           mov  dx,offset Not_Inst_Msg            
+           call Disp
+           xor  al,al    ; 0 = not installed
+           jmp  short Exit ; exit to DOS
+
+; display installed
+Detected:  mov  dx,offset Inst_Msg 
+           call Disp
+           mov  al,1
+
+Exit:      mov  ah,4Ch   ; exit to DOS w/RC
+           int  21h
+
+; display string
+Disp       proc near uses ax
+           mov  ah,09h   
+           int  21h
+           ret
+Disp       endp
+
+Inst_Msg     db  'ANSI.SYS installed.','$'
+Not_Inst_Msg db  'ANSI.SYS not installed.','$'
+
+.end
+</font></pre>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+
+<b>The third technique</b> is another small .COM file which sends an ANSI cursor report command to the driver and checks to see if ANSI returns a response. When executed from batch file, it will return the same errorlevel setting as with the second technique descussed before:
+<pre><font size=2>;----------------------------------------------;
+; Utility to detect if ANSI.SYS is already     ;
+; installed on the system.                     ;
+;                                              ;
+; Sends ANSI cursor report character to screen.;
+; If there is a response (ANSI returns actual  ;
+; cursor report) then ANSI is installed.       ;
+;                                              ;
+; - use nbasm to assemble this source          ;
+;                                              ;  
+; Support batch file:                          ;
+;  Returns errorlevel 0 if not detected.       ;
+;  Returns errorlevel 1 if detected            ;
+;                                              ;
+; by Hendry Lee                                ;
+;----------------------------------------------;
+
+.model tiny
+.code
+           org  100h
+
+; clear keyboard buffer
+           call FlushBuf          
+; test for ANSI
+           mov  dx,offset Ansi_Test
+           call Disp
+           mov  ah,0Bh    ; get STDIN status
+           int  21h
+           call ClrSc
+           call Goto_Top_Left
+           cmp  al,0FFh   ; = char returned
+           jz   short Detected
+
+Not_Detected:    ; display not installed
+           mov  dx,offset Not_Inst_Msg 
+           call Disp
+           xor  al,al
+           jmp  short Exit ; exit to DOS
+
+; clear keyboard buffer
+Detected:  call FlushBuf
+           mov  dx,offset Inst_Msg ; installed
+           call Disp
+           mov  al,1
+
+Exit:      mov  ah,4Ch      ; exit to DOS
+           int  21h
+
+Disp       proc near uses ax
+           mov  ah,09h      ; display string
+           int  21h
+           ret
+Disp       endp
+
+FlushBuf   proc near uses ax
+loophere:  mov  ah,06h    ; direct console input
+           mov  dl,0FFh
+           int  21h
+           or   al,al       ; any input?
+           jnz  loophere    ; yes, get next
+           ret
+FlushBuf   endp
+
+ClrSc      proc near uses ax bx cx dx
+           mov  ah,06h      ; scroll up window
+           xor  al,al       ; entire screen
+           mov  bh,7h       ; normal attribute
+           xor  cx,cx       ; upper left (0,0)
+           mov  dh,24       ; lower right row
+           mov  dl,79       ; lower right column
+           int  10h
+           ret
+ClrSc      endp
+
+Goto_Top_Left proc near uses ax bx dx
+           mov  ah,02h     ; set cursor position
+           mov  bh,0h      ; at this page
+           mov  dh,00h     ; row at 0
+           mov  dl,00h     ; column at 0
+           int  10h
+           ret
+Goto_Top_Left endp
+
+;ANSI cursor report command
+Ansi_Test     db  1Bh,'[6n','$'   
+Inst_Msg      db  'ANSI.SYS installed.','$'
+Not_Inst_Msg  db  'ANSI.SYS not installed.','$'
+
+.end
+</font></pre>
+<br>
+The <b>Pros and Cons</b> of each:<br>
+The first technique is all batch script.  No need for an assembler or the time to debug it in DEBUG if you need to modify it.  However, it does print extra line feeds to the screen.<br>
+<br>
+The second and third technique are very small, 82 bytes and 156 bytes respectively.  If you want to use either one in a batch file with out the print to screen, you could delete even more bytes.  However, if you are an optimize freak (and who isn't), you could have them return 0FFh instead of 01h and save a few more bytes, but let is leave optimization for a different issue.
+<font color="blue">&#165;</font><br>
+<br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page13.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="bcover.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 14
+
+</BODY>
+</HTML>

@@ -1,0 +1,22 @@
+Describes the first and most common colors and there values
+Benjamin David Lunt
+by Forever Young Software
+(C)opyright 1984-1997
+Revised: 06/26/97
+
+
+This file describes the first 32 colors of the CGA, EGA, and VGA systems.
+
+  Num  Color                  Num  Color
+   0    Black (or backgound)   8    Grey
+   1    Blue                   9    lt Blue
+   2    Green                 10    lt Green
+   3    Cyan                  11    lt Cyan
+   4    Red                   12    lt Red (Pink)
+   5    Magenta               13    lt Maganta
+   6    Brown                 14    Yellow
+   7    lt Grey               15    White
+
+For blink mode add 16 to the value above and the color will blink:
+ie.  17 =  (1) Blue above but will blink
+     26 = (10) lt Green above but will blink

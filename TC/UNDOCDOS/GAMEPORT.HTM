@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>Detecting the Gameport.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Detecting the Gameport</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  08 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a><br>
+<br>
+<pre><font size=2>
+; ************************************************************************
+; *  This is a small snip of code to detect the game port.
+; *
+; *  You may use this code as you would like.
+; *  As always, If this code crashes you machine in anyway I am
+; *  not held responsible.  Use at your own risk.
+; *
+
+.model tiny
+.code
+           org  100h
+start:     mov  ax,cs                   ; free unused part of Mem Block
+           mov  es,ax                   ;   for .COM file format
+           mov  bx,4096                 ;
+           mov  ah,4Ah                  ;
+           int  21h                     ;
+
+           mov  al,01h                  ; value to write to
+           mov  dx,0201h                ; port number 0201h
+           out  dx,al                   ; 
+
+           mov  bx,offset yes           ; assume gameport installed
+           mov  cx,0F00h                ; number of loops
+port_loop: in   al,dx                   ; read from port
+           and  al,0Fh                  ; if joystick present, then AL should
+           cmp  al,0Fh                  ; be 0Fh after ANDing with 0Fh.
+           je   short done
+           loop port_loop
+           mov  bx,offset no            ; gameport not installed
+done:      mov  dx,bx                   ; bx = offset of string to print
+           mov  ah,09h
+           int  21h
+           ret
+
+yes        db  13,10,'Game port installed.',13,10,36
+no         db  13,10,'Game port not installed.',13,10,36
+
+.end  start
+</font></pre>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,484 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>DOS Programming, Undocumented DOS, and DOS Secrets
+A few little secrets about DOS programming.  Continuing to get more code snippets and info.  Do you need help with you DOS programming?</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+<!-- **** this makes sure that my page takes up all screen, not just the current frame **** -->
+<script language="JavaScript" type="">
+if (top.frames.length > 0) {
+  top.location.href="http://www.zekes.com/~blunt/index.htm";
+}
+</script>
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<font color="purple" face="Comic Sans MS" size=2>
+<H1 align=center>Programming MS-DOS with Power</H1>
+<p align=center>
+<font size=4>DOS Programming, Undocumented DOS, and DOS Secrets</font>
+</font>
+
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+<hr>
+
+<font color="#102050" face="Comic Sans MS" size="2">
+	This web site is devoted to DOS programming for those of us who still enjoy programming in DOS.  Don't get me wrong, I do program in Windoze also.  In fact, I use VC++, but when it comes to having fun, I still turn to DOS programming.  Here you will find hard to find info on programming DOS.  I will update this site as I frequently as possible.<br>
+<br>
+If you would like to see any specific code and/or documentation on this page, just <A HREF="mailme.htm">e-mail</A> me.  Any and all code or documentation that I put on this site is free.  I am a strong believer in freeware.  The only thing I ask is that you spread the word to your friends.  You can request code and/or documentation for Assembler, Basic, C and Pascal as well as any DOS help.  <i>There are no dumb questions, just dumb answers</i>.<br>
+<br>
+If you are looking for a more commercial aspect, go to my <a href="consult.htm">consulting</a> page.<br>
+<br>
+I know that my site has a lot of cookies, this is because of my ISP (though a great one at that).  I am sorry for any inconvenience that these cookies might be.  If you would like to turn off the warning windows, (in IE 3.x) go to View - Options - Advanced Tab - Warn before accepting "cookies".  In IE 4.x you can turn off cookies all-together.<br>
+<br>
+<hr>
+Read the latest <A HREF="news.htm">News from Forever Young Software</A> (19 Dec 1998)<br>
+ - Bounced email addresses.  If you haven't recieved a reply from me, check this list.<br>
+ - <i>Borland</i> has a new name;  <i>Inprise</i><br>
+ - Some utilities you got to have for Quick Basic 4.5 from Microsoft<br>
+ - The new <b>v.90</b> modem software for <i>Gateway 2000</i> customers will speed up your connect by about 50%.<br>
+<br>
+A complete .zip file of <a href="undocdos.zip"><font size=3>all the files</font></a> (825k) on this site is now available for downloading for off-line viewing.  This file uses long file names and the HTML extension, so PKUNZIP will not extract it correctly.  You can use <a href="http://www.winzip.com">Winzip</a> to extract the files correctly.  Once downloaded, extract to an empty directory and then point your browser to index.htm.<br>
+I will try to keep this file up to date.  However, it will most likely be behind a little.  The lastest date of this zip file is:  <b>09 Jan 1999</b><br>
+<br>
+Beta releases of the <a HREF="newbasic.htm"><font size=3>New Basic</font></a> package.<br>
+Current Beta version:  <b>00.28.65</b> &nbsp; (18 Jan 1999)<br>
+<br>
+<a href="dhmag.htm"><font size=3>DOS Help Magazine</font></a> is here.  Current issue:  <b>Volume 1  Number 2</b>.<br>
+<br>
+
+<a href="contest.htm"><font size=3>The Current Contest</font></a>
+<img src="smllnew.gif" align=middle alt="New Item" border=0 width=22 height=12><br>
+ - The current contest, <i>attrib</i>, is similar to the DOS command of the same name<br>
+<br>
+<a href="books.htm"> <img src="books.gif" align=middle alt="Books" border=0 width=45 height=39></a>I have added a lot of recommendations to my <a href="books.htm"><font size=3>book list</font></a>.  Check them out.<br>
+<hr>
+In each subject there will be links to pages of info/source/etc. of an item of that subject.<br>
+Each item will be like the following:<br>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="roadwork.gif" align=middle alt="Under Construction" border=0 width=34 height=28>
+<img src="whatsnew.gif" align=middle alt="New Item" border=0 width=40 height=40>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<u><font size=3 color=blue>A demo link to an item in that subject</font></u> (dd mmm yyyy) 
+<img src="smllnew.gif" align=middle alt="New Item" border=0 width=22 height=12> 
+<img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12><br>
+<br>
+The <img src="roadwork.gif" align=middle alt="Under Construction" border=0 width=34 height=28> image denotes that this link is under construction and might/might not be usable.<br>
+The <img src="whatsnew.gif" align=middle alt="New Item" border=0 width=40 height=40> image denotes that this item is new item for about two weeks.<br>
+The <img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+image denotes that this page has downloadable file(s). (All download files have the file size indicated)<br>
+The link (<u><font size=3 color=blue>A demo link to an item in that subject</font></u>) will always have a date of when created/last modified next to it.<br>
+The <img src="smllnew.gif" align=middle alt="New Item" border=0 width=22 height=12> image denotes that this item has been a new item for about a month but is not as new as other items might be with the above image.<br>
+The <img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12> image denotes that this item has been updated.  The date after the link denotes when.<br>
+<hr>
+<b>Select one of the following subjects:</b><br>
+<a href="#disk"><font size=3>Disk/Files</font></a> - Programming the disk and/or file info.<br>
+<a href="#dos"><font size=3>DOS</font></a> - DOS programs, DOS prompt, DOS compilers, etc.<br>
+<a href="#games"><font size=3>Games</font></a> - Programming Games.<br>
+<a href="#hardware"><font size=3>Hardware/System programming</font></a> - Memory, BIOS, CMOS, and other Hardware/System items.<br>
+<a href="#input"><font size=3>Input/Output Devices</font></a> - Mice, Joystick, Keyboard, Modem, Printer, etc..<br>
+<a href="#misc"><font size=3>Misc</font></a> - Item that don't fit in any/all the other subjects.<br>
+<a href="#sound"><font size=3>Sound</font></a> - Sound programming<br>
+<a href="#video"><font size=3>Video/Graphics</font></a> - Graphics programming<br>
+See <a href="#bottom"><font size=3>bottom of this page</font></a> for other useful links and info.<br>
+<br>
+<!-- **************** Updated Stuff ********************** -->
+<b>List of items/pages that are 
+<img src="smllnew.gif" align=middle alt="New Item" border=0 width=22 height=12>
+or have been <img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12>:</b><br>
+ - <A HREF="filedir.htm"><font size=3>Get Filenames in a Directory</font></A>  &nbsp;
+<img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12> (10 Dec 1999)<br>
+ - - No differences other than I modified the DEMO.BAS file to be a little more helpful.<br>
+ - <A href="handles.htm"><font size=3>Information on File Handles</font></A>  &nbsp;
+<img src="smllnew.gif" align=middle alt="New Item" border=0 width=22 height=12> (07 Jan 1999)<br>
+ - <A HREF="cmosinfo.htm"><font size=3>Retrieving the CMOS memory information</font></A>  &nbsp;
+<img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12> (06 Jan 1999)<br>
+<br>
+<hr>
+<!-- **************** DISK/FILES ********************** -->
+<a name="disk"></a><font size=3 color=purple>DISK/FILES</font> - Info/source/etc. that has to do with disks and their files.<br>
+
+<img src="whatsnew.gif" align=middle alt="New Item" border=0 width=40 height=40> 
+<A href="handles.htm"><font size=3>Information on File Handles</font></A> (07 Jan 1999) <br>
+-This page will include a number of items on File Handles.<br>
+-1. What value is specified for <kbd><font size=2 face="">FILES=<i>n</i></font></kbd> in CONFIG.SYS with out reading CONFIG.SYS - <b>Undocumented</b> <br>
+<br>
+<a href="frmtdemo.htm"><font size=3>Format a floppy disk</font></a> (04 Feb 1998) <br>
+ - A routine in assembler callable from Basic to format a floppy disk in the four (4) different sizes. (assembly and basic source included)<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="exehdr.htm"><font size=3>The EXE header</font></a> (11 Dec 1998)<br>
+ - The EXE Header. <i>(Assembly  included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="diskinfo.htm"><font size=3>Some information on disks</font></a> (09 Dec 1998) <br>
+-Now includes a graphical (text) CheckDisk program and more info on the FAT.  <i>(C source included)</i>
+-Shows how a disk is made up<br>
+-Including the boot sector (with assembler source)<br>
+-Why the disk space remaining and the actual disk space differs.<br>
+-And more, lots more.<br>
+<br>
+<a href="snumber.htm"><font size=3>Getting the Serial Number</font></a> (09 Dec 1998) <br>
+ - Getting/Setting the Serial Number of a disk. <i>(Assembly source included) (Basic source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="getddata.htm"><font size=3>Getting the size of a disk</font></a> (13 Aug 1997) <br>
+ - Getting the size of a disk and other info like free space. <i>(Assembly and Basic source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="filedir.htm"><font size=3>Get Filenames in a Directory</font></A> (10 Dec 1999) 
+<img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12><br>
+ - Get filenames from any directory. <i>(Assembly and Basic source included)</i><br>
+ - Returns only DIR's when specified.<br>
+ - Includes code to get a files date and time.<br>
+<br>
+<A HREF="progname.htm"><font size=3>Getting the program name</font></A> (09 Dec 1998) <br>
+ - Retrieve the currently running program's path and name from the Environment - <b>Undocumented</b> <br>
+<br>
+<A HREF="getdrvs.htm"><font size=3>Get all accessible drives</font></A> (09 Dec 1998) <br>
+ - Get all disk drives that are accessible by DOS <i>(Assembly source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="wipeit.htm"><font size=3>Wipe a files contents</font></A> (07 Dec 1997) <br>
+ - Wipe a files contents and then delete it.  Used for security purposes <i>(Assembly source included)</i><br>
+<br>
+<A HREF="cdinfo.htm"><font size=3>Getting info of a CD</font></A> (09 Dec 1998) <br>
+ - Retrieving the information of a CD (ID, Name, date, etc.) <i>(Assembly source included)</i><br>
+<br>
+<A HREF="splayit.htm"><font size=3>Compression using the splay-tree technique</font></A> (09 Dec 1998) <br>
+ - Compression using the splay-tree technique.   <i>(Assembly source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+ - <A HREF="longfile.htm"><font size=3>Long file names in DOS</font></A> (22 Dec 1998)<br>
+ &nbsp; - Now includes source code to get short filename of a long filename<br>
+ &nbsp; - Includes source code to view long filename in MS-DOS Mode (<i>with out Windoze 95</i>)<br>
+ &nbsp; - Using Long file names in DOS. --- <i>DOS 6.2 or higher only</i><br>
+<br>
+<a HREF="fexist.htm"><font size=3>File Exist</font></a> (05 Dec 1997) <br>
+ - A small example to show how to call an assembly routine in Quick Basic.  (assembly code included)<br>
+ - Now includes an example on how to have <b>in-line</b> assembly code in your Basic programs<br>
+<br>
+<A HREF="chkdsk.htm"><font size=3>Check Disk</font></A> (09 Dec 1998) <br>
+ - Checks a disk drive for ready (undocumented) returns error in DOS' ERROR LEVEL for use in batch files.<br>
+<br>
+<hr>
+<!-- **************** DOS ********************** -->
+<a name="dos"></a><font size=3 color=purple>DOS</font> - Info/source/etc. that has to do with DOS, the DOS prompt, DOS programs, compilers, etc..<br>
+<a href="clrsdos.htm"><font size=3>Change the colors in DOS</font></a> (27 Oct 1998) <br>
+ - How to change the colors in DOS.  i.e.:  When you use DIR, DOS prints the listing in RED on GREEN.  (Why would you want those colors.  Christmas ???)<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="drtut.htm"><font size=3>A DEBUG tutorial</font></a> (04 Nov 1997) <br>
+ - A Tutorial on DEBUG.  We write a small DIR routine. (Assembler source included).<br>
+<br>
+<a href="dosbugs.htm"><font size=3>Bugs in DOS and DOS programs</font></a> (24 Oct 1998) <br>
+ - Includes bugs to DOS programs and there fixes if any.<br>
+ - Includes a link to a large text file of basic bugs and quirks.<br>
+<br>
+<img src="roadwork.gif" align=middle alt="Under Construction" border=0 width=34 height=28>
+<a href="batch.htm"><font size=3>Batch File Programming</font></a> (20 Dec 1998) <br>
+ - Includes tutorials, utilities, and misc info on batch file programming.<br>
+<br>
+<hr>
+<!-- **************** GAMES ********************** -->
+<a name="games"></a><font size=3 color=purple>Games</font> - Info/source/etc. that has to do with programming games and the such.<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="gametutr.htm"><font size=3>A small game tutorial</font></a> (13 June 1998) <br>
+ - This tutorial includes information on graphics, animation, and sound. (assembly and C source included)<br>
+ - This tutorial will have different steps published on this page about every month.<br>
+ - - Current step:  Step 2<br>
+<br>
+<hr>
+<!-- **************** Hardware/System Programming ********************** -->
+<a name="hardware"></a><font size=3 color=purple>Hardware/System Programming</font> - Info/source/etc. that has to do with programming hardware which includes the BIOS, memory, etc. and System Programing.<br>
+
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+- <A HREF="pnpbios.htm"><font size=3>The PnP BIOS Data Area</font></A> (05 Dec 1998) <br>
+ &nbsp; - How to get the serial number of your Mother Board, the CPU speed, etc. from the PnP BIOS Data area on most Intel AMI BIOS machines.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="cputype.htm"><font size=3>Getting the CPU type</font></a> (20 Nov 1997)<br>
+ - A small simple routine to check for the CPU and FPU type. (assembly source included).<br>
+<br>
+<a href="ourint.htm"><font size=3>Create your own interrupt</font></a> (09 Dec 1998)<br>
+ - Create your own software interrupt "callable" by other assembler code just like calling int 21h. (assembly source included).<br>
+<br>
+<a href="demoisr.htm"><font size=3>A Demo ISR in C</font></a> (30 Nov 1997) <br>
+ - Creating your own Interrupt Handler for the TIMER interrupt. (C source included).<br>
+ - Includes a keyboard handler to check for more than one key press at a time. (C source included)<br>
+<br>
+<a href="ivect.htm"><font size=3>Interrupt Vectors</font></a> (09 Dec 1998) <br>
+ - Getting the address of an interrupt and viewing its code.<br>
+<br>
+<A HREF="int24h.htm"><font size=3>Using your own int24h error handler</font></A> (01 Aug 1997) <br>
+ - Using your own int24h error handler in your program. <i>(Assembly source included)</i><br>
+Also how to view the assembler source of DOS's Int24h handler and other interrupts. <b>Undocumented</b><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="mcb.htm"><font size=3>Viewing the MCB's and the Master Environment Block</font></A> (29 Oct 1998)<br>
+ - Viewing the Memory Control Blocks and getting the address of the master environment block. <b>Undocumented</b><br>
+ - Now includes code to add to the PATH= variable string in the master environment block.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="cmosinfo.htm"><font size=3>Retrieving the CMOS memory information</font></A> (06 Jan 1999) 
+<img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12><br>
+ - The CMOS memory information<br>
+ - Getting the date of the machine, by-passing DOS.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="tsrdemo.htm"><font size=3>Terminate and Stay Resident Programming</font></A> (13 Dec 1998) <br>
+ - Terminate and Stay Resident Programming.<br>
+ - Also includes a routine to 'turn off' the internal speaker using a TSR.<br>
+ - Includes a TSR to send DOS's screen mode 03h to the Windoze clipboard.<br>
+ - Now includes a sample source to hook int 21h and do some code before and after each time int 21h is called.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="emsinfo.htm"><font size=3>An EMS tester</font></A>  (17 Apr 1997)
+Current Version:  1.00<br>
+ - An EMS tester.  Shows how to display the information about your EMS.  <i>(Assembly source included)</i><br>
+<br>
+<A HREF="settimer.htm"><font size=3>Set a timer</font></A> (09 Dec 1998) <br>
+ - Set a internal timer that sets a flag when time is up, allowing your program to do something else without waiting for the timer (sort of multi tasking).<br>
+<br>
+<A HREF="rombios.htm"><font size=3>ROM BIOS</font></A> (08 Oct 1997) <br>
+ - The values and the uses of the ROM BIOS data area<br>
+<br>
+<A HREF="romver.htm"><font size=3>ROM Version</font></A> (30 June 1998) <br>
+ - Print the systems' ROM BIOS version, date, and machine ID<br>
+<br>
+<A HREF="isegcall.htm"><font size=3>Inter-Segment calls in assembler</font></A> (09 Dec 1998) <br>
+ - Inter-Segment calls in assembly can be very similar to Overlays.<br>
+ - If your program needs to be small so that you have a lot of free memory, try this.<br>
+<br>
+<hr>
+<!-- **************** I/O Programming ********************** -->
+<a name="input"></a><font size=3 color=purple>Input/Output Devices</font> - Info/source/etc. that has to do with programming I/O Devices.<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="modminfo.htm"><font size=3>Information on Modems</font></a> (02 Jan 1998) <br>
+ - Information on Modems.  Includes most Hayes compatible commands as well as <i>call waiting</i> and other 'interesting' features.<br>
+ - Now includes a small, <i>simple</i> terminal program written in versions of C, Pascal, Basic, and assembler that use some of these features.<br>
+<br>
+<a href="printjet.htm"><font size=3>Printing to Hewlett-Packard</font></a> 
+ (19 Oct 1997) <br>
+ - Printing graphics to a Hewlett-Packard in Basic (Basic source included).<br>
+<br>
+<a href="joystick.htm"><font size=3>Joystick</font></a> (08 Oct 1997)  <br>
+ - Programming the joystick.<br>
+<br>
+<a href="prntcol.htm"><font size=3>Printing Colored Text</font></a> (23 Sept 1997) <br>
+ - Print colored text on an ink jet printer (<i>Quick Basic example included</i>)<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="mouse.htm"><font size=3>A complete mouse library</font></A> (21 Sept 1998) <br>
+ - A complete mouse library for assembly and calling the mouse in Basic and C <i>(source included)</i><br>
+<br>
+<A HREF="prntgrax.htm"><font size=3>Printing graphics on a dot matrix printer</font></A> (18 Jan 1998) <br>
+ - Printing graphics on a dot matrix printer (Epson compatible printers).<br>
+ - Now includes basic code to print large text.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="altkey.htm"><font size=3>Alt Key</font></A> (30 Mar 1997) <br>
+ - A small example to show how to call an assembly routine in Turbo Pascal.  (assembly code included)<br>
+<br>
+<a href="gameport.htm"><font size=3>Detecting the Game port</font></a> (09 Dec 1998) <br>
+ - Checking to see if there is a game-card. <i>(Assembly  included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="kbuffio.htm"><font size=3>Using the Keyboard buffer</font></a> (25 Sept 1998) <br>
+ - Getting keys from the keyboard buffer without using any interrupts or other DOS services. <i>(C source included)</i><br>
+ - Now includes code (basic and assembler) to see if a key is being pressed without the annoying keyboard delay.  <i>Great for game programming</i>.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="kbbuffio.htm"><font size=3>Using the buffered keyboard input of Service 0Ah</font></a> (04 Oct 1998) <br>
+ - Getting a string of chars from the keyboard with DOS's editing capabilities. <i>(Assembler source included)</i><br>
+<br>
+<hr>
+<!-- **************** Misc Programming ********************** -->
+<a name="misc"></a><font size=3 color=purple>Misc Item Programming</font> - Info/source/etc. that has to do with all/none of the other subjects.<br>
+<a href="gettoday.htm"><font size=3>Get todays weekday name</font></a> (16 June 1998) <br>
+ - Get todays weekday name.  i.e.: Sunday, Monday, etc.<br>
+<br>
+<a href="clipbrd.htm"><font size=3>Communicated with the Windoze Clipboard from DOS</font></a> (09 Aug 1998) <br>
+ - Manipulating the Windoze Clipboard in DOS. (C and Basic source included).<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<a href="multbig.htm"><font size=3>Multiply extremely large numbers</font></a> (17 Sept 1997) <br>
+ - Multiply two extremely large numbers in Quick Basic the 'handwritten way'.  (<i>Quick Basic code included</i>)<br>
+<br>
+<A HREF="prthex.htm"><font size=3>Print Hex</font></A> (09 Dec 1998) <br>
+ - Print a number to the screen in hex format (small and tight assembler code)<br>
+ - now with smaller and tighter assembler code<br>
+<br>
+<A HREF="cmndline.htm"><font size=3>Getting the Command Line parameters</font></A> (04 May 1997) <br>
+ - How to get a programs parameters off of the command line.<br>
+<br>
+<A HREF="execute.htm"><font size=3>Executing a program within another program</font></A> (09 Dec 1998) <br>
+ - The assembly code listing to execute a program from within another program.<br>
+<br>
+<A HREF="chkwin.htm"><font size=3>Check Windoze</font></A> (09 Dec 1998) <br>
+ - Checks to see if in a Windoze-DOS session or running in True DOS.  Returns version info in DOS' ERROR LEVEL for use in batch files.<br>
+<br>
+<hr>
+<!-- **************** Sound Programming ********************** -->
+<a name="sound"></a><font size=3 color=purple>Sound Programming</font> - Info/source/etc. that has to do with Sound Programming.<br>
+<A HREF="snd.htm"><font size=3>Producing sound on the internal Speaker</font></A> (09 Dec 1998) <br>
+ - Using the internal speaker to produce sound. <i>(Assembly source included)</i><br>
+ - Now includes a TSR in assembler to 'silence' the speaker. <i>(Assembly source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="playwav.htm"><font size=3>Playing WAV files in DOS</font></A> (19 Sept 1998) <br>
+ - Play WAV files in DOS <i>(Assembly, Basic, and Pascal source included)</i> <br>
+<br>
+<A HREF="detectsb.htm"><font size=3>Detecting a Sound Blaster</font></A> (09 Dec 1998) <br>
+ - Detecting for a Sound Blaster or compatible Sound Card on the current system.   <i>(Assembly source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="cdp.htm"><font size=3>A CD Player for DOS</font></A> Current Version:  2.25e (08 Nov 1998) <br>
+ - A command-line CD Player for DOS that has all the standard functions including
+<b>Eject</b> and <b>Close</b>ing the tray, and <b>background playing</b>.  (Exit to DOS 
+while letting the CD continue to play)  <i>(Assembly source included)</i><br>
+<b>Now includes a FAQ list to help you write your own CD player.</b><br>
+<br>
+<hr>
+<!-- **************** Video Programming ********************** -->
+<a name="video"></a><font size=3 color=purple>Video/Graphics Programming</font> - Info/source/etc. that has to do with the Video and Graphics Programming.<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="vesa.htm"><font size=3>Checking for a VESA compatible system</font></A> (16 July 1997) <br>
+ - Checking for a VESA compatible system. <i>(Assembly source included)</i><br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="modex.htm"><font size=3>Programming the VGA</font></A> (29 Apr 1997) <br>
+Programming the VGA with pixel resolutions of up to (320x400 x 256 colors)   <i>(Assembly source included)</i><br>
+<br>
+<A HREF="bmpfile.htm"><font size=3>BMP files explained</font></A> (17 Apr 1997) <br>
+ - Describes the BMP files' header and how it stores graphics and attributes.<br>
+<br>
+<A HREF="pcxfile.htm"><font size=3>PCX files explained</font></A> (05 July 1998) <br>
+ - Describes the PCX files' header and how it stores graphics and attributes.  Also explains Run-length encoding (RLE), which is used in PCX files.<br>
+<br>
+<img src="cdp.gif" align=middle alt="Source Code Included" border=0 width=38 height=37>
+<A HREF="font.htm"><font size=3>Font</font></A> (09 Dec 1998) <br>
+(<b>now includes a C version</b> (by request))<br>
+(<b>now includes a Pascal version</b> (by request)) <br>
+ - Changes the font of the text mode 8x14 character set.<br>
+                 ** Only works on an EGA or better card **<br>
+<br>
+<!-- ****************************************************************************** -->
+<a name="bottom"></a>
+<hr>
+<p align=center>
+<img src="help.gif" align=middle alt="need help" border=0 width=27 height=34>
+If you are a DOS programmer and need a little help
+<img src="help.gif" align=middle alt="need help" border=0 width=27 height=34><br>
+e-mail me with the question and I will get back with you as soon as possible with the answer, a little bit of code, or what ever it takes.  If I can't help you I will point you to someone or somewhere that can.  There is no charge for the help, you don't even have to give me any credit, I just like to pass on knowledge and hope that I can expand mine by helping others.<br>
+<hr>
+<p align=center>
+This is a <b>Puzzle</b> page rather than a <b>Contest</b> page.<br>
+About every week or so, there will be a new puzzle.<br>
+(not lately though, huh?  I am working on it)<br>
+Enter <A HREF="puzzles.htm"><font size=3>Puzzle Page</font></A><br>
+<hr>
+<p align=center>
+<A HREF="faq.htm"><font size=3>FAQ list</font></A><br>
+Last  <img src="updated.gif" align=middle alt="Updated" border=0 width=38 height=12> on: 
+15 Nov 1998<br>
+<br>
+<p align=center>
+<a href="books.htm"> <img src="books.gif" align=middle alt="Books" border=0 width=45 height=39></a><A HREF="books.htm"><font size=3>Recommended Reading</font></A><a href="books.htm"> <img src="books.gif" align=middle alt="Books" border=0 width=45 height=39></a>
+<hr>
+<p align=center>
+ <A HREF="newbie.htm"><font size=3>Programming help for 'Newbies'</font></A> <br>
+This is a page devoted to the Newbie.  It has programming help and info for new programmers just starting or novice programmers that would like to learn more.<br>
+<br>
+<A HREF="misc.htm"><font size=3>Utilities and misc programming files</font></A> <br>
+This is a page where I will put misc files and DOS utilities that I have created.<br>
+<br>
+<A HREF="tipstrks.htm"><font size=3>Tips and Tricks of DOS and DOS Programming</font></A> 
+<br>
+Tips and Tricks for DOS and DOS apps, and Tips and Tricks for DOS programming<br>
+<br>
+<A HREF="wintips.htm"><font size=3>Tips For Windoze 95</font></A> <br>
+Misc tips to move faster and easier through this 'other' platform to help make your DOS session better<br>
+<br>
+<A HREF="undoc.htm"><font size=3>Undocumented DOS programming</font></A><br>
+Undocumented DOS Programming<br>
+
+<p align=center>
+<img src="chain.gif" align=middle alt="links" border=0 width=50 height=23> 
+ These are some of my <a HREF="links.htm"><font size=3>Most Used</font></a> links 
+<img src="chain1.gif" align=middle alt="links" border=0 width=50 height=23><br>
+      
+<p align=center>
+<a HREF="newbasic.htm"><font size=3>New Basic</font></a> is a new compiler/interpreter/assembler for DOS
+<p align=center>
+<hr>
+<p align=center>
+<font size=2>
+<A HREF="aboutme.htm"><font size=3>Benjamin David Lunt</font></A><br>
+<img src="mail.gif" align=middle alt="mail" border=0 width=23 height=20>
+<b><A HREF="mailme.htm">blunt@zekes.com</A></b>
+<img src="mail.gif" align=middle alt="mail" border=0 width=23 height=20><br>
+http://www.zekes.com/~blunt/index.htm<br>
+<I>Copyright &copy; 1984-1999 Forever Young Software<br>
+Best viewed at a resolution of 1024x768 x 16 bpp<br>
+This Home Page was created on Sunday, March 30, 1997<br>
+<b>Most recent revision:  Monday, January 18, 1999<br>
+11:26pm  US Mnt Strd Time</b><br>
+All rights reserved<br></I>
+<A HREF="legal.htm"><font size=2>Legal Notice</font></A><br>
+</font>
+<hr>
+<p align=center>
+<font size=3>
+<a HREF="http://www.zekes.com"><IMG SRC="zekes.jpg" ALT="Go To My Internet Service Provider" ALIGN=middle BORDER=0 WIDTH=100 HEIGHT=50></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a HREF="http://www.gw2k.com"><IMG SRC="gw2k.gif" ALT="Go To Gateway 2000" ALIGN=middle BORDER=0 WIDTH=150 HEIGHT=50></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="mylink.gif" align=middle alt="Put this image on your page and link to http://www.zekes.com/~blunt/index.htm" border=0 width=125 height=56>
+</font><br>
+<br>
+
+<a HREF="http://www.microsoft.com/ie/download"><IMG SRC="msie.gif" ALT="Microsoft IE" ALIGN=middle BORDER=0 WIDTH=88 HEIGHT=31></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a HREF="http://home.netscape.com/comprod/mirror/index.htm"><IMG SRC="netscape.gif" ALT="Netscape" ALIGN=middle BORDER=0 WIDTH=88 HEIGHT=30></A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a HREF="http://home.arachne.cz/"><IMG SRC="arachne.gif" ALT="Arachne DOS Browser" ALIGN=middle BORDER=0 WIDTH=88 HEIGHT=31></A>
+<br>
+
+<br>
+<a href="http://www3.pagecount.com/aa-cgi-bin/user.map2/108074">
+<img src="http://www3.pagecount.com/aa-cgi-bin/counter.gif?108074&g" alt="PageCount.com" width=472 height=105 border=0 ISMAP></a><br>
+<hr>
+<p align=center>
+<A HREF="aboutme.htm"><font size=2>About Me</font></A> |
+<A HREF="books.htm"><font size=2>Books</font></A> |
+<A HREF="contest.htm"><font size=2>Contest</font></a> |
+<A HREF="dhmag.htm"><font size=2>DHMag</font></A> |
+<A HREF="faq.htm"><font size=2>FAQ</font></A> |
+<A HREF="legal.htm"><font size=2>Legal Notice</font></A> |
+<A HREF="links.htm"><font size=2>Links</font></A> |
+<A HREF="mailme.htm"><font size=2>email</font></A> |
+<A HREF="misc.htm"><font size=2>Misc</font></A><br>
+<A HREF="newbasic.htm"><font size=2>New Basic</font></A> |
+<A HREF="newbie.htm"><font size=2>Newbie</font></A> |
+<A HREF="news.htm"><font size=2>News</font></A> |
+<A HREF="puzzles.htm"><font size=2>Puzzles</font></A> |
+<A HREF="tipstrks.htm"><font size=2>Tips-Tricks</font></A> |
+<A HREF="undoc.htm"><font size=2>Undoc</font></A> |
+<A HREF="wintips.htm"><font size=2>Win Tips</font></A><br>
+<br>
+The Israelites looked at Goliath and moaned, "He is so big! How can we ever defeat him?"<br>
+David looked at Goliath and exclaimed, "He is so big!  How could I ever miss?"<br>
+<i>unknown author</i><br>
+</p>
+
+</td>
+</table>
+
+</BODY>
+</HTML>

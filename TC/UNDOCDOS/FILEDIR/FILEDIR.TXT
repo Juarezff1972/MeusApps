@@ -1,0 +1,68 @@
+FILEDIR is a routine to retrieve specified filenames from a directory
+    Version:  1.02b
+     Author:  Ben Lunt (Forever Young Software(R))
+       Date:  10 Dec 1999
+  Assembler:  MASM 5.10
+   Compiler:  QB45
+
+
+This package contains the following files:
+      DEMO.BAS        The demo QB45 program to call FILEDIR
+      FILEDIR.ASM     The MASM 5.1 assembler code for FILEDIR
+      FILEDIR.OBJ     The OBJ file ready for link
+      FILEDIR.QLB     The Quick Lib for use with QB45 interpreter
+      FILEDIR.TXT     You are reading it.
+
+
+DEMO.BAS is an example of how to call the assembler routine.
+
+You must DIM an array of at least the amount of files assumed and each
+array subset must be 12 bytes long.
+
+FATTR% is sent as what attrib to get.
+   1 --> Read only
+   2 --> Hidden
+   4 --> System
+   8 --> Volume Label only
+  16 --> Sub Dir's
+  32 --> all regular files
+
+You can mix and match.  i.e.:  1+2+4 (7) will return all files that are
+  Read Only, Hidden, and System only.
+
+DFiles$ is the file(s) to return  (you may use wildcards)
+
+
+To use the QLB file in the interpreter, type the following at the DOS prompt:
+
+  qb /l filedir demo
+
+
+To link the OBJ file to a program you have made:
+
+  link progname+filedir,,,bcom45;
+
+
+History:
+ 10 Dec 1999 - 1.02b
+    No version difference.  Only added a little better demo.bas
+
+ 16 Nov 1998 - 1.02b
+    Fixed DIR attrib 'flag' bug, so that if you specify 16 in FATTR%, then
+     this routine wouldn't return anything else until a restart.
+    Thanks to Dan Badstubner for catching this bug.
+
+  9 Jan 1998 - 1.01b
+    Fixed DIR attrib.  If you specify 16 in FATTR%, then this routine
+      will only return dir's.
+
+
+This code is freeware.  You may use this code as you wish, but PLEASE
+leave me the credit if you distribute it anywhere.  Also, (for my own
+protection), if this code, in any way, does bad things to your machine,
+I am not responsable.
+
+  e-mail:  blunt@zekes.com
+ webpage:  http://www.zekes.com/~blunt/index.html
+
+     Forever Young Software(R) (C)1984 - 1999     All rights reserved

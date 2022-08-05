@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>Programming the internal timer</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Programming the internal timer</H1>
+<br><br><br><br>
+<pre><font size=2>		push	ds
+		pop	es
+		mov	bx,offset Flag	; must point to a BYTE in your data segment (make sure es=ds)
+		mov	ax,8300h	; (AH) Service 83h, --  (AL)=0 to start timer, 1 to cancel timer
+		mov	cx,004Ch	; 5,000,000  (or 5 sec)
+		mov	dx,4B40h	;  cx = high order word of interval time, dx = low order word
+		int	15h		; 1,000,000 = 1 sec (cx:dx = how many microseconds to wait)
+
+LoopIt: 	mov	al,Flag		; Check to see if flag set (80h)
+		or	al,al		; if it is set then do code
+		jnz	TimerUp    	;
+		.
+		. do what ever code you wanted to do while timer was tickn'
+		.
+		jmp	short LoopIt
+TimerUp:				;  do what ever code you wanted to do when timer was up
+</font></pre>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<br><br>
+Be careful.  If you put some complicated code inside the loop that is running while the timer
+is tickn', then you might not catch the timer on time.  If you test for the 'timer up' at the
+top of the loop, then have some code that takes 16 cycles to execute before you get back to
+test the flag, you could be off by 16 cycles.  So make it short!<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</font></P>
+</td>
+</table>
+</BODY>
+</HTML>

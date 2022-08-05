@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<TITLE>The CMOS memory information</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>The CMOS memory information</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+CMOS stands for:  <b>C</b>omplementary <b>M</b>etal <b>O</b>xide <b>S</b>emiconductor<br>
+<br>
+In the 286 and up, the CMOS memory chip holds 64 bytes of data.  The data is held in the chip by the battery.  This is so that when you turn your machine off, the machine can still keep track of the time, data, disk type(s) and so one.<br>
+<br>
+The CMOS memory is accessed via 2 I/O ports, at addresses 70h and 71h.  A program writes the config. address (00h through 3Fh) to I/O port 70h and then writes a new byte value or reads the current byte value at I/O port 71h.  <b>I strongly suggest that you don't write to these ports unless you know what you are doing.  You could severely mess up your machine</b><br>
+<br>
+The following table specifies the information in the CMOS memory:<br>
+<font face="" size=3><pre>
+address (hex)		Contents
+	00h		Current Second   (either in BCD or hex format, see bit 2 of offset 0Bh below)
+	01h		Second Alarm
+	02h		Current Minute   
+	03h		Minute Alarm
+	04h		Current Hour     (see bit 1 of offset OBh below)
+	05h		Hour Alarm
+	06h		Day of the Week
+	07h		Day of the Month
+	08h		Month
+	09h		Year (00-99)   (see offset 32h)
+	0Ah		Clock Register A
+	0Bh		Clock Register B
+			bits:	76543210	Meaning
+				X.......	1 = enable clock setting by freezing updates
+				.X......	1 = enable periodic interrupt
+				..X.....	1 = enable alarm interrupt
+				...X....	1 = enable update-ended interrupt
+				....X...	1 = enable square wave output
+				.....X..	1 = Data Mode - 0: BCD, 1: Binary
+				......X.	1 = 24/12 hour selection - 1 enables 24 hour mode
+				.......X	1 = Daylight Savings Enable
+							=1 enables automatic switching to/from DST
+								in April and October
+
+	0Ch		Clock Register C
+	0Dh		Clock Register D
+	0Eh		Diagnostic byte (got during Power On Self Test)
+			bits:	76543210	Meaning
+				X.......	1 = CMOS battery Dead
+				.X......	1 = checksum incorrect
+				..X.....	1 = config. byte incorrect
+				...X....	1 = memory size incorrect
+				....X...	1 = hard disk or controller error
+				.....X..	1 = date or time incorrect
+				......XX	Not used
+	0Fh		Power-down system status  ?what was last boot?
+	10h		Bits 4-7: first floppy disk type
+				0000 = no disk drive
+				0001 = 5.25" 320k or 360k
+				0010 = 5.25" 1.2m
+				0011 = 3.5"  720k
+				0100 = 3.5"  1.44m
+				0110 = 3.5"  2.88m
+			Bits 0-3: second floppy disk type
+				same as above
+	11h		reserved
+	12h		Bits 4-7: first Hard Drive type
+	  		Bits 3-0: second Hard Drive type
+	13h		reserved
+	14h		Configuration byte
+			bits:	76543210	Function		 Meaning
+				XX......	number of disk drives	00 = 1 drive
+								01 = 2 drives
+				..XX....	Primary display type		00 = display has its own BIOS
+								01 = 40-column CGA
+								10 = 80-column CGA
+								11 = MDA
+
+				....XX..	not used
+				......X.			1 = math coprocessor installed
+				......X.			0 = no floppy drives
+								1 = floppy drives available
+	15h		Low byte of base memory size
+				100h = 256k
+				200h = 512k
+				280h = 640k
+	16h		High byte of 15h above
+	17h		Low expansion memory byte
+	18h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+	19h		Extended type byte: Hard drive 1
+	1Ah		Extended type byte: Hard drive 2
+	1Bh-2Dh		reserved
+	2Eh		check-sum for addresses 10h-2Dh  (word)
+	2Fh		  see above
+	30h		Low expansion memory byte
+	31h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+	32h		Centry in BCD (19 or 20)  (see offset 09h)
+	33h		Information flag
+</pre></font>
+<br><br><br>
+You may also use INT 11h to get some of this data.<br>
+<br>
+For more detailed information, download the following zip file: <a HREF="cmosinfo.zip">CMOSINFO.ZIP</A><br>
+<br>
+For a sample assembler program to print the date and time, download the following asm file: <a href="cmosdt.asm">cmosdt.asm</a> (3k)<br>
+<br>
+This was extracted from <i>Peter Norton's PC Programmers Bible</i><br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

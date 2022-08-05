@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>Getting the CPU and FPU type.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Getting the CPU and FPU type</H2>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+This small routine is a simple way of detecting between the different Intel CPU and FPU chips (80/88, 186, 286, etc.)<br>
+<br>
+There are ways to detect between the closer family of chips.  For instance; detecting between an 8086 and an 8088 (8-bit bus and 16-bit processors), and the 80186 and 80188 (just check the size of the instruction queue).  I do not do this in this routine, but if you need some help on doing this, let me know.<br>
+<br>
+The code is quite commented so with out any more blaa....<br>
+<br>
+To assemble the code using MASM 5.10:
+<font face="">
+<pre>
+  MASM cputype;
+  LINK cputype;
+  EXE2COM cputype;
+</pre>
+</font>
+If you need an EXE to COM converter, you can get one <a HREF="exe2com.exe">here</a>.<br>
+<br>
+Download the asm file from <a HREF="cputype.asm">here</A><br>
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  20 Nov 1997<br>
+Assembler:  MASM 5.10<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>
+

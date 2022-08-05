@@ -1,0 +1,49 @@
+ Forever Young Software      (C)opyright 1984-1998      All rights reserved
+Registering: ---->  CD Player  v2.25e  (if different, please specify below)
+
+**All information is optional and will not be given or sold to anyone else**
+
+  Last Name: ______________________________   (Circle one)   Male  Female
+ First Name: ____________________  M.I. ___      Age:  -18    19-45    46+
+  Address 1: ______________________________
+  Address 2: ______________________________   1st Language spoken:
+      State: ______________________________      __________________________
+Zip or code: ______________________________
+    Country: ______________________________   2st Language spoken:
+      Phone: ______________________________      __________________________
+
+Education:
+  Last grade completed:  8 9 10 11 12  GED  Bach1  Bach2  Masters  other
+  Studied: ________________________________________________________________
+  Degree:  no   yes --> ___________________________________________________
+
+Programming Skills:
+   Favorite Platform:  DOS  Windoze95/3.1x  UNIX  OS/2  Other:_____________
+  Most used Platform:  DOS  Windoze95/3.1x  UNIX  OS/2  Other:_____________
+   Favorite language/assembler: _____________________________ ver: ________
+  Most used language/assembler: _____________________________ ver: ________
+
+Can you program in:    Fluent    Good    Fair    Not at All  (check one)
+  Assembly             ____      ____    ____       ____
+  Basic                ____      ____    ____       ____
+  C/C++                ____      ____    ____       ____
+  CoBOL                ____      ____    ____       ____
+  Delphi               ____      ____    ____       ____
+  ForTran              ____      ____    ____       ____
+  Java                 ____      ____    ____       ____
+  Pascal               ____      ____    ____       ____
+  Perl                 ____      ____    ____       ____
+  Visual C++           ____      ____    ____       ____
+  Visual Basic         ____      ____    ____       ____
+  Other: ____________  ____      ____    ____       ____
+
+Comments:_________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+__________________________________________________________________________
+
+ Forever Young Software   blunt@zekes.com   www.zekes.com/~blunt/index.html

@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<TITLE>The PnP BIOS data area</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<H2>The PnP BIOS data area</H2>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+Please note:  Since this page has just been created, I have not had a chance to double check all the information with another source.  If you find an error or have more information, please let me know.<br>
+<br>
+A lot of people have asked my how to get the serial number of the mother board or the CPU.<br>
+<br>
+Well, I haven't been able to create a program than will take the case off the machine and looking at the printed numbers, so let us try looking in the BIOS's Plug and Play Data Area for now. (grin)<br>
+<br>
+If you have a BIOS capable of PnP then you can check this data area for a lot of information about your machine:<br>
+<li>The serial numbers for just about anything that is PLUGged in and PLAYed.
+<li>The manufacturer of most items
+<li>The date of most items
+<li>etc..
+<br>
+<br>
+Search your BIOS area for the following 5 byte string:  "_DMI_" <br>
+<a href="dmi.asm">Here</a> is an assembler routine to find it for you in segment F000h.  Mine is at offset 9900h.<br>
+<br>
+Now, each <i>item</i> after this offset is in table format.  On my machine, the first table (type 0) starts at offset 9918h.  This type table is known as the BIOS information type.  It contains the BIOS vender name, version, release date, etc. about the bios.<br>
+<br>
+Next is type 1:  It is the System Information type.  It has the manufacture, product name, version, and serial number of the system.<br>
+<br>
+Next is type 2:  The type you want to get the serial number of the mother board.  (see below for an example)<br>
+<br>
+There are 38 types on my machine, not including the ending type(s).<br>
+<br>
+Each of these type tables have the following format:<br>
+<pre><font size=2 face="">offset  Name           Length     Value  Description
+ 00h    Type #          byte        n      Type number
+ 01h    Length          byte        n      Length of type (not counting strings)
+ 02h    Handle          word        n      Handle (when called from PnP services)
+ 04h    Item #1         byte      string/etc.
+</font></pre>
+If a value has the format string, then it will have a value of 1 for the first string, 2 for the second item with a string as its value, etc..   This way, the "viewer" can tell how many strings there are following the type table.<br>
+<br>
+These type strings are directly after the type table and are asciiz strings.  The last string is followed by a null char and then the next type table.<br>
+<br>
+Let us get the serial number given to the system by the manufacturer.  This serial number is the same number stamped on the back of the case and typed on your invoice.  Get out your documentation on your system or look on the back of your case and write down your serial number on scratch paper for future reference in reading the rest of this article.<br>
+<br>
+<ul>
+<li>First find the following string in the BIOS area (Most of the time it is at segment F000h.): _DMI_<br>
+(use the above linked source code if you want to.)<br>
+<li>Now jump down 18h bytes and you should be at the first of type 0 table.  The first byte should be a 0.  Then a length.  Is it 12h?  Probably.  So let us skip the next 12h bytes.  Now you should have 3 asciiz strings to skip over, and one null byte.<br>
+<li>Now you should be at the first of the type 1 table.  The System information table.  The first byte should be a 1 for type 1.  The next should be the length.  The Handle should come next (2 bytes).  Now the manufacturer string byte (1), with the product name string byte (2), and the version string byte (3), and now the serial number string byte should be a 4.  Yes?  Let us skip the next 3 asciiz strings and view the fourth string.  Is it the serial number you wrote down?  Most of the time it is.  If it is not, it will be filled with spaces or just a null string.  If it is spaces or a null string, your manufacturer decided not to put the number in the PnP bios.<br>
+</ul>
+<br>
+Wow, that wasn't to difficult.  There are many other type tables and all with very useful info.  For instance:<br>
+<ul>
+<li>Type 4 contains the actual speed of the processor.
+<li>Type 5 contains the supported speed of the memory controller.
+<li>How about the Cache speed, type 7.
+<li>The built-in pointing device, type 21.
+<li>Type 33 contains the system boot info.
+</ul>
+<br>
+The following .pdf file contains a lot more info on each one of these types: <br>
+<br>
+ &nbsp; <a href="ftp://download.intel.com/ial/wfm/smbios.pdf">ftp://download.intel.com/ial/wfm/smbios.pdf</a> (462k) (version 2.3) (Last checked: 05 Dec 1998)<br>
+<br>
+(alternate downloads:)<br>
+ &nbsp; <a href="http://www.phoenix.com/techs">http://www.phoenix.com/techs</a><br>
+ &nbsp; <a href="http://www.ibm.com/products/surepath">http://www.ibm.com/products/surepath</a><br>
+<br>
+Remember that all manufacturer BIOS's are different and you might have to do some more reading to find out what your BIOS is about, but this documentation I have just given you and the link above should work with all the following manufactures:<br>
+<br>
+American Megatrends Inc., Award Software International Inc., Compaq Computer Corporation, Dell Computer Corporation, Hewlett-Packard Company, Intel Corporation, International Business Machines Corporation, Phoenix Technologies Limited, or SystemSoft Corporation.<br>
+<br>
+Also, if you mess up your BIOS while doing any of the above mentioned actions, or playing around, I or any of the above manufactures are NOT to be held responsible.  <b>Use at your own risk</b>.
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</td>
+</table>
+</BODY>
+</HTML>

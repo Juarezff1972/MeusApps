@@ -1,0 +1,167 @@
+<HTML>
+<HEAD>
+<TITLE>The address of an interrupt.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>The address of an interrupt</H2>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The address of an interrupt can be taken from the interrupt vector table in low memory at address 0000:0000h.  This table has the addresses of all 256 interrupts (00h-FFh).  Each address takes 4 bytes in the table so the table is 1024 (1k) bytes long.  If you want to know the address of a specific interrupt, then get the dword at 4 x <i>n</i> where <i>n</i> is the interrupt wanted.  Example:  If I want the address of interrupt 21h, I would get the dword at offset 84h (132d) in the table.  <i>Remember that these 4 bytes are in little-endian format</i>.<br>
+<br>
+Once you have the segment and offset of that interrupt you can use DEBUG to see the code that makes up that interrupt.  For example:  If we find that interrupt 21h is at 1234:5678h, then we could start DEBUG and type in at the (-) prompt: u 1234:5678.  This would display the first part of the code for the DOS interrupt 21h.  You could then follow each jump, call, and so-on to find out how DOS does everything it does.<br>
+<br>
+I have included a small routine in assembly that displays the address of each interrupt from the vector table at 0000:0000h.  It is called IVECT.ASM and was assembled to a 418 byte COM file.  It prints about 3 or 4 lines per interrupt to the screen, so to view all of the text either press the pause key (pause or Ctrl-S) or redirect the text to a file.  i.e.: using <i>IVECT > IVECT.TXT</i> at the DOS prompt will redirect the text to the file named IVECT.TXT<br>
+<br>
+Version 1.10b includes a minor addition.  It now displays if the interrupt is being used.<br>
+<br>
+Version:  1.10b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  8 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a>
+<pre><font size=2>
+; This is a small util. to display the segment address of
+; each interrupt vector.  You can take this address of
+; a given interrupt number and use it in DEBUG with the
+; -u command to view the code of this interrupt.
+
+.model tiny
+.186
+           org  100h
+start:     mov  ax,cs                   ; free unused part of Mem Block
+           mov  es,ax                   ;   for .COM file format
+           mov  bx,4096                 ;
+           mov  ah,4Ah                  ;
+           int  21h                     ;
+
+           mov  si,offset StartIt       ; display start up string
+           call prtstring               ;
+
+           xor  bx,bx                   ; make es:bx point to 0000:0000
+           mov  es,bx
+
+           mov  cx,256                  ; 256 interrupts (00-FF)
+MainLoop:  push cx
+           mov  si,offset InvectS       ; display string
+           call prtstring               ;
+           mov  al,CIntVNum             ; display current int number
+           call prthexs                 ;
+           inc  byte CIntVNum           ; inc for next time
+           mov  dl,'h'                  ; print 'h'
+           mov  ah,02                   ;
+           int  21h                     ;
+           mov  si,offset InINumS       ; display string
+           call prtstring               ;
+           mov  ax,es:[bx]              ; get interrupt vector address
+           inc  bx                      ;  offset first (little endian)
+           inc  bx                      ;
+           push ax                      ;
+           mov  ax,es:[bx]              ;  segment second (little endian)
+           mov  cx,ax                   ;  save segment
+           inc  bx                      ;
+           inc  bx                      ;
+           call prthex                  ; and print segment
+           mov  dl,':'                  ; print ':'
+           mov  ah,02                   ;
+           int  21h                     ;
+           pop  ax                      ;
+           push ax                      ; save offset for IRET test
+           call prthex                  ; print offset
+           mov  dl,'h'                  ; print 'h'
+           mov  ah,02                   ;
+           int  21h                     ;
+           cmp  cx,0F000h               ; if segment => F000h then in ROM-BIOS
+           jb   short NotinBIOS         ;
+           mov  si,offset InBIOSS       ;
+           call prtstring               ;
+NotinBIOS: pop  si                      ; restore offset
+           push es                      ;
+           mov  es,cx                   ; see if IRET
+           mov  al,es:[si]              ;
+           pop  es                      ;
+           cmp  al,0CFh                 ; is it IRET
+           jne  short NotIRET           ;  if so, then not used
+           mov  si,offset NotUsedS      ;
+           call prtstring               ;
+NotIRET:   mov  si,offset CRLF          ;
+           call prtstring               ;
+           pop  cx                      ;
+           loop MainLoop                ;
+Done:      mov  ah,4Ch                  ; exit to DOS
+           int  21h                     ; 
+
+
+prtstring  proc near uses ax dx si
+ps1:       mov  dl,[si]                 ; Get character
+           inc  si                      ; Point to next one
+           or   dl,dl                   ; End of string?
+           jz   short ps2               ; Yes, so exit
+           mov  ah,02h                  ; Output a character
+           int  21h
+           jmp  short ps1               ; Keep doing it
+ps2:       ret
+prtstring  endp
+
+PrtHexs    proc near uses ax bx dx cx
+           mov  bx,offset Hex
+           push ax
+           shr  al,04h
+           xlatb
+           mov  dl,al
+           mov  ah,02
+           int  21h
+           pop  ax
+           and  al,0Fh
+           xlatb
+           mov  dl,al
+           mov  ah,02
+           int  21h
+           ret
+PrtHexs    endp
+
+PrtHex     proc near uses ax bx cx dx
+           mov  bx,offset Hex
+           mov  cx,04h
+HexLoop:   push ax
+           mov  al,ah
+           shr  al,04h
+           xlatb
+           mov  dl,al
+           mov  ah,02
+           int  21h
+           pop  ax
+           shl  ax,04h
+           loop HexLoop
+           ret
+PrtHex     endp
+
+CIntVNum   db  00h
+
+StartIt    db  13,10,'Interrupt Vector Display Util        Version   01.10b'
+           db  13,10,'Forever Young Software(r)   (C)opyright 1984-1999',13,10,10,0
+InvectS    db  13,10,'   Interrupt Vector Number:  ',0
+InINumS    db  13,10,'        at segment address:  ',0
+InBIOSS    db  13,10,'     In ROM-BIOS memory area.',0
+NotUsedS   db  13,10,' Interrupt not used.',0
+CRLF       db  13,10,0
+Hex        db  '0123456789ABCDEF'
+
+.end  start
+</font></pre>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

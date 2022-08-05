@@ -1,0 +1,191 @@
+<HTML>
+<HEAD>
+<TITLE>Using the Keyboard Buffered input of DOS.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Using the Keyboard Buffered Input of DOS</H2>
+</p>
+
+<p align=left><font color=black size=3 face="">
+
+<pre>
+----------
+> [....]  My question, [how to] use the DOS function for buffered 
+> keyboard input (0Ah), then write a program that allows the user 
+> to type a string, then echo's the string back to the screen 
+> using function (09h).
+> 
+> Thank you
+> 
+> Bill
+> 
+> 
+
+DOS's int 21h service 0Ah is one of the few that are truly
+services.  It allows the user to input a string a chars while
+being able to use backspace to correct errors and other
+niceties as such.
+
+First, service 0Ah needs a little bit of information before it
+can start working.  It needs a small buffer to store the
+string once the user has pressed the enter key.  This
+service also needs another byte of information.  The working
+length of this buffer.  i.e.  The allowed length of the string.
+
+Let us start.
+;  This assembler listing is assembled using NBASM ver 00.22.8x
+;  To get NBASM, a free assembler, go to:
+;    http://www.zekes.com/~blunt/newbasic.htm
+
+.model tiny
+.code
+
+; first let us print a string to the screen letting the
+; user no that we want him/her to enter a string
+; I will discuss the print service later
+
+           mov  dx,offset FirstS
+           mov  ah,09h
+           int  21h
+
+; Even though this service wants the location (offset) of
+; our buffer in DX, we need a BASE register to access
+; individual bytes in this buffer.  So lets put the offset in
+; BX.   (read below on how large of a buffer we need)
+
+           mov  bx,offset OurBuff
+
+; However, for smaller code, let us put the offset
+; in to DX also.  
+; (mov dx,bx is one byte smaller than mov dx,offset OurBuff)
+
+           mov  dx,bx
+
+; we need to tell service 0Ah that we want to allow up to
+; 32 chars in our string.  This is done by putting 33 in the
+; first byte of the buffer.  Why 33?  32 chars plus the
+;  <Enter> key.
+
+           mov  byte [bx],33
+
+; now we can call the service (interrupt) so DOS will do the
+; user input routine.
+
+           mov  ah,0Ah
+           int  21h
+
+; Once the user enters the string and presses <ENTER>, DOS
+; returns to this point.  Now we can do what we want with this
+; string.
+; Since you mentioned that you wanted to print the string to the
+; screen using service 09h, we will have to do some manipulation
+; on are newly acquired string.
+
+; First let us print another string denoting to the user, the
+;  string to be printed.
+
+           mov  dx,offset SecndS
+           mov  ah,09h
+           int  21h
+
+; Service 09h also wants the offset to the buffer (string) in DX.
+; But as stated before, we need a base register to access individual
+; bytes of the string.
+
+           mov  bx,offset OurBuff
+
+; Also, service 09h needs a '$' (dollar sign) at the end of the string
+; denoting 'end of string' for the service to stop printing here.
+; Where do we put this '$'?  Well we know that service 0Ah above
+; returns the actual length of the string in byte position two of the
+; working buffer.
+
+           mov  al,[bx+1]
+
+; AL now contains the actual length of the string.
+; Remember that offsets are zero based and [bx+1] is the second
+; position in the buffer.
+; Now we want to put a '$' at the end of the string so that service
+; 09h will stop printing at the end of our string.
+; Remember that the string doesn't actually start at the beginning
+; of our buffer.  It starts at offset 02h or at the third position.  So
+; we need to add 2 to the length to get to the end of the string.
+
+           add  al,02
+
+; Now that we know the offset from the beginning of the buffer
+; of where to put the '$', we need to put it there.
+; Remember that with 8086 assembler  we can not put an 8-bit register
+; into a 16 bit register, so we must clear out AH first
+; Then we need another Base (or index) register to hold this value.
+
+           xor  ah,ah
+           mov  si,ax
+
+; Just a note:  In assembler, there are many ways to do simple items
+; like clearing AH.  
+;   mov   ah,00h (takes 3 bytes)
+;   xor   ah,ah  (takes 2 bytes and is faster)
+;   cbw   (takes one byte, However,  This clears AH only if bit 7 of )
+;         ( AL is clear (i.e. if  AL < 128 )                         )
+; Now we can put the '$' at this position.
+
+           mov  byte [bx+si],'$'
+
+; Now we can point DX to the start of the string and call the service
+;  (interrupt).  Remember that DX needs to point to offset 02h.
+
+           mov  dx,offset OurBuff
+           add  dx,02
+           mov  ah,09h
+           int  21h
+
+; Taadaa.  Did it work?  Now we must tell DOS to quit our program or
+; the CPU will try to interpret the data in OurBuff as code and could
+; crash the machine.
+
+           mov  ah,4Ch
+           int  21h
+
+; We need to have the first byte of our buffer hold the working
+; size of the buffer.  The second byte is returned by the service
+; as the amount of chars entered.  The we need 32 bytes of space
+; because we wanted up to 32 chars.  And finally the last byte is
+; room for the CR (0Dh) that DOS appends to the string.
+
+OurBuff    db  00h,00h       ; the working and actual lengths
+           dup 32            ; string (adjust length to same as code above)
+           db  00h           ; the CR (ascii 13d)
+
+; Now the two strings to print for a nice user interface.
+; Note the 13,10 at the beginning.  Service 09h takes the 13 as
+; a carriage return (CR) and the 10 as a Line feed (LF).
+
+FirstS     db  13,10,'Please enter a string: $'
+SecndS     db  13,10,'       String entered: $'
+
+.end
+**********************************************************************************
+</pre>
+</font>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

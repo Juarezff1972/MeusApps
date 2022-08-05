@@ -1,0 +1,101 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 01, November 1998, Page 13</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page12.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page14.htm">Turn the page ---> </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Undocumented</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+Each article in this column will be about undocumented items and/or features of DOS and DOS Apps.  If you know of any undocumented items in DOS, DOS apps, Intel Instructions, etc.,  lease let us know and you could  be the author of the article for an upcoming issue. [Ed.]<br>
+<br>
+<b>Undocumented</b>.  Well, what does this word mean?  If I document something that is undocumented, then is it undocumented any more?<br>
+<br>
+Microsoft defines Undocumented in this fashion: "<i>Microsoft can not guarantee that the information in this entry will be valid for future version of MS-DOS.</i>" [Undocumented DOS, Addison Wesley, 1990].<br>
+<br>
+How about <i>something that is undocumented; is unsupported, most likely will be taken out of [DOS] at any time, and is without written references</i>.  Does that sound familiar?  However, Microsoft used a highly used, highly undocumented assembler instruction called the LOADALL instruction.  The LOADALL instruction allowed access to extended memory on a 286.  Did you ever see any documentation of it?  Did Intel ever let you know about it in their manuals?  In their table of opcodes, Intel put a blank next to <b>0F 05</b>, the opcode for LOADALL.<br>
+<br>
+How about the <i>DOS in-flag</i>?  Did you ever hear about this?  The <i>DOS in-flag</i> is used very much in writing TSRs to see if it is "safe" to enter DOS.<br>
+<br>
+How about the <i>list-of-lists</i>?  How much information is needed from this list and how would you know how to access this list?<br>
+<br>
+In each article of this column, we will take an undocumented topic and discuss it in detail to give you more information on an undocumented item of DOS.  We will also have "tips", so-to-speak, of other small items that are undocumented.<br>
+<br>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+
+For instance; how many times have you wanted to get the length of an asciiz string? There are many ways to do this:<br>
+<pre>         mov  si,offset string
+Loop1:   lodsb
+         or   al,al
+         jnz  short Loop1
+         mov  cx,si
+         sub  cx,offset string
+</pre> or <pre>         mov  si,offset string
+         xor  cx,cx
+Loop1:   lodsb
+         inc  cx
+         or   al,al
+         jnz  short Loop1
+</pre> or <pre>         les  di,string
+         mov  cx,256
+         xor  al,al
+         repne 
+         scasb
+         xchg cx,ax
+         mov  cx,256
+         sub  cx,ax
+</pre> how about <pre>         les  di,string
+         mov  ax,1212h
+         int  2Fh
+</pre>
+This undocumented service was included with DOS 3.x and up.
+<font color="blue">&#165;</font><br>
+
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page12.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page14.htm">Turn the page ---> </a><br>
+<p align=right><font color="black" size=2>Page 13
+
+</BODY>
+</HTML>

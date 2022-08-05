@@ -1,0 +1,212 @@
+<HTML>
+<HEAD>
+<TITLE>Detecting for a Sound Blaster.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Detecting a Sound Blaster</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+DETECTSB is Sound Blaster or compatible sound card detection routine for DOS<br>
+Version:  1.00<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  09 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a><br>
+<pre><font size=2>
+.model tiny
+.code
+           org  100h                    ; were need to make a .COM file
+start:     mov  dx,offset DSound        ; text output
+           mov  ah,09h
+           int  21h
+
+           call DetectIt                ; detect it here
+           jc   short RstError          ; if carry then error
+
+           mov  dx,offset SoundBD       ; text output
+           mov  ah,09h
+           int  21h
+
+           call Reset_DSP               ; reset it
+           jc   short RstError          ; if carry then error
+
+           mov  dx,22Ch                 ; enable SB speakers (for all SBs &lt;SB16)
+           call WaitWrite               ; dx = DSP write data or command
+           mov  al,0D1h                 ; al = enable speaker
+           out  dx,al                   ; output: DSP write data or command
+
+           xor  ax,ax                   ; setup IRQ :
+           mov  es,ax                   ; es to page 0 (Interrupt table)
+           mov  si,60                   ; si = position in interrupt table
+
+           in   al,21h                  ; disable IRQ
+           and  al,01111111b            ; set mask register bit to disable interrupt
+           out  21h,al
+
+           in   al,21h                  ; change pic mask
+           and  al,01111111b            ; clear mask register bit to enable interrupt
+           out  21h,al
+
+           mov  dx,offset DetDone       ; text output
+           mov  ah,09h
+           int  21h
+           xor  al,al                   ; no error   ERRORLEVEL = 0
+           jmp  short Done
+
+RstError:  mov  dx,offset Sberror       ; display information if Soundblaster
+           mov  ah,09h                  ;    is not on this baseaddress
+           int  21h                     ; text output
+           xor  al,al                   ; there was an error
+           dec  al                      ;     ERRORLEVEL = 0FFh
+Done:      mov  ah,4Ch
+           int  21h
+
+Reset_DSP  proc near
+
+           mov  dx,226h
+           xor  al,al          ; al = 1
+           inc  al
+           out  dx,al          ; start DSP reset
+
+           in   al,dx          ; wait for slow ports
+           in   al,dx          ;  .
+           in   al,dx          ;  .
+           in   al,dx          ;  .
+
+           xor  al,al
+           out  dx,al          ; end DSP Reset
+
+           add  dx,08h         ; dx = DSP data available
+           call WaitRead
+           sub  dx,04h         ; dx = DSP Read Data
+           in   al,dx
+           clc
+           cmp  al,0AAh        ; if there is a SB then it returns 0AAh
+           je   short SBthere
+           stc
+SBthere:   ret
+Reset_DSP  ENDP
+
+DetectIt   proc near
+
+           mov  dx,0388h
+           mov  al,04h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,60h
+           out  dx,al
+           call WaitWrite
+           dec  dx
+           mov  al,04h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,80h
+           out  dx,al
+
+           dec  dx
+           in   al,dx
+           xor  ah,ah
+           mov  bx,ax                   ; B
+
+           mov  al,02h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,0FFh
+           out  dx,al
+           call WaitWrite
+           dec  dx
+           mov  al,04h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,21h
+           out  dx,al
+           call WaitWrite
+
+           dec  dx
+           in   al,dx
+           xor  ah,ah
+           mov  cx,ax                   ; C
+
+           mov  al,04h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,60h
+           out  dx,al
+           call WaitWrite
+           dec  dx
+           mov  al,04h
+           out  dx,al
+           call WaitWrite
+           inc  dx
+           mov  al,80h
+           out  dx,al
+           stc                          ; Assume no success
+           and  bx,0E0h
+           jz   short DetDone1
+           and  cx,0E0h
+           cmp  cx,0C0h
+           jne  short DetDone1
+           clc
+DetDone1:  ret
+DetectIt   endp
+
+WaitRead   proc near
+
+           push cx
+           xor  cx,cx                   ; need that for slow SBs !
+loopWaitR: dec  cx
+           jz   short endloopR
+           in   al,dx                   ; al = data available status
+           or   al,al
+           jns  short loopWaitR         ; jump if bit7=0 - no data available
+endloopR:  pop  cx
+           ret
+WaitRead   endp
+
+WaitWrite  proc near
+
+           push cx
+           xor  cx,cx                   ; need that for slow SBs !
+loopWaitW: dec  cx
+           jz   short endloopW
+           in   al,dx                   ; al = write command status
+           or   al,al
+           js   short loopWaitW         ; jump if bit7=1 - writing not allowed
+endloopW:  pop  cx
+           ret
+WaitWrite  endp
+
+DSound     db 13,10,'Detect SoundBlaster   v1.00'
+           db 13,10,'Forever Young Software(r)     (C)opyright 1984-1999',13,10
+           db 13,10,'Trying to detect a Sound Blaster or compatible'
+           db 13,10,'  speaker system on this system.',13,10,'$'
+Sberror    db 13,10,'A SoundBlaster is not detected on this system.$'
+SoundBD    db 13,10,'SoundBlaster Detected.'
+           db 13,10,'  Starting init process.$'
+DetDone    db 13,10,'Process done......',13,10,10,'$'
+
+.end  start
+</font></pre>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

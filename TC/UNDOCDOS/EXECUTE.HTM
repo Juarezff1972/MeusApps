@@ -1,0 +1,119 @@
+<HTML>
+<HEAD>
+<TITLE>Executing a program within a program - Assembly included</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Executing a program within a program</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+I have included the assembly source listing (see below) for executing another program from within a High-level Programming Language.  I have used QuickBasic 4.5 as my example, but it should be easy enough to change it to C or Pascal.  Just see which order they stack the parameters on the stack and you can change it quite easily.<br>
+<br>
+<br>
+<b>THE SOURCE CODE:</b><br>
+<form><TEXTAREA NAME="Src1" ROWS=15 COLS=100 WRAP=off>
+Dosseg
+.model medium, basic
+.286
+.stack
+.data
+
+	CmdTail	db	64			; Length of command tail
+			db	64 dup(20h),13	; Actual command tail
+	Parms		dw	0		; Parent environment block is OK
+			dw	offset CmdTail	; Command tail address
+			dw	seg CmdTail
+			dw	0,0		; FCB pointers don't matter
+			dw	0,0
+.code
+Even						; make all math even for faster execution
+		public	execute			; make execute public to quick basic
+Execute	proc far basic uses bp bx cx dx si di ds es, execfile:word, Prms:word ; save registers
+		local	savess:word, savesp:word ; must save these  (can't push ss or sp on to stack)
+						 ;	(wouldn't know were to pop from when done)
+		push	ds			; make sure es = ds
+		pop	es			;
+		mov	bx,offset Prms		; Put passed parameter list
+		mov	si,[bx+2]			;    into our parameter list
+		mov	di,offset CmdTail		;
+		inc	di			; inc past len
+		mov	cx,64			; no more than 64
+PutParms:	lodsb				;
+		or	al,al			; end of passed list?
+		jz	short DonePs		; yes then end
+		stosb				;
+		loop	PutParms			;
+DonePs:		mov	ah,4Bh			; exec function
+		xor	al,al			; load and execute
+		mov	bx,offset execfile		; path name to file to execute
+		mov	dx,[bx+2]
+		mov	bx,offset parms		;    parameter block
+		sti
+		mov	savess,ss			; don't want to loose sp:ss during
+		mov	savesp,sp		;    exec call
+		cli
+		int	21h			; call interrupt
+		sti
+		mov	ss,savess			; restore sp:ss from saved values
+		mov	sp,savesp		;
+		cli
+		xor	ah,ah			; clear HI byte of RC
+		jnc	short ExeDn		; if error, carry set and al = error
+		xor	al,al			; if no error clear LO byte of RC
+ExeDn:		ret				; r2
+Execute		endp				; end of procedure
+		end				; end of assembly code
+</textarea></form>
+<br><br><br>
+
+To call this routine in QuickBasic4.5 use the following:<br>
+<font face="" size=2>
+<br>
+SETMEM (-10000)<br>
+DECLARE FUNCTION Execute% (ExecFile$, Prms$)<br>
+<br>
+PRINT Execute%("c:\DOS\EDIT.COM" + CHR$(0), "/someparameter" + CHR$(0))<br>
+</font>
+<br>
+<br>
+You give this function two parameters.  The first is the path and file name that you want to execute.  The second is the parameter list that would be added on to the command line if it was executed from the DOS prompt.  <i>Please note that both have the string of <i>+CHR$(0)</i> added to them.  This makes them ASCIIz.  MUST BE DONE.</i><br>
+<br>
+<br>
+<font face="" size=2>
+This function returns in Execute% an error code of:<br>
+     0 = OK<br>
+     1 = invalid function<br>
+     2 = file not found<br>
+     3 = path not found<br>
+     4 = too many files open<br>
+     5 = access denied<br>
+     8 = insufficient memory<br>
+    10 = invalid environment block<br>
+    11 = invalid format<br>
+<br>
+<br>
+</font>
+As QuickBasic allocates all of the available memory as startup, you must free some of that memory to allow this function to work.  You must free enough memory so that the wanted program can fit and all of the memory that it wants can fit.  To do this, you can use the following line:<br>
+SETMEM(- <i>somevalue</i>)<br>
+<br>
+<br>
+If you have any other questions or see a mistake that I made, please e-mail me and I will
+do my best to help out.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

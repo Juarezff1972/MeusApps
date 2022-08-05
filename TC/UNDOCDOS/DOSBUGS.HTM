@@ -1,0 +1,172 @@
+<HTML>
+<HEAD>
+<TITLE>Bugs in DOS and DOS Programs and there fixes (if any).
+Forever Young Software</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<H2>Bugs in DOS and DOS Programs and there fixes (if any)</H2>
+These are bugs/fixes that I know of and that people have told be about.  If you know of a bug and/or fix not displayed here, or you have more info on a bug/fix displayed here, please let me know.<br>
+<br>
+<a href="#dosutils"><font size=3>DOS Utilities</font></a>  - Bugs with DOS Utilities<br>
+<a href="#compilers"><font size=3>DOS Compilers/Assemblers</font></a>  - Bugs with DOS compilers/assemblers<br>
+
+
+<hr>
+<a name="dosutils"></a>
+<font size=4 color=purple>DOS Utilities</font> - Bugs with DOS Utilities<br>
+<b>DEBUG.EXE</b><br>
+<b>Version</b> (11:11a) (Win 95) and most likely all before<br>
+<b>Founded</b>: Forever Young Software (<a href="mailto:blunt@zekes.com">did you know about it?</a>)<br>
+<b>Date</b>: Oct 1998<br>
+<b>Fix</b>: No/Unknown<br>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+As I was playing with the CALL FAR instruction in DEBUG.EXE, I noticed a few bugs.<br>
+Enter DEBUG and then the A command to start assembling.<br>
+<font face= "" size=3>
+- Now enter: <pre>   CALLF [DI]
+   CALLFA [DI]
+   CALLFAR [DI]
+   CALLF 100
+   CALLFA 100
+   CALLFAR 100
+   Carriage return</pre>
+</font>
+- Now Enter U 100 to unassemble what you just entered.
+If you notice, for CALLF and CALLFA, DEBUG added the F and FA as literals to the command.<br>
+<font face= "" size=3>
+<pre>   CALLF [DI]   above now =   CALL [DI+0F]
+   CALLFA [DI]  above now =   CALL [DI+00FA]
+   CALLF 100    above now =   CALL 010F
+   CALLFA 100   above now =   CALL 01FA</pre>
+</font>
+<br>
+<hr width="50%">
+<br>
+<b>Do the following in Debug</b>:<font face="" size=3><pre>
+-e 100 d9 e2
+-u 100
+</pre></font>
+notice that nothing is printed on the 100 line<br>
+<br>
+<br>
+</font>
+<hr>
+<a name="compilers"></a>
+<font size=4 color=purple>DOS Compilers/Assemblers</font> - Bugs with DOS compilers/assemblers<br>
+<b>BC.EXE</b><br>
+<b>Version</b> 4.5 (Quick Basic 4.5)<br>
+<b>Founded</b>: Unknown<br>
+<b>Date</b>: Unknown<br>
+<b>Fix</b>: No/Unknown<br>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The line "PRINT var1, var2" results in var2 getting redefined. This only occurs in a compiled program, when called as a SUB. This does not occur when in the environment (interpreter).
+<pre>
+'---------start of main module
+DECLARE SUB dispdebug (v1%, v2%)
+DEFINT V
+dispdebug 10, 15
+
+'---------start of subroutine
+DEFINT V                   ' make sure you get this in there
+SUB dispdebug (v1%, v2%)
+    CLS
+    PRINT v1: PRINT v2
+    PRINT v1; "    "; v2
+    PRINT v1; v2
+    PRINT v2, v2
+    PRINT v1, v2
+    PRINT
+    PRINT v1; v2
+    PRINT v2; v1
+END SUB
+'---------end of subroutine
+'---------end of code
+
+Compiled output:
+(The question marks (??) denotes the value that is wrongly printed)
+(It is different on most occasions (I got zero (0))
+
+ 15 
+ 10 
+ 15      10 
+ 15  10 
+ 10            ??
+ 15            ??
+
+ 15  ??
+ ??  15
+
+</pre>
+Notice after the <i>print v2, v2</i> line the v2 var is redefined.<br>
+I think that it has to do with the stack.  Basic pushes the variables on the stack when passed to the sub, then it uses these stack positions as the variables.  QB does not define two new variables and use them.<br>
+<br>
+Try it with a few other variations.  You get some different values with different variations.<br>
+<br>
+<br>
+<b>BC.EXE</b><br>
+<b>Version</b> 4.5 (Quick Basic 4.5)<br>
+<b>Founded</b>: Unknown<br>
+<b>Date</b>: Unknown<br>
+<b>Fix</b>: No/Unknown<br>
+The Quick Basic compiler will not compile a source file (text or binary (fast save)) if it is named <i>USER.BAS</i>.<br>
+<br>
+The compiler expects input from <i>stdin</i> rather than the file <i>USER.BAS</i>.<br>
+Try it and see.<br>
+<br>
+There is a large text file of <b>Compiled Basic Bugs and Quirks</b> for version QB2.x through QB4.5.
+It is at <a HREF="ftp://ftp.coast.net/SimTel/msdos/qbasic/msquirks.zip">ftp://ftp.coast.net/SimTel/msdos/qbasic/msquirks.zip</A> and details a bug and/or quirk for just about every command in Basic.  Great reading.<br>
+</font>
+<br>
+<br>
+<b>Patch to tell BC/Link</b> not to include the communications code if you don't use COM: in your code<br>
+ - <a href="http://support.microsoft.com/download/support/mslfiles/NOCOM450.EXE">
+http://support.microsoft.com/download/support/mslfiles/NOCOM450.EXE</a><br>
+<br>
+<b>The Critical Error patch is at</b>:
+ - <a href="http://support.microsoft.com/download/support/mslfiles/QB4CRIT.EXE">
+http://support.microsoft.com/download/support/mslfiles/QB4CRIT.EXE</a><br>
+<br>
+<br>
+<b>MASM upgrades/patches:</b><br>
+ - <a href="http://support.microsoft.com/download/support/mslfiles/ML613.EXE">
+ML613.EXE --&gt; MASM 613 Patch</a><br>
+ - <a href="http://support.microsoft.com/download/support/mslfiles/ML612.EXE">
+ML612.EXE --&gt; MASM 612 Patch</a><br>
+ - <a href="http://support.microsoft.com/download/support/mslfiles/ML611D.EXE">
+ML611D.EXE --&gt; MASM 611d Patch</a><br>
+<br>
+<br>
+<b>Turbo Pascal (Inprise/Borland)</b><br>
+Info at <a href="http://www.inprise.com/devsupport/pascal/">
+http://www.inprise.com/devsupport/pascal/</a><br>
+ - Int 3 patch and info at:  <a href="http://www.inprise.com/devsupport/pascal/ti_list/TI113.html">
+http://www.inprise.com/devsupport/pascal/ti_list/TI113.html</a><br>
+ - Turbo Vision directories patch and info at: 
+<a href="http://www.inprise.com/devsupport/pascal/ti_list/TI1259.html">
+http://www.inprise.com/devsupport/pascal/ti_list/TI1259.html</a><br>
+ - Editor patch at: <a href="http://www.inprise.com/devsupport/pascal/ti_list/TI1259.html">
+http://www.inprise.com/devsupport/pascal/ti_list/TI1259.html</a><br>
+ - Turbo Debug info (version 5) info at: 
+<a href="http://www.inprise.com/devsupport/pascal/ti_list/TI456.html">
+http://www.inprise.com/devsupport/pascal/ti_list/TI456.html</a><br>
+ - Crt patch or runtime error 200 patch: (unsupported by Borland/Inprise):
+<a href="http://europe.rainbow.com/tech/tech_notes/tn2030_a.html">
+http://europe.rainbow.com/tech/tech_notes/tn2030_a.html</a><br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

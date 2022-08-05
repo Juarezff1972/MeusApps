@@ -1,0 +1,263 @@
+<HTML>
+<HEAD>
+<TITLE>Undocumented DOS Programming</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Undocumented DOS Programming</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<b>INTERRUPT 21h</b><br>
+<b>Service 37h</b> subservice 00h returns the default command line switch char. in DL.  (/ or -)<br>
+<br>
+<b>Service 34h</b> returns the address of the Critical Section Flag or <i>InDOS</i> flag address in ES:BX.  In DOS 2.x, the Critical Error Flag is the byte after while in DOS 3.x the Critical Error Flag is before the <i>InDOS</i> flag byte.  (In DOS 3.x, use service 5Dh subservice 06h to get the address of this Critical Error Flag).<br>
+If both of these flags are clear, it is OK to re-enter DOS.  If the <i>InDOS</i> flag is non-zero then DOS is busy and your TSR should wait to use INT 21h.<br>
+<br>
+<b>Service 37h</b> subservice 01h sets the default command line switch char. to the char specified in DL.<br>
+<br>
+<b>Service 52h</b> returns the address of DOS's internal list of tables and lists, AKA the <i>List of Lists</i> in DOS 2.x and higher.<br>
+This <i>List of Lists</i> contain things like address of first MCB, number of logical disks, and other items.  This list starts at 12 bytes before the actual address returned and goes up to 71 bytes after the returned address depending on the current DOS version.<br>
+If you have a copy of "UNDOCUMENTED DOS" by Addison Wesley, you can look on page 518 for this list in detail.<br>
+<br>
+<b>Service 53h</b> converts a BPB (BIOS-Parameter Block) to a DPB (Driver Paramter Block) (DOS 2+)<br>
+- on entry<br>
+&nbsp;AH = 53h<br>
+&nbsp;DS:SI <- of BPB to be converted<br>
+&nbsp;ES:BP <- of new DPB<br>
+- on return<br>
+&nbsp;Carry if error<br>
+<br>
+<b>Service 55h</b> Creates a new PSP (Program Segment Prefix) (DOS 2+)<br>
+(not necessarily needed but undocumented all the same)<br>
+ - Service 55h of Interrupt 21h  (DOS 2.0+)
+- on entry<br>
+&nbsp;AH = 55h<br>
+&nbsp;DX = new segment of PSP
+&nbsp;CX = old segment of PSP
+- on return<br>
+&nbsp;Carry if error<br>
+<br>
+<b>Service 60h</b> returns a 'qualified' path/filename in DI from the 'unqualified' path/filename is SI.  DI is a buffer of 128 or more.  This service will set all slashes to back-slashes; it will put a drive specification at from the path/filename if needed; and it will change all to upper case.  It will not check for file existences though.  DOS 3.x+<br>
+<br>
+<b>Service 69h</b> gets/sets the disk serial number in DOS 4.x.  You clear AL to 00h to get the disk information (see below) or set AL to 01h to set the disk information.  Set BL to the drive (0=default, 1=a, 2=b, etc.), DS:DX points to the disk info buffer.<br>
+This buffer has the format of:
+<font face="" size=3>
+<pre>Offset   Size   Description
+  00h    word    info level (00h)
+  02h   dword    disk serial number (binary)
+  06h  11 bytes  volume label or "NO NAME    " if none present
+  11h   8 bytes  "FAT12   " or "FAT16   " (only if AL=00h)
+</pre>
+</font>
+See <a href="snumber.htm"><font size=2>Getting the Serial Number</font></a> for the documented way of getting the serial number.  (This documented way doesn't allow you to set the info, only get the info.)<br>
+<br>
+<b>INTERRUPT 29h</b><br>
+Interrupt 29h will write the char in AL to the screen faster than service 02h or 09h of int 21h though is identical (not counting redirection) to service 02h of int 21h (but much faster).<br>
+<br>
+<b>INTERRUPT 2Eh</b><br>
+Interrupt 2Eh will execute a DOS command just as if you typed it in at the DOS prompt.  You give the command to execute in DS:SI with the first byte specifying the length the string including a CR (enter) char at the end of the string.  This interrupt destroys all registers including SS:SP.  Also, make sure you have freed enough memory for the COMMAND interpreter and the command to execute.  (DOS 2.0+)<br>
+<b>This interrupt will not return back to your program in a Windoze 95 DOS session.</b><br>
+<br>
+<b>INTERRUPT 2Fh</b><br>
+<b>Service 1212h</b> returns the length of an asciiz string including the null char. (DOS 3.x)<br>
+On Entry:<br>
+ &nbsp; AL = 12h<br>
+ &nbsp; AH = 12h<br>
+ &nbsp; ES:DI -> asciiz string<br>
+On Return:<br>
+ &nbsp; CX = length including the null ending char<br>
+<br>
+<b>Service 1213h</b> uppercase character. (DOS 3.x)<br>
+On Entry:<br>
+ &nbsp; AL = 12h<br>
+ &nbsp; AH = 13h<br>
+ &nbsp; last word put on stack is char to upper case<br>
+On Return:<br>
+ &nbsp; AL = upper case char<br>
+Note:  Push a value on to the stack, call this service, then pop<br>
+from the stack, or <kbr>add  sp,2</kbd><br>
+Note:  To uppercase a char if you know that it is already a lowercase char,<br>
+just <b>AND</b> the byte with 11011111b.  However, I include this service because it<br>
+is undocumented.  Why else?<br>
+<br>
+<b>Service 121Eh</b> compare filenames. (DOS 3.x)<br>
+On Entry:<br>
+ &nbsp; AX = 121Eh<br>
+ &nbsp; DS:SI --> first asciiz filename<br>
+ &nbsp; ES:DI --> second asciiz filename<br>
+On Return:<br>
+ &nbsp; ZF = set if equal<br>
+Note:  you don't have to use filenames.  Why not use any twp asciiz strings?<br>
+DOS won't know the difference!<br>
+<br>
+<br>
+<b>SAMPLE CODE FOR ABOVE:</b><pre><font size=2> ; assemble with <a href="newbasic.htm">NBASM</a>
+
+.MODEL tiny
+.code
+start:     .start            ; frees the desire memory we want
+           mov  ax,3700h     ; returns default switch char / or -
+           int  21h          ;
+           mov  ah,02        ;   subservice 01h sets
+           int  21h          ;         (dl=char to set)
+
+           mov  si,offset CRLF
+           call prtstring
+
+           mov  ah,60h              ; will change an 'unqualified' filename
+           mov  si,offset Unqulname ; to a 'qualified' filename.
+           mov  di,offset Qulname   ; i.e.:  put a drive letter and a
+           int  21h                 ; full colon in front of (if none)
+           mov  si,offset Unqulname ; will also make all forward-
+           call prtstring           ; slashes to back-slashs.
+           mov  si,offset CRLF      ; does no check for file existence
+           call prtstring           ; all upper case
+           mov  si,offset Qulname   ;  DOS 3.x+
+           call prtstring
+           mov  si,offset CRLF           
+           call prtstring                
+      
+           mov  al,'U'       ; FAST write char
+           int  29h          ; writes a char to the screen
+           mov  al,'N'       ; exactly like service 02h and 09h
+           int  29h          ;  of int 21h except much faster
+           mov  al,'D'       ; DOS 2.x+
+           int  29h          ;
+           mov  al,'o'       ;
+           int  29h          ;
+           mov  al,'c'       ;
+           int  29h          ;
+      
+           mov  si,offset DirStr ; Execute a command using BASE LEVEL
+           push ds           ; COMMAND Interpreter (DOS 2.0+)
+           push es           ; destroys all registers
+           push bp           ; including sp and ss
+           cli               ; the string to execute should have
+           mov  SaveSS,ss    ;   a single byte at the first with
+           mov  SaveSP,sp    ;   the length of the string and the
+           sti               ;   string should have a CR at the end
+           int  2Eh          ;
+           cli               ;  This command executes a command
+           mov  ss,SaveSS    ;  just like if you typed it in at the
+           mov  sp,SaveSP    ;  DOS prompt.
+           sti               ;
+           pop  bp           ;    Does NOT return to your program
+           pop  ds           ;     in a Windoze 95 DOS session.
+           pop  es           ;  Make SURE you free enough memory
+                             ; to run the COMMAND.COM and the command
+                             ; you are going to run.
+
+Done:      mov  ah,4Ch       ; exit to DOS
+           int 21h           ; 
+
+Prtstring  proc near uses ax
+Ps1:       mov  dl,[si]      ; Get character
+           inc  si           ; Point to next one
+           or   dl,dl        ; End of string?
+           jz   short ps2    ; Yes, so exit
+           mov  ah,02h       ; Output a character
+           int  21h
+           jmp  short Ps1    ; Keep doing it
+Ps2:       ret
+Prtstring  endp
+
+Unqulname  db  'dos/utils\edit.com',0
+Qulname    dup 128,0
+CRLF       db  13,10,0
+BPBbuffer  dup 25,0
+SaveSS     dw  00h
+SaveSP     dw  00h
+DirStr     db  8,'dir /-p',13
+
+.end  start
+</font></pre>
+<br><br>
+<hr>
+Also see <a href="progname.htm">program name</a> for another Undocumented routine.<br>
+<br>
+<hr>
+The BIOS Name is at F000:FF59h. It has an unknown length but is in an ASCIIZ string.<br>
+<br>
+The BIOS Date is at F000:FFF5h. It is 8 bytes long and has the form of: MM/DD/YY.  There is a NULL byte after it if you want to use it as an ASCIIZ string.<br>
+<br>
+The BIOS Time is at F000:FFE0h. It is 8 bytes long and has the form of: HH/MM/SS.  There is a NULL byte after it if you want to use it as an ASCIIZ string.<br>
+<br>
+Here is a small snippet of code to print them:<pre><font size=2> ; assemble with <a href="newbasic.htm">NBASM</a>
+
+.model tiny
+.code
+           org  100h            ; COM files start at 100h
+start:     mov  dx,offset NNstr ; print the NameNumber message
+           mov  ah,09
+           int  21h
+           push ds
+           mov  bx,0F000h       ; segment working with
+           mov  ds,bx
+           mov  si,0FF59h
+LoopIt1:   lodsb                ; get the byte
+           or   al,al
+           jz   short DNameN
+           int  29h             ; fast print it
+           jmp  short LoopIt1   ;
+
+DNameN:    pop  ds
+           mov  dx,offset BDate ; print the date message
+           mov  ah,09
+           int  21h
+           push ds              ; save DS
+           mov  cx,08           ; date is 8 bytes long
+           mov  si,0FFF5h       ; move pointer to F000:FFF5h
+           mov  ds,bx
+LoopIt:    lodsb                ; get the byte
+           int  29h             ; fast print it
+           loop LoopIt          ; loop 8 times
+           pop  ds
+
+           mov  dx,offset BTime ; print the Time message
+           mov  ah,09
+           int  21h
+           push ds
+           mov  ds,bx
+           mov  si,0FFE0h
+           mov  cx,08
+LoopIt2:   lodsb                ; get the byte
+           int  29h             ; fast print it
+           loop LoopIt2         ; loop 8 times
+           pop  ds              ; restore DS
+
+           mov  al,13           ; CR
+           int  29h
+           mov  al,10           ; LF
+           int  29h
+        
+           int  20h             ; exit to DOS
+
+BDate      db   13,10,'BIOS Date:  ',36
+NNstr      db   13,10,'BIOS Name:  ',36
+BTime      db   13,10,'BIOS Time:  ',36
+
+.end start
+
+</font></pre>
+<br><br>
+<hr>
+If you have any other questions or see a mistake that I made,
+<A HREF="mailme.htm">e-mail</A> me and I will do my best to help out.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

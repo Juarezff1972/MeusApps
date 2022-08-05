@@ -1,0 +1,7 @@
+LIBRARY              SUM
+DESCRIPTION          'Teste de DLL por (C) Coyote'
+EXETYPE              WINDOWS
+CODE                 PRELOAD MOVEABLE DISCARDABLE
+DATA                 PRELOAD MOVEABLE SINGLE
+HEAPSIZE             1024
+EXPORTS              somatorio

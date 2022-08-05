@@ -1,0 +1,24 @@
+EMSINFO  an EMS memory tester
+    Version:  1.03
+     Author:  Ben Lunt (Forever Young Software(R))
+       Date:  04/13/97
+  Assembler:  MASM 5.10
+
+Type EMSINFO at the DOS prompt
+
+This code is freeware.  You may use this code as you wish, but PLEASE
+leave me the credit if you distribute it anywhere.  Also, (for my own
+protection), if this code, in any way, does bad things to your machine,
+I am not responsable.
+
+This code was quickly put together.  If you see an error or have a
+suggestion or question about EMSINFO please e-mail me and I will do
+my best to help out.
+
+PLEASE DO NOT PUT YOUR REVISED VERSION ON THE WEB.  E-MAIL ME WITH
+YOUR REVISED CODE AND LET ME PUT IT ON THE WEB IN ITS' ORIGONAL PLACE
+AND IN ITS' ENTIRETY.  (I will give you credit if applicable)
+
+e-mail:  blunt@zekes.com
+
+     Forever Young Software(R) (C)1990 - 1997     All rights reserved

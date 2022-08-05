@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+<TITLE>Programming the VGA</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Programming the VGA</H1>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The Standard VGA mode 13h is the easiest and fastest color graphics programming.  It uses
+a single long, linear bitmap, with each byte controlling one pixel.  If I had a bitmap of
+320x200 with 256 colors with each pixel represented by a single byte, I can quickly put
+that bitmap on the screen by copying it to memory location 0A000:0000h.  This makes for
+extremely fast screen updates and flicker free animation.  Also, if I have a small bitmap
+of 25x25 that I want to scroll across the screen, All I need to do is put the background
+on using the tech. above and then copy the 25x25 space of the background into a temp memory
+position, copy my 25x25 bitmap to that location, wait, copy the saved 25x25 background bitmap
+back into its place and move to the next position.  This way I don't even touch the rest of
+background, and makes for even faster and better animation.  I could even get better animation
+by rotating through 3 or more 25x25 bitmaps of a man walking while moving across the screen
+to give a better representation of animation.<br>
+<br>
+Mode X is the undocumented mode of the VGA.  It is very close to Mode 13h (320x200x256)
+except it has more vertical pixels (320x240x256) and we have to send our data to the VGA's
+registers rather than just putting it into 0A000:0000h<br>
+<br>
+You can also program the VGA to have a resolution of 320x400 with 256 colors.  This mode
+is still 13h but we now use 4 bitplanes.  The standard VGA mode 13h is really a 320x400
+res. mode, except the designers wanted to only use 64k so they made each line display
+twice, hence the 320x200 res mode.  If we use 4 bitmaps, now we can take control of that
+second printed line.<br>
+<br>
+In this discussion, I will include a source code listing for a small animation demo for the
+standard VGA mode 13h.  You can get a copy of it <a HREF="ani.zip">here</A>, or below, and
+unzip it (<a href="ftp://ftp.pkware.com/pub/pkware/pkz204g.exe">PKUNZIP</a> 2.04g recommended) in a directory of your choice, then view ANI.TXT for
+more info on running the demo and view the source code (MASM 5.1).<br>
+<br>
+As far as the rest of the graphic modes described on this page, I suggest that you get a
+copy of the following book.  It is a very good, source filled documentation on all the
+graphical modes of the CGA, EGA, VGA, MGA, MCGA, and many more.  It includes a CD with all
+the code on it, and the complete text to his book, <i>Zen of Assembly Language</i>.<br>
+<br>
+Michael Abrash's ZEN of GRAPHICS PROGRAMMING<br>
+2nd Edition   1996<br>
+The Coriolis Group<br>
+ISBN 1-883577-89-6:  $44.99 (US dollars)<br>
+830+ pages of detailed documentation on programming graphics<br>
+See <a HREF="books.htm">here</A> on how to get this book.<br>
+<br>
+<a HREF="ani.zip">ANI.ZIP</A> (31k)<br>
+To see the demo, type ANI at the DOS prompt.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

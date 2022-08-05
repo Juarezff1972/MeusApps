@@ -1,0 +1,246 @@
+<HTML>
+<HEAD>
+<TITLE>Producing Sound on the Iternal Speaker.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Producing Sound on the Internal Speaker</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+SND produces sound on the speaker.<br>
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  09 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a><br>
+<br>
+SND sends the freq's specified in a buffer to the speaker for a duration of the next word in the buffer (1-16 where 16 = one second).<br>
+This allows you to specify any freq. and duration wanted to produce sounds from a simple rhyme to a complex Bomb sound.<br>
+You can use this routine in your game with little or no trouble.<br>
+You can have an 'unlimited' (less than 64k) number of buffers holding different sound data.  All you have to do is point SI to this buffer and then call it.<br>
+<br>
+<pre><font size=2>
+; This routine shows how to send sound (freq.) to the internal speaker.
+; You can sound a frequency between 1 and 4000+.  Please Note that the
+; human ear has a hard time hearing a frequency less than about 440.
+; I use a timer function to wait for the duration.  I also have
+; the freq. and duration in a buffer and get a single freq. and duration
+; value each time.  This is so that you can make quite a few different
+; sounds and just point SI to that buffer and then call this routine.
+; The 00h,00h (asciiz) at the end of the buffer tells this routine to
+; quite.
+;
+
+.model tiny
+.code
+           org  100h
+start:     push ds
+           pop  es
+           mov  si,offset SomeTune
+           
+           mov  dx,61h                  ; turn speaker on
+           in   al,dx                   ;
+           or   al,03h                  ;
+           out  dx,al                   ;
+
+           mov  dx,43h                  ; get the timer ready
+           mov  al,0B6h                 ;
+           out  dx,al                   ;
+
+LoopIt:    lodsw                        ; load desired freq.
+           or   ax,ax                   ; if freq. = 0 then done
+           jz   short LDone             ;
+           mov  dx,42h                  ; port to out
+           out  dx,al                   ; out low order
+           xchg ah,al                   ;
+           out  dx,al                   ; out high order
+           lodsw                        ; get duration
+           mov  cx,ax                   ; put it in cx (16 = 1 second)
+           call PauseIt                 ; pause it
+           jmp  short LoopIt
+
+LDone:     mov  dx,61h                  ; turn speaker off
+           in   al,dx                   ;
+           and  al,0FCh                 ;
+           out  dx,al                   ;
+
+           int  20h                     ; exit to DOS
+
+  ; this routine waits for specified milliseconds
+PauseIt    proc near uses ax bx cx dx
+           xor  dx,dx                   ; cx = 16 = 1 second
+           mov  ax,62500
+           mul  cx
+           mov  cx,dx
+           xor  dx,dx
+           mov  bx,offset PFlag
+           mov  ax,8300h
+           mov  [bx],al                 ; clear flag
+           int  15h
+WaitForIt: cmp  byte PFlag,00h
+           je   short WaitForIt
+           ret
+PauseIt    endp
+
+PFlag      db  00h          ; flag for pauseit routine
+SomeTune   dw  1397,08
+           dw  1397,08
+           dw  1397,08
+           dw  1318,06
+           dw  1244,16
+           dw  1046,04
+           dw  1108,04
+           dw  1174,04
+           dw  1244,04
+           dw  1174,08
+           dw  1244,08
+           dw  1318,08
+           dw  1396,08
+           dw  1480,08
+           dw  1568,16
+           dw  00h,00h
+
+.end  start
+</font></pre>
+<br>
+<hr>
+NOSOUND is a TSR that 'silences' the sound on the speaker.<br>
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  09 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a><br>
+<br>
+To use this routine, enter <i>NOSOUND ON</i> at the DOS prompt.  To allow sound again, enter <i>NOSOUND OFF</i>.  The routine stays resident, so you can call NOSOUND with the ON or OFF parameters as much as you would like.<br>
+<br>
+<pre><font size=2>
+; use NOSOUND ON to silence the speaker
+; use NOSOUND OFF to 'un' silence the speaker
+;
+.model tiny
+.code
+           org 100h
+start:     jmp  install
+
+Copyright  db 13,10,'NOSOUND  Quiets the hardware speaker.'
+           db  13,10,'Copyright  1997  Forever Young Software',13,10,36
+AllowY     db  13,10,'  Allowing Sound$'
+AllowN     db  13,10,'  Not Allowing Any Sound$'
+Old1CAdr   dw  00h          ; these remember the original Int 1Ch address
+Old1CSeg   dw  00h          ; they must be in the code segment
+Old16Adr   dw  00h          ; these remember the original Int 16h address
+Old16Seg   dw  00h          ; they must be in the code segment
+job        db  00h          ; 0 = sound off, else sound on
+
+NewInt1Ch: cli                          ; disable interrupts
+           mov  al,cs:job               ; if job != 0 then skip ours
+           or   al,al                   ; (need to use fast intructions)
+           jnz  short SoundOn           ; ('cmp mem,immed' is just to slow)
+           push dx                      ;
+
+; the in and out instructions are extremly slow on so-called
+;'faster' machines (386, 486, 586 (pentiums)) so this is why you
+; still hear a little bit of sound at first.
+
+           mov  dx,61h                  ; turn sound off
+           in   al,dx                   ;  .
+           and  al,0FCh                 ; clear bits 1 & 0
+           out  dx,al                   ;  .
+           pop  dx                      ;
+SoundOn:   sti                          ; reenable interrupts
+           jmp  far cs:Old1CAdr
+
+NewInt16h: cli                          ; disable interrupts
+           cmp  ah,66h                  ; if our service number
+           jne  short SkipOurs
+           mov  cs:job,al               ; then put 'job' in job above
+           mov  al,ah                   ; send installed flag
+           sti                          ; and return to NOSOUND.COM
+           iret                         ;
+SkipOurs:  sti                          ; reenable interrupts
+           jmp  far cs:Old16Adr         ;
+
+Install:   mov  dx,offset Copyright     ; print message
+           mov  ah,09h                  ;
+           int  21h                     ;
+           mov  ah,62h                  ; get PSP segment
+           int  21h                     ;
+           mov  es,bx                   ;
+           xor  al,al                   ; assume no sound
+           mov  dx,offset AllowN        ; print message
+           mov  ah,es:[0083h]           ; get command line 'n' or 'f'
+           cmp  ah,'n'                  ; if 'n' then job != 0
+           jne  short SoundOff1         ;
+           mov  al,0FFh                 ;
+           mov  dx,offset AllowY        ; print message
+SoundOff1: push ax                      ; save al
+           mov  ah,09h                  ;
+           int  21h                     ;
+           pop  ax                      ; restore al
+           mov  ah,66h                  ; call interrupt 16h w/our service #
+           int  16h                     ; on return:
+           cmp  al,66h                  ; 
+           jne  short NotInstld         ; if al = 66h, then is installed
+           mov  ah,4Ch                  ; and exit (no TSR it)
+           int  21h                     ;
+
+NotInstld: mov  ah,62h                  ; free environment string
+           int  21h                     ;
+           mov  es,bx                   ;
+           mov  bx,2Ch                  ;
+           mov  ax,es:[bx]              ;
+           mov  es,ax                   ;
+           mov  ah,49h                  ;
+           int  21h                     ;
+
+           mov  ax,351Ch                ; ask DOS for the existing Int 1Ch vector address
+           int  21h                     ; DOS returns the segment:address in ES:BX
+           mov  cs:Old1CAdr,bx          ; save it locally
+           mov  cs:Old1CSeg,es
+
+           mov  ax,251Ch                ; point Interrupt 1Ch to our own handler
+           mov  dx,offset cs:NewInt1Ch
+           push cs                      ; copy CS into DS
+           pop  ds
+           int  21h
+
+           mov  ax,3516h                ; ask DOS for the existing Int 16h vector address
+           int  21h                     ; DOS returns the segment:address in ES:BX
+           mov  cs:Old16Adr,bx          ; save it locally
+           mov  cs:Old16Seg,es
+
+           mov  ax,2516h                ; point Interrupt 16h to our own handler
+           mov  dx,offset cs:NewInt16h
+           push cs                      ; copy CS into DS
+           pop  ds
+           int  21h
+
+           mov  dx,offset install       ; save all TSR code + PSP
+           sub  dx,offset start
+           sub  dx,271
+           mov  cl,04h                  ;   + 15 bytes to make sure we get all of TSR
+           shr  dx,cl                   ; (paragraphs)
+           mov  ax,3100h                ; exit to DOS but stay resident
+           int  21h                     ;
+
+.end start
+</font></pre>
+Please let me know if there are any errors or if this routine doesn't work on your machine.  On faster machines (about 133mhz and faster), this routine might not work.<br>
+<br>
+Please read the .ASM file for distribution rules and copyrights.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

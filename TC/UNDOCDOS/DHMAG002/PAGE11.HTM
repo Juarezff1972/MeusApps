@@ -1,0 +1,149 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 11</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page10.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page12.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">C</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%" valign=top>
+<p align=left><font color="black" size=3>
+<br>
+Have you ever wanted to send a complete text file to the Windoze Clipboard?  Well here is a small file in C that will allow you to send any text file smaller than 32k to the Clipboard.<br>
+<br>
+<kbd>CLIP.C</kbd> below (see listing 1) takes any text file smaller than 32k as <kbd>stdin</kbd> and sends it to the clipboard.  It is not a driver, so no need to load it at startup and take up precious memory.<br>
+<br>
+First we get the text from <kbd>stdin</kbd>.  Most of the time, this will be through redirection.<pre>CLIP < filename.txt</pre>
+However; you can run <kbd>CLIP</kbd> and type in your text, then press <kbd>CTRL-Z</kbd> and the <kbd>ENTER</kbd> key when you are done.  If you made a mistake, press <kbd>CTRL-C</kbd> and <kbd>CLIP</kbd> will abort.<br>
+<br>
+Next we check the clipboard interface.  We call Interrupt 0x2F, service 0x1700.  If this interrupt returns 0x1700 in the AX register, then the clipboard interface is not available.<br>
+<br>
+Next we want to open and clear the clipboard.  (Services 0x1701 & 0x1702)<br>
+<br>
+We are going to get the <kbd>stdin</kbd> as simple as can be.  The <kbd>getc()</kbd> macro does not get CR.  So when a LF comes up, we have to send both a CR and a LF.<pre>
+  do {
+    if((tchar = getc(stdin)) == EOF) break;
+    if (tchar == 0x0A) { *(buff++) = 0x0D; buffsize++; }
+    *(buff++) = tchar;
+    buffsize++;
+  } while(1);
+</pre>
+
+Now send it to the clipboard. <pre>  inregs.x.ax = 0x1703;   //service number
+  inregs.x.bx = FP_OFF(buffptr);   // offset of buffer
+  inregs.x.cx = buffsize;          // buffer size
+  inregs.x.dx = 0x01;              // text
+  inregs.x.si = 0x00;              //
+  segregs.es = FP_SEG(buffptr);    // segment of buffer
+  int86x(0x2F,&inregs, &outregs, &segregs);
+</pre>
+
+Then all we have to do is close the clipboard interface. (Service 0x1708)<br>
+<br>
+That's it.  See <a href="http://www.zekes.com/~blunt/clipbrd.html">http://www.zekes.com/~blunt/clipbrd.html</a> for source and documentation on how to use the clipboard interface in your programs.
+
+<font color="blue">&#165;</font><br>
+<br>
+<br>
+<hr>
+<br clear=left>
+<b>Listing 1</b><pre>
+#include "dos.h"
+#include "stdlib.h"
+#include "stdio.h"
+
+         int  retcode, i;
+unsigned int  buffsize = 0;
+         char buffer[32767];
+         char *buff = buffer;
+         char tchar;
+
+void far *buffptr = buffer;
+
+union REGS inregs, outregs;
+struct SREGS segregs;
+
+void main(void) {
+  printf("\nSend STDIN to the clipboard.    Version 0.90");
+  printf("\nCopyright  Forever Young Software  1984-1998\n");
+
+  // get stdin
+  do {
+    if((tchar = getc(stdin)) == EOF) break;
+    if (tchar == 0x0A) { *(buff++) = 0x0D; buffsize++; }
+    *(buff++) = tchar;
+    buffsize++;
+  } while(1);
+
+  // check to see if we can use the clipboard
+  inregs.x.ax = 0x1700;
+  int86(0x2F, &inregs, &outregs);
+  if (outregs.x.ax == 0x1700) {
+    printf("\nError with clipboard.");
+    exit(-1);
+  }
+
+  // open the clipboard interface
+  inregs.x.ax = 0x1701;
+  int86(0x2F, &inregs, &outregs);
+
+  //  and clear its contents
+  inregs.x.ax = 0x1702;
+  int86(0x2F, &inregs, &outregs);
+
+  // put buff to the clipboard
+  inregs.x.ax = 0x1703;
+  inregs.x.bx = FP_OFF(buffptr);
+  inregs.x.cx = buffsize;
+  inregs.x.dx = 0x01;
+  inregs.x.si = 0x00;
+  segregs.es = FP_SEG(buffptr);
+  int86x(0x2F,&inregs, &outregs, &segregs);
+
+  //  and close it
+  inregs.x.ax = 0x1708;
+  int86(0x2F, &inregs, &outregs);
+
+  exit(0);
+}
+</pre>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page10.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page12.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 11
+
+</BODY>
+</HTML>

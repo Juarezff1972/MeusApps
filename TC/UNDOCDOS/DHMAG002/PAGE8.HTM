@@ -1,0 +1,102 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 8</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page7.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page9.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Batch Files/DOS</font></h1>
+<hr>
+<br>
+
+</td>
+</table>
+<br clear=left>
+<p align=left><font color="black" size=3>
+
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<br>
+<! - column one starts here >
+<b>Come Back Rebooting</b><br>
+Have you ever written a batch file to install some files and/or then modify the autoexec.bat file, want to reboot the system, and to find that the user has to find his/her way back to where they were before the reboot?  How about we create a few small batch files to fix this!<br>
+<br>
+Let us say that you are in a directory call <kbd>NewGame</kbd> and you have modified the autoexec.bat file to include your path in the <kbd>PATH=</kbd> environment variable.  Now you want to reboot the machine, once rebooted, run the new autoexec.bat file as normal but then come back to <kbd>NewGame</kbd> and test your additions.  Assuming that your autoexec.bat file does not have a line in it to call Windows (we're talking true DOS here), you can make a copy of autoexec.bat and name it autoexec.old.  Then using the append to file redirect, copy the lines: 
+<pre>CD\NewGame
+testit</pre>
+to the autoexec.bat file.  Then when the machine reboots, it will come back to your directory and you can continue with the installation.<br>
+<br>
+However, you now have to delete the autoexec.bat file and rename the copy (autoexec.old) back to autoexec.bat or everytime the machine reboots, it will 'come back' to your directory and try to finish the installation.<br>
+<br>
+Here is some sample batch script for the reboot batch file:
+<pre>copy c:\autoexec.bat c:\autoexec.old
+echo CD\NewGame >> c:\autoexec.bat
+echo testit >> c:\autoexec.bat
+reboot
+</pre>
+How about the <kbd>testit</kbd> batch file:<pre>
+del c:\autoexec.bat
+ren c:\autoexec.old autoexec.bat
+:: continue with installation.
+</pre>
+Now this is just a simple example to show you how it can be done.  The more complex you get, the more work you will have to do to preserve the original settings.  Also, you can include QBASIC script in your batch files by creating a temp file, <kbd>echo</kbd>ing source to it, and then calling QBASIC.  See the next article in this month's column to find out how.<br>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+<b>QBASIC in my Batch files?</b><br>
+Have you ever wanted to do something in your batch file that the batch script just wouldn't allow but you could easily do it in QBASIC?  How about this simple example that prints <kbd>Hello World</kbd> to the screen.<br>
+<br>
+<pre>:: This is a simple batch file
+::  that shows you have to include
+::   QBASIC script in your batch files.
+@echo off
+echo 'demo .bas file &gt; demo.bas
+echo print "Hello World" &gt;&gt; demo.bas
+echo system &gt;&gt; demo.bas
+qbasic /run demo
+del demo.bas
+</pre>
+<br>
+This batch file will create a file named <kbd>DEMO.BAS</kbd>, echo a rem statement, a <kbd>print "Hello World"</kbd> line and a <kbd>system</kbd> line to it.  Then it will call qbasic and run the program and exit.<br>
+<br>
+Notice that we had to put the <kbd>system</kbd> command at the end of our script.  If we did not, qbasic would run our program and then just sit there and wait for user input.<br>
+<br>
+Now of course you can print <kbd>Hello World</kbd> to the screen using just batch file script, but this is just a demo, isn't it?
+<font color="blue">&#165;</font><br>
+<br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page7.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page9.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 8
+
+</BODY>
+</HTML>

@@ -1,0 +1,229 @@
+<HTML>
+<HEAD>
+<TITLE>Printing Graphics on a dot matrix printer.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+See <a href="#bottom">bottom of this page</a> for information on how to print large text on an Epson compatible printer.<br>
+<br>
+<H2>Printing Graphics on a dot matrix printer</H2>
+</p>
+Printing graphics on a dot matrix printer is as simple as sending it the correct
+initialize codes and then sending it the first horizontal 8 bits of the graphic and then
+the next and so on.<br>
+<br>
+<b>To initialize the printer for graphics you need to know what codes to send it:</b><br>
+<i>Please note that each printer is a little different.  I have an Panasonic KX-P1124 dot
+matrix printer so I will be sending it the default Epson commands.  These commands should
+work on most Epson compatible printers.</i><br>
+<br>
+We can set the left margin using:<br>
+ESC+"l"+n or chr$(27)+chr$(108)+chr$(n)<br>
+where <i>n</i> is the amount of chars to advance from the left side.  (note:  we assume there are
+10 chars per inch)<br>
+<br>
+Next we must set the paper feed:<br>
+ESC+"3"+n or chr$(27)+chr$(51)+chr$(n)<br>
+Set paper feed to <i>n</i>/180 of an inch.<br>
+<br>
+Next we must go to the first of this line:<br>
+chr$(13)<br>
+<br>
+Next we set it to 8 pin double density graphics (960 dots per line/120 dots per inch).<br>
+ESC+"L"+n1+n2 or chr$(27)+chr$(76)+chr$(n1)+chr$(n2)<br>
+where <i>n1</i> is the LO order byte and <i>n2</i> is the HI order byte of the pixel width of the line
+to be printed (the width of the graphic in pixels). <br>
+<b>This must be set for each printed line.</b><br>
+<br>
+Next we can send the first printed line of graphics to the printer.<br>
+<i>See below for more info on this</i><br>
+<br>
+When we finish the printed line, we send the CR LF chars (13 and 10) to the printer.  This
+returns the print head the left margin and scrolls the paper to the next line pos.<br>
+<br>
+We now have to reset the density.  Go to the paragraph above for this.<br>
+<br><br>
+<b>THE CODE:</b> Quick Basic 4.x<br>
+<form><TEXTAREA NAME="Src1" ROWS=15 COLS=100 WRAP=off>
+DIM I AS STRING * 1
+
+SCREEN 13
+LINE (5, 30)-(120, 70), 15, BF
+
+CIRCLE (50, 50), 20, 8
+PAINT (50, 50), 8, 8
+LINE (30, 50)-(70, 67), 8, BF
+LINE (15, 50)-(85, 60), 7, BF
+LINE (35, 35)-(37, 37), 1
+LINE -(37, 55), 1
+LINE -(35, 57), 1
+LINE -(43, 57), 1
+LINE -(41, 55), 1
+LINE -(41, 47), 1
+LINE -(44, 47), 1
+LINE -(45, 48), 1
+LINE -(45, 44), 1
+LINE -(44, 45), 1
+LINE -(41, 44), 1
+LINE -(41, 38), 1
+LINE -(47, 38), 1
+LINE -(49, 39), 1
+LINE -(49, 35), 1
+LINE -(35, 35), 1
+PAINT (39, 40), 1, 1
+
+LINE (45, 40)-(48, 40), 1
+LINE -(55, 46), 1
+LINE -(67, 35), 1
+LINE -(69, 38), 1
+LINE -(50, 57), 1
+LINE -(45, 57), 1
+LINE -(45, 55), 1
+LINE -(50, 50), 1
+LINE -(44, 40), 1
+PAINT (48, 42), 1, 1
+
+LINE (121, 30)-(270, 70), 1, B
+COLOR 1
+LOCATE 7, 17
+PRINT "Forever Young"
+LOCATE 8, 17
+PRINT "Printer Test Page"
+PAINT (125, 35), 15, 1
+LINE (121, 30)-(270, 70), 15, B
+
+Flag% = 0
+'OPEN "lpt1" FOR BINARY AS #1 LEN = 1
+OPEN "test.prn" FOR BINARY ACCESS WRITE AS #1 LEN = 1
+
+I = CHR$(27)	' Set left margin (ESC+"l"+n)
+PUT #1, , I
+I = "l"
+PUT #1, , I
+I = CHR$(10)
+PUT #1, , I
+I = CHR$(27)	' Set paper feed to n/180 of an inch
+PUT #1, , I
+I = "3"
+PUT #1, , I
+I = CHR$(24)
+PUT #1, , I
+I = CHR$(13)	' Go to front of line (CR)
+PUT #1, , I
+
+FOR Ry% = 30 TO 70 STEP 8
+  I = CHR$(27)	' 8 pin double density graphics 
+  PUT #1, , I
+  I = "L"
+  PUT #1, , I
+  I = CHR$(20)
+  PUT #1, , I
+  I = CHR$(2)
+  PUT #1, , I
+  FOR Rx% = 5 TO 270 STEP 1
+    Byte1% = 0
+    Byte2% = 0
+    FOR K% = 0 TO 7 STEP 1
+      Bb% = POINT(Rx%, Ry% + (7 - K%))
+      IF Bb% = 1 THEN
+        Byte1% = Byte1% + (2 ^ K%)
+        Byte2% = Byte2% + (2 ^ K%)
+      END IF
+      IF Bb% = 7 THEN
+        IF Flag% = 0 THEN
+          Byte1% = Byte1% + (2 ^ K%)
+          Flag% = -1
+        ELSE Flag% = 0
+        END IF
+      END IF
+      IF Bb% = 8 THEN Byte2% = Byte2% + (2 ^ K%)
+    NEXT K%
+    I = CHR$(Byte1%)
+    PUT #1, , I
+    I = CHR$(Byte2%)
+    PUT #1, , I
+  NEXT Rx%
+  I = CHR$(13)
+  PUT #1, , I
+  I = CHR$(10)
+  PUT #1, , I
+NEXT Ry%
+
+CLOSE #1
+END
+</textarea></form>
+<br><br>
+To print a printed line of graphics, you must set the density (see above) and then get
+8 pixels from the graphic you are going to print.  These 8 pixels are not in the same line
+as you might think:<br>
+Starting in the top left hand corner; (see color shading scheme at end of this page)<br>
+Pixel #1 is the first pixel of the first line (set or not set).<br>
+Pixel #2 is the first pixel of the second line.<br>
+Pixel #3 is the first pixel of the third line.<br>
+...<br>
+Pixel #8 is the first pixel of the eighth line.<br>
+<br>
+To send these pixels the printer, send them as a bit representation in a single byte
+(explains the 8 pixels at a time).<br>
+bit 0 = Pixel #1<br>
+bit 1 = Pixel #2<br>
+bit 2 = Pixel #3<br>
+...<br>
+bit 7 = Pixel #8<br>
+<br>
+When you send that single byte, then do the same thing except go to the next pixel set away
+from the left side of the graphic.  (i.e.  Pixel #1 is the second pixel of the first line.)<br>
+<br>
+When you get to the end of the line, you should do a CR LF and then reset the density and do
+the next 8 lines of the graphic.<br>
+<br>
+Please note that I send it two bytes at a time for the same 8 pixel set.  This allows me to
+send a 'dark' or a 'light' printed set, allowing me to give the 'grey-scale' effect.<br>
+<br>
+Please see <a href="printjet.htm"><font size=2>Printing to Hewlett-Packard</font></a>
+for more on printing graphics to the printer.<br>
+<br>
+<hr>
+<a name="bottom"></a>
+There have been times when you have wanted to print a text file to the printer, but wanted the text to be a little larger so that you could see it easier, right?  Well the Epson compatible printers included a few commands to allow <i>double high</i> and <i>double width</i> printing.<br>
+<br>
+Run the following basic code to see an example:<br>
+<font face="" size=3>
+<pre>LPRINT "This should be normal"
+
+LPRINT CHR$(27) + "w" + CHR$(1) ' double high
+LPRINT CHR$(27) + "W" + CHR$(1) ' double width
+
+LPRINT "This should be double width and high"
+
+LPRINT CHR$(27) + "w" + CHR$(0) ' release double high
+LPRINT CHR$(27) + "W" + CHR$(0) ' release double width
+
+LPRINT "This should be normal"
+</pre>
+</font>
+<br>
+If you want to print a text file with this larger text, do the following:<br>
+<br>
+Use your favorite compiler/assembler to create a small routine to send the <b>27-w-1</b> (hex 1Bh - 77h - 01h) and the <b>27-W-1</b> (hex 1Bh - 57h - 01h) to the printer.  Then send the printer the text file either by printing the file with EDIT.COM or sending it via redirection.  Then to reset the printer, send the release codes <b>27-w-0</b> (hex 1Bh - 77h - 00h) and the <b>27-W-0</b> (hex 1Bh - 57h - 00h) to the printer.<br>
+<br>
+You can even set the printer to print in PICA or ELITE mode sending <b>27-P</b> (hex 1Bh - 50h) or <b>27-M</b> (hex 1Bh - 4Dh) respectively.<br>
+Your 'operating manual' that was included with your printer should have all of these codes for you, or you can go to the web site of your printer manufacturer and find the Epson compatible codes for their machine.<br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,266 @@
+<HTML>
+<HEAD>
+<TITLE>Manipulating the Windoze Clipboard with DOS.  Forever Young Software</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Manipulating the Windoze Clipboard with DOS</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+We can work with the clipboard through the Multiplex interrupt, interrupt 2Fh service 17h.<br>
+We must check the use of this service before we can use it.  To check it, call service 1700h.  If 1700h returned, then error has ocurred.<br>
+<br>
+We must Open the clipboard to be able to use it.  Once opened, we can:<br>
+<li> Get size of contents - returns the length in increments of 32.  If the text is of length 55, then this will return 64.<br>
+<li> Clear the contents of the clipboard<br>
+<li> Get contents of the clipboard<br>
+<li> Put contents in to the clipboard<br>
+Then we most close it.<br>
+<br>
+See <a href="#basver"><font size=3>below</font></a> for a stripped down Basic version.<br>
+See <a href="dhmag.htm"><font size=3>V.01 Number 2</font></a> of DHmag for a DOS program to send a text file to the clipboard.<br> 
+See <a href="tsrdemo.htm"><font size=3>this</font></a> page for a TSR that uses the Windoze clipboard.<br>
+<br>
+You can also get and put graphics with these functions in Windoze Bitmap format.<br>
+See the following line in the code below:<br>
+<font size=3 face="">
+<pre>#define FRMT_BITMAP 2     // format of 2 = Windoze Bitmap</pre>
+<br>
+<pre>
+/*****************************************************************************************
+   This is a small demo on how to communicate with the Windoze clipboard.
+   This only works in a Windoze DOS session, not in True DOS.
+
+   - Compile in the medium model
+*/
+
+
+#include "dos.h"
+
+#define FRMT_TEXT   1     // format of 1 = text
+#define FRMT_BITMAP 2     // format of 2 = Windoze Bitmap
+
+         int  retcode;
+unsigned int  thisseg, thisoff, sizecnts;
+unsigned char buffer[500];   // make sure large enough
+
+void far *mptr = buffer;
+
+int chkclipbrd(void);
+int openclipbrd(void);
+int closeclipbrd(void);
+int clearclipbrd(void);
+int getsizeclipbrd();
+int getclipbrddata(unsigned dataseg, unsigned buffer);
+int putclipbrddata(unsigned dataseg, unsigned buffer, unsigned bufsize);
+
+void main(void)
+{
+  printf("\nSmall example on communicating with the Windoze clipboard.\n");
+
+  if (chkclipbrd() == 0) {
+    printf("\nError with clipboard.");
+    exit(-1);
+  }
+
+  openclipbrd();    // open the clipboard interface (allow us to use it)
+
+  sizecnts = getsizeclipbrd();   // in increments of 32  (2 paragraphs)
+  printf("\nThe current size of the clipboard contents:  ");
+  printf("%i", sizecnts);
+
+  thisseg = FP_SEG(mptr);
+  thisoff = FP_OFF(mptr);
+  if (getclipbrddata(thisseg, thisoff) != 0) {
+    buffer[sizecnts] = '\0';
+    printf("\nThe current contents of the clipboard:\n\n");
+    printf("%s", buffer);
+  } else
+    printf("\n\nThe clipboard is empty\n");
+
+  clearclipbrd();  // clear the clipboard contents
+
+  strcpy (buffer, "Forever Young Software");
+  printf("\nPutting 'Forever Young Software' in to the clipboard\n");
+  thisseg = FP_SEG(mptr);
+  thisoff = FP_OFF(mptr);
+  sizecnts = strlen(buffer);
+  putclipbrddata(thisseg, thisoff, sizecnts);
+
+  closeclipbrd(); // close the clipboard interface (don't allow us to use it)
+
+  exit(0);
+}
+
+int chkclipbrd(void)
+{
+  _asm {
+    mov  ax,1700h
+    int  2Fh
+    mov  retcode,ax
+  }
+  if (retcode == 0x1700)
+    return(0);
+  else
+    return(retcode);
+}
+
+int openclipbrd(void)
+{
+  _asm {
+    mov  ax,1701h
+    int  2Fh
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+
+int closeclipbrd(void)
+{
+  _asm {
+    mov  ax,1708h
+    int  2Fh
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+
+int clearclipbrd(void)
+{
+  _asm {
+    mov  ax,1702h
+    int  2Fh
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+
+int getsizeclipbrd()
+{
+  _asm {
+    mov  ax,1704h
+    mov  dx,FRMT_TEXT
+    int  2Fh
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+
+int getclipbrddata(unsigned dataseg, unsigned buffer)
+{
+  _asm {
+    mov  ax,1705h
+    mov  es,dataseg
+    mov  bx,buffer
+    mov  dx,FRMT_TEXT
+    int  2Fh
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+
+int putclipbrddata(unsigned dataseg, unsigned buffer, unsigned bufsize)
+{
+  _asm {
+    push si
+    mov  ax,1703h
+    mov  es,dataseg
+    mov  bx,buffer
+    mov  dx,FRMT_TEXT
+    mov  cx,bufsize
+    xor  si,si
+    int  2Fh
+    pop  si
+    mov  retcode,ax
+  }
+  return(retcode);
+}
+</pre>
+</font>
+<hr>
+<a name="basver"></a><font size=3 color=purple>Basic version</font>
+<font size=3 face="">
+<pre>
+DECLARE FUNCTION ClipClose% ()
+DECLARE FUNCTION ClipOpen% ()
+DECLARE SUB ClipGetData (ClipSize%, ClipContents$)
+DECLARE SUB ClipGetDataSize (ClipSize%)
+
+' Remember to include the /I parameter at the command line
+'$INCLUDE: 'qb.bi'
+
+DIM ClipSize%, ClipContents$
+
+DIM SHARED Regs AS RegType
+DIM SHARED RegsX AS RegTypeX
+
+CLS
+IF ClipOpen% &#60;&#62; 0 THEN
+	PRINT "The Clipboard has been opened."
+END IF
+
+CALL ClipGetDataSize(ClipSize%)
+PRINT
+PRINT "The Clipboard holds"; ClipSize%; "bytes of information."
+
+CALL ClipGetData(ClipSize%, ClipContents$)
+PRINT
+PRINT "ClipContents$="; ClipContents$; "*END"
+
+IF ClipClose% &#60;&#62; 0 THEN
+	PRINT : PRINT "The Clipboard has been closed."
+END IF
+
+' 1 if successful, 0 if failed
+'
+FUNCTION ClipClose%
+	Regs.ax = &H1708
+	CALL INTERRUPT(&H2F, Regs, Regs)
+	ClipClose% = Regs.ax
+END FUNCTION
+
+SUB ClipGetData (ClipSize%, ClipContents$)
+	ClipContents$ = SPACE$(ClipSize%) + CHR$(0)
+	RegsX.ax = &H1705
+	RegsX.dx = &H1  'data type held in Clipboard = text
+	RegsX.es = VARSEG(ClipContents$)
+	RegsX.bx = SADD(ClipContents$)
+	CALL INTERRUPTX(&H2F, RegsX, RegsX)
+END SUB
+
+SUB ClipGetDataSize (ClipSize%)
+	Regs.ax = &H1704
+	Regs.dx = &H1  'data type = text
+	CALL INTERRUPT(&H2F, Regs, Regs)
+	ClipSize% = Regs.ax
+END SUB
+
+'  1 if successful, 0 if failed'
+'
+FUNCTION ClipOpen%
+	Regs.ax = &H1701
+	CALL INTERRUPT(&H2F, Regs, Regs)
+	ClipOpen% = Regs.ax
+END FUNCTION
+</pre>
+</font>
+
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

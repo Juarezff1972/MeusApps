@@ -1,0 +1,32 @@
+CDP a command line audio CD player for DOS
+    Version:  1.031
+     Author:  Ben Lunt (Forever Young Software(R))
+       Date:  02 July 1997
+  Assembler:  MASM 5.10
+
+Type CDP at the prompt and then follow the instructions
+
+ Note:  CDP assumes that drive D: is your cd drive
+          (you can change it easy enough)
+  Also:  CDP assumes that MSCDEX or a compatible driver
+          is already installed and activated.
+          (use autoexec.bat and config.sys)
+
+This code is freeware.  You may use this code as you wish, but PLEASE
+leave me the credit if you distribute it anywhere.  Also, (for my own
+protection), if this code, in any way, does bad things to your machine,
+I am not responsable.
+
+This code was quickly put together and does have a few bugs that
+could be taken out, but all-in-all the know-how is described well
+enough.  If you see an error or have a suggestion or question about
+CDP please e-mail me and I will do my best to help out.
+
+PLEASE DO NOT PUT YOUR FIXED VERSION ON THE WEB.  E-MAIL ME WITH
+YOUR FIXED CODE AND LET ME PUT IT ON THE WEB IN ITS' ORIGONAL PLACE
+AND IN ITS' ENTIRETY.
+
+  e-mail:  blunt@zekes.com
+ webpage:  http://www.zekes.com/~blunt/index.html
+
+     Forever Young Software(R) (C)1984 - 1998     All rights reserved

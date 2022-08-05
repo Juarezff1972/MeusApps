@@ -1,0 +1,374 @@
+<HTML>
+<HEAD>
+<TITLE>Getting CD Information.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Getting information about a CDROM</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+CDINFO will retrieve the VTOC of a CDROM which includes the ID, NAME, and DATE of the CDROM<br>
+Version:  1.10b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  9 Dec 1998<br>
+Assembler: <a href="newbasic.htm">NBASM 00.23.xx</a><br>
+<br>
+CDINFO will not display the ID, Name, or Date of an Audio disc because they are 'formatted' differently.<br>
+<br>
+<pre><font size=2>
+;    a small util to check for the MSCDEX driver and get
+;    the CDs ID, Name, and date given.
+;   See end of this source for info on the VTOC
+;
+
+.model tiny
+.code
+start:     .start
+           push ds
+           pop  es
+
+           mov  si,offset PCDinfo       ; print CDinfo string
+           call prtstring               ;
+
+           mov  ax,01100h               ; check to see if MSCDEX is installed
+           int  2Fh                     ;
+           cmp  al,0FFh                 ;
+           je   short instld
+           jmp  notinstld               ;
+instld:    mov  si,offset PYes          ;
+           call prtstring               ;
+
+           mov  si,offset PVersion      ; get and print MSCDEX version
+           call prtstring               ;
+           mov  ax,150Ch                ;
+           int  2Fh                     ;
+           xor  ah,ah                   ;
+           mov  al,bh                   ;
+           call prtdec                  ;
+           mov  ah,02                   ;
+           mov  dl,46                   ;
+           int  21h                     ;
+           xor  ah,ah                   ;
+           mov  al,bl                   ;
+           call prtdec                  ;
+
+           mov  ax,1500h                ; return how many cd's present
+           xor  bx,bx                   ;  bx = # of cd's
+           int  2Fh                     ;  cl = # of first cd drive
+           mov  NumCDs,bx               ;     (0-a:,1-b:,etc.)
+           add  cl,65                   ;
+           xor  ch,ch                   ;
+           mov  FirstCD,cx              ;
+           mov  si,offset PTtlDrvs      ; print total drives string
+           call prtstring               ;
+           mov  ax,NumCDs               ;
+           call prtdec                  ;
+           mov  si,offset PFrstDrv      ; print first drive string
+           call prtstring               ;
+           mov  dx,FirstCD              ;
+           mov  ah,02h                  ;
+           int  21h                     ;
+
+           mov  ax,1501h                ; get name of cdrom device driver
+           mov  bx,offset DrvData       ;
+           int  2Fh                     ;
+           mov  di,offset DrvrName      ; buffer to store returned name
+           push ds                      ; save ds (lds destroys it)
+           mov  bx,offset DrvData       ; returned:
+           inc  bx                      ;   offset   size  contents
+           lds  si,[bx]                 ;     00h    byte  subunit number
+           add  si,10                   ;     01h   dword  address of driver
+           mov  cx,08h                  ;  not more than 8 bytes long
+DNGet:     lodsb                        ;
+           cmp  al,20h                  ; if &lt; 8 bytes then truncated w/20h
+           je   short DNGDn             ;
+           stosb                        ;
+           loop DNGet                   ;
+DNGDn:     xor  al,al                   ; make sure it is an asciiz string
+           stosb                        ;
+           pop  ds                      ; restore ds (from lds)
+           mov  si,offset PDrvrname     ; print Driver name status
+           call prtstring               ;
+           mov  si,offset Drvrname      ;
+           call prtstring               ;
+
+           mov  ax,1503h                ; get abstract file name
+           mov  bx,offset AbsName
+           mov  cx,03h
+           int  2Fh
+           mov  si,offset AbsNameS      ; and print it (if all spaces,
+           call prtstring               ;   then none there)
+           mov  si,offset AbsName       ;
+           call prtstring               ;
+
+           mov  ax,1504h                ; get Bibliography file name
+           mov  bx,offset AbsName
+           mov  cx,03h
+           int  2Fh
+           mov  si,offset BibNameS      ; and print it (if all spaces,
+           call prtstring               ;   then none there)
+           mov  si,offset AbsName       ;
+           call prtstring               ;
+
+           mov  ax,1502h                ; get Copyright file name
+           mov  bx,offset AbsName
+           mov  cx,03h
+           int  2Fh
+           mov  si,offset CpyNameS      ; and print it (if all spaces,
+           call prtstring               ;   then none there)
+           mov  si,offset AbsName       ;
+           call prtstring               ;
+           mov  si,offset CRLF          ;
+           call prtstring               ; print CR LF
+
+VTOCLoop:  mov  si,offset VTOCNumS
+           call prtstring
+           mov  ax,VTOCNum
+           call prtdec
+           mov  bx,offset VTOCBuff      ; get VTOC info
+           mov  cx,FirstCD
+           sub  cx,65
+           mov  dx,VTOCNum
+           inc  word VTOCNum
+           mov  ax,1505h
+           int  2Fh
+           mov  VTOCStat,al
+           jc   short VTOCErr
+           cmp  al,0FFh
+           je   short VTOCDoIt
+           cmp  al,01h
+           jna  short VToCDoIt
+           jmp  Done
+VTOCDoIt:  mov  al,VTOCBuff             ; print volume descriptor
+           xor  ah,ah                   ;
+           cmp  ax,0FFh                 ;
+           jne  short Not0FF            ;
+           mov  ax,04h                  ;
+Not0FF:    cmp  ax,04h                  ;
+           jbe  short DescOffOK         ;
+           mov  ax,05h                  ;
+DescOffOK: mov  bx,offset DescOff       ;
+           shl  ax,01                   ;
+           add  bx,ax                   ;
+           mov  si,[bx]                 ;
+           call prtstring               ;
+
+           mov  si,offset CDIDS         ; print CD ID Name
+           call prtstring               ;
+           mov  si,offset CDID          ;
+           mov  cx,05                   ;
+           mov  ah,02                   ;
+CDIDLoop:  lodsb                        ;
+           mov  dl,al                   ;
+           int  21h                     ;
+           loop CDIDLoop                ;
+
+           mov  si,offset CDNameS       ; print CD Name
+           call prtstring               ;
+           mov  si,offset CDName        ;
+           mov  cx,32                   ;
+           mov  ah,02                   ;
+CDNmLoop:  lodsb                        ;
+           mov  dl,al                   ;
+           int  21h                     ;
+           loop CDNmLoop                ;
+
+           mov  si,offset CDDateS       ; print CD date
+           call prtstring               ;
+           mov  si,offset CDDate        ;
+           mov  di,offset DateFrmt      ;
+           movsw
+           inc  di                      ;
+           movsw
+           inc  di                      ;
+           movsw
+           mov  si,offset DateFrmt      ;
+           call prtstring               ;
+           mov  si,offset CRLF          ; print CR LF
+           call prtstring               ;
+           cmp  byte VTOCStat,01h       ; check status
+           jnbe short Done              ;   if 0 or 1 then loop
+           jmp  VTOCLoop  
+VTOCErr:   mov  si,offset VTOCErrS
+           call prtstring
+           jmp  short Done
+notinstld: mov  si,offset PNo
+           call prtstring
+           call prtdec
+Done:      mov  ah,4Ch                  ; exit to DOS
+           int  21h                     ; 
+
+PrtDec     proc near uses ax cx dx
+           mov  cx,0FFFFh               ; Ending flag
+           push cx
+           mov  cx,10
+PD1:       xor  dx,dx
+           div  cx                      ; Divide by 10
+           add  dl,30h                  ; Convert to ASCII
+           push dx                      ; Store remainder
+           or   ax,ax                   ; Are we done?
+           jnz  PD1                     ; No, so continue
+PD2:       pop  dx                      ; Character is now in DL
+           cmp  dx,0FFFFh               ; Is it the ending flag?
+           je   PD3                     ; Yes, so continue
+           mov  ah,02h                  ; Output a character
+           int  21h
+           jmp  short PD2               ; Keep doing it
+PD3:       ret
+PrtDec     ENDP
+
+Prtstring  proc near uses ax
+Ps1:       mov  dl,[si]                 ; Get character
+           inc  si                      ; Point to next one
+           or   dl,dl                   ; End of string?
+           jz   ps2                     ; Yes, so exit
+           mov  ah,02h                  ; Output a character
+           int  21h
+           jmp  short Ps1               ; Keep doing it
+Ps2:       ret
+Prtstring  endp
+
+NumCDs     dw  00h
+FirstCD    dw  00h
+DDfhandle  dw  00h
+DrvrName   dup 9,0             ; 8 + asciiz
+Command    db  00h
+
+PCDinfo    db  13,10,' CD Information routine  v1.10b   Forever Young Software   1997'
+           db  13,10,'----------------------------------------------------------------'
+           db  13,10,'      MSCDEX installed?  ',0
+PVersion   db  13,10,'        MSCDEX version:  ',0
+PTtlDrvs   db  13,10,'          Total drives:  ',0
+PFrstDrv   db  13,10,'    First Drive letter:  ',0
+PDrvrname  db  13,10,'           Driver Name:  ',0
+CDIDS      db  13,10,'            CD ID Name:  ',0
+CDNameS    db  13,10,'               CD Name:  ',0
+CDDateS    db  13,10,'               CD Date:  ',0
+DateFrmt   db  '  /  /  ',0
+CRLF       db  13,10,0
+
+PNo        db  'No',0
+PYes       db  'Yes',0
+VTOCErrS   db  13,10,10,'Error getting VTOC info.  Could be an Audio disc',0
+DrvData    dup 75             ; allows 15 drives
+VTOCNumS   db  13,10,'Volume Table of Contents #',0
+VTOCNum    dw  00h
+VTOCStat   db  00h
+VTOCBuff   db  00h
+CDID       db  '     '
+           dw  00h
+           dup 32,0
+CDName     dup 32,32
+           dup 743,0
+CDDate     dup 6,32
+           dup 1231,0
+AbsNameS   db  13,10,'    Abstract file name:  ',0
+BibNameS   db  13,10,'Bibliography file name:  ',0
+CpyNameS   db  13,10,'   Copyright file name:  ',0
+AbsName    dup 39,0
+DescOff    dw  offset DescBootS
+           dw  offset DescPrmryS
+           dw  offset DescSuppS
+           dw  offset DescPartS
+           dw  offset DescTermS
+           dw  offset DescUnknS
+DescBootS  db  13,10,'   *Boot Record',0
+DescPrmryS db  13,10,'   *Primary volume descriptor',0
+DescSuppS  db  13,10,'   *Supplementary volume descriptor',0
+DescPartS  db  13,10,'   *Volume partition descriptor',0
+DescTermS  db  13,10,'   *Volume descriptor set terminator',0
+DescUnknS  db  13,10,'****Unknown descriptor',0
+
+.end  start
+
+
+****** VTOC of a Data CDROM ************
+This is no where near complete.  I just took a few CDs
+ and compared them.  Each item that is not obvious, I
+ will try to explain what I think it is.  When I get
+ more info, I will update this.
+
+Items with a '*' next to the offset were updated on 12 Nov 1997
+
+The VTOC is a buffer of 2048 bytes in length:
+Offset   Value            Description
+*  0   - 1                if 00h -> Boot record
+                             01h -> Primary volume descriptor
+                             02h -> Supplementary volume descriptor
+                             03h -> Volume partition descriptor
+                             FFh -> Volume descriptor set terminator
+                            else -> Unknown descriptor
+*  1   - 'CD001'          Standard identifier
+                           (if you have a CD changer this
+                            could change to spec. which disc)
+*  6   - 1                Volume descriptor version
+   7   - 0                Seams to always be a 0
+   8   - 32 dup(32)       32 spaces
+  40   - 32 dup(32)       * Name of CD padded with spaces *
+  72   - 7 dup(0)         zeros
+  80   - ?                acts like an 8 byte number
+  88   - 32 dup(0)        zeros
+ 120   - ?                has the following 12 ascii chars:
+                            1,0,0,1,1,0,0,1,0,8,8,0
+                            seem to be the same on all discs
+ 132   - ?
+ 133   - ?
+ 134   - 4 dup(0)         zeros
+ 138   - ?                seems to be the same as offset 133
+ 139   - ?                seems to be the same as offset 132
+ 140   - 18               seems to be same on all discs
+ 141   - 10 dup(0)        zeros
+ 151   - ?
+ 152   - 4 dup(0)         zeros
+ 156   - 34               seems to be same on all discs
+ 157   - 0                seems to be same on all discs
+ 158   - ?
+ 159   - 5 dup(0)         zeros
+ 165   - ?
+ 166   - 0                seems to be same on all discs
+ 167   - 8                seems to be same on all discs
+ 168   - 4 dup(0)         zeros
+ 172   - 8                seems to be same on all discs
+ 173   - 0                seems to be same on all discs
+ 174   - ?                acts like an 6 byte number
+ 180   - 0                seems to be same on all discs
+ 181   - 2                seems to be same on all discs
+ 182   - 0                seems to be same on all discs
+ 183   - 0                seems to be same on all discs
+ 184   - 1                seems to be same on all discs
+ 185   - 0                seems to be same on all discs
+ 186   - 0                seems to be same on all discs
+ 187   - 1                seems to be same on all discs
+ 188   - 1                seems to be same on all discs
+ 189   - 0                seems to be same on all discs
+ 190   - 623 dup(0)       zeros
+ 813   - 'YYYYMMDD????????' Date and then some ?
+ 829   - 0                seems to be same on all discs
+ 830   - repeat of offset 813 -> 829
+
+ The rest are all zeros (except for a few)
+
+If you have any info on this and would like to share it,
+  it would be appreciated.  Forever Young
+</font></pre>
+<br>
+<br>
+<i>Thanks to Pierre Richard for requesting this info</i>.
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

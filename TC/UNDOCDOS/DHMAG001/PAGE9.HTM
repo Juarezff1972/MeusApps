@@ -1,0 +1,165 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 01, November 1998, Page 9</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page8.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page10.htm">Turn the page ---> </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Assembler</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+
+<p align=left><font color="black" size=3>
+
+<td width="48%" valign=top>
+<br>
+This Assembler column is one of four columns that will be in every issue, with the other three being the other 'major' compilers; Basic, C, and Pascal.<br>
+<br>
+As with the other columns to there respected names, this column will be devoted to assembler and assembly programming.  Each issue will have a new article or a continuing article about the assembly language.<br>
+<br>
+Unless otherwise noted, I will use the NBASM assembler for each of the assembler listings in this column.  You can get NBASM at:  <a href="http://www.zekes.com/~blunt/newbasic.html"> http://www.zekes.com/~blunt/newbasic.html</a><br>
+<br>
+<i>Now on to the show</i>.<br>
+<br>
+Wow, the power of assembly.  With assembly, you can do anything that the current machine's processor will allow.  In other words, what you program in a Basic, C, or Pascal, your program will be smaller, faster and more powerful.  However, assembly has its drawbacks.  It takes longer to program and debug an assembler program than the same program in the higher level language.  Also, a program in Basic, C, or Pascal can easily be ported to another processor/OS by simply using a compiler designed for the different processor/OS.  The assembler program can not.  Assembly is programmed for a specific processor/OS and is very hard to port to another with out a lot of work.<br>
+<br>
+Let us do a small program in each of the four languages and see the differences of each.<br>
+<br>
+<b>Basic</b>:<pre>PRINT "Hello World"
+END</pre>
+<br>
+Notice that it only took two lines to create a fully workable program that prints "Hello World" on the DOS screen at the current cursor location. Not much work.<br>
+<br>
+<b>Pascal</b>:<pre>PROGRAM HelloWorld
+
+BEGIN
+  WRITELN('Hello World');
+END.</pre>
+<br>
+Notice this took more lines but Pascal is a bit more powerful than Basic.<br>
+<br>
+<b>C</b>:<pre>void main(void)
+{
+   printf("Hello World\n");
+   exit(0);
+}</pre>
+<br>
+Notice this also takes a few lines more than basic, but C is more powerful than Basic and Pascal.<br>
+<br>
+Now lets look at the low level language.  <b>ASSEMBLY</b>:<pre>.MODEL small, basic
+.186
+.stack
+.data
+
+HelloWorldStr  db  'Hello World',13,10,'$'
+
+.code
+start:     mov  ax,DGROUP
+           mov  ds,ax
+           mov  bx,ss
+           sub  bx,ax
+           shl  bx,04
+           mov  ss,ax
+           add  sp,bx
+           mov  bx,ds
+           mov  ax,es
+           sub  bx,ax
+           mov  ax,sp
+           shr  ax,04
+           add  bx,ax
+           mov  ah,4Ah
+           int  21h
+
+           mov  dx,offset HelloWorldStr
+           mov  ah,09
+           int  21h
+
+Done:      mov  ah,4Ch
+           int  21h
+           end  start</pre>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - ******************************************** column two starts here >
+Notice the detail and work we must do to accomplish the same task as the high level languages.  This is because in assembly we must do everything where the high level languages do most of this for us.  On the other hand, the assembler routine will assembler to a small .EXE where the others will be a little larger.  The assembler routine can even be modified to become a considerably smaller .COM file.<br>
+<br>
+In fact the above assembler routine, when modified to become a .COM file will be like:<pre>.MODEL small, basic
+.186
+.code
+start:     mov  dx,offset HelloWorldStr
+           mov  ah,09
+           int  21h
+           ret
+
+HelloWorldStr  db  'Hello World',13,10,'$'
+
+           end  start</pre>
+<br>
+<br>
+Now let us compare the sizes of each executable file created by each language's translator (largest to smallest):<br>
+<br>
+<b>Basic</b>:  Stand-alone EXE was a whopping 12,294 bytes.<br>
+<br>
+<b>C</b>: The C sources executable was 5,885 bytes.<br>
+<br>
+<b>Basic</b>:  An EXE requiring BRUNxx.EXE was 3,220 bytes.<br>
+<br>
+<b>Pascal</b>: The Pascal sources executable was 1,920 bytes.<br>
+<br>
+<b>Assembly</b>: The assembler sources executable was 570 bytes for the EXE (first listing) and a mere 22 bytes for the COM file (second listing).<br>
+<br>
+<br>
+The Basic compiler added a lot of code to the executable for Error checking, stacks, etc. that where not needed.  However, there is no way to tell the basic compiler not to add this stuff.  On the other hand, if I were to enter this basic program in a basic compiler on a Mac OS, I would not have to change a line at all.<br>
+<br>
+The second executable created by the Basic Compiler is smaller, however it requires the BRUNxx.EXE file to run.<br>
+<br>
+The C and Pascal compilers added some code to the executable also, but not near as much, and they too can be typed into their Mac family compilers with little or know modifications.<br>
+<br>
+The assembler executables where extremely smaller with the second being a tiny little 22 byte file.  The assembler didn't add anything that we didn't want it to.  However, try entering this source into a MAC assembler. :-) <br>
+<br>
+For the sources above, I used MS-Quick Basic 4.5, Borland Turbo Pascal 6.x, MS-Quick C 2.5x, and MS-MASM 5.1x respectively.<br>
+<br>
+This column in the next issue will be devoted to assembler only, while each of the other three languages will be in their respected columns.<br>
+<br>
+If you have any questions pertaining to this article or any other column, please see the <a href="page7.htm">Questions and Answers</a> page.
+<font color="blue">&#165;</font><br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page8.htm"><--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page10.htm">Turn the page ---> </a><br>
+<p align=right><font color="black" size=2>Page 9
+
+</BODY>
+</HTML>

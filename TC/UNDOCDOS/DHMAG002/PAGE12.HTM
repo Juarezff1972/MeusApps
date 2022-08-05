@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 12</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page11.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page13.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Pascal</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=16>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+This month I thought of doing something simple.  I thought I would explain how to call an assembler routine in Pascal.  All the code in listing 1 does is check to see if the user has a 386 or higher machine.<br>
+<br>
+Pascal includes a very nice "directive" called 'assembler' that you add to the end of a function or procedure declaration line.<pre>function <i>funcname</i>: boolean; assembler;</pre>
+This tells the pascal compiler that the following function is an assembler routine.  When this happens, the compiler creates a few optimizer options and makes your code smaller and faster.<br>
+<br>
+I won't get in to detail on how the assembler routine works, but I will show how you create the assembler function.<br>
+<br>
+Create a procedure/function just like normal, except add the <kbd>assembler;</kbd> "directive" on to it.  Then instead of using <kbd>begin/end;</kbd> use <kbd>asm/end;</kbd>.<br>
+<br>
+In a function, AX is returned as the function value.  In a <kbd>boolean;</kbd> typed function, AX is returned <kbd>True</kbd> (Not zero), or <kbd>False</kbd> (is zero).  If you want to return a 32 bit value, use <kbd>DX:AX</kbd>.
+<font color="blue">&#165;</font><br>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+<b>Listing 1</b><br>
+<pre>program Is386demo;
+uses dos;
+
+function is386: boolean; assembler;
+  asm
+    push bx        { save reg's used (except ax)     }
+    xor  ax,ax     { assume false                    }
+    mov  bx,7000h  { if bits 12,13,14 are still set  }
+    push bx        { after pushing/poping to/from    }
+    popf           { the flags register then we have }
+    pushf          { a 386+                          }
+    pop  bx
+    and  bx,7000h
+    cmp  bx,7000h
+    jne  @Not386
+    mov  ax,-1
+@Not386:
+    pop  bx        { restore register                }
+end;
+
+begin
+   if not is386 then
+     writeln('You have a 286 or before')
+   else
+     writeln('You have a 386 or higher (32-bits)');
+end.</pre>
+
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page11.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page13.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 12
+
+</BODY>
+</HTML>

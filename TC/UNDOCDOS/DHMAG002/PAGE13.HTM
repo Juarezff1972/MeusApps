@@ -1,0 +1,161 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 13</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page12.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page14.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Undocumented</font></h1>
+<h4><font color=purple>Get/Set the Program Title</font></h4>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+
+<p align=left><font color="black" size=3>
+<br>
+<! - column one starts here >
+Have you ever had a few DOS session buttons on the task bar and wished there was some way to change that 8.3 name that usually appears on the button to something worth looking at?  This name is called 'the program title'.  In this month's column, we learn how to get and set this title in our DOS programs, so that when in Windows, we can see which DOS session we want to go to.<br>
+<br>
+DOS and Windows use the Multiplex interrupt to communicate with each other.  This interrupt has a number of 2Fh.  For example, to send a bitmap or text to the Windows clipboard from DOS, you would use this interrupt.  (See <a href="http://www.zekes.com/~blunt/clipbrd.html">
+http://www.zekes.com/~blunt/clipbrd.html</a> for more on using the clipboard in DOS).<br>
+<br>
+Let us first get the program title.  We will use service 168Eh on the multiplex interrupt (2Fh).  We must set this service number to ax.  We set DX to 02h for the subservice.  ES:DI points to the buffer that this service will fill with the title.  We must put in CX the size of this buffer we have created.  Now call the interrupt.<pre><font size=2>      mov  ax,168Eh      ; get title
+      mov  dx,0002h      ;
+      mov  di,offset Org ; buffer (es:di)
+      mov  cx,256        ; size of buffer
+      int  2Fh           ;
+      or   ax,ax         ; if ax = 0 error
+      jz   short Error   ;
+</font></pre>
+On return, this service will set AX to zero if there was an error.  If there was not an error, our buffer contains the current title of our program.  Remember that we had to set CX to the length of our buffer.  If the current title is longer than the buffer we have set up (CX), this service will return CX-1 chars of the title and a NULL char so that we have an ASCIIZ string.<br>
+<br> 
+Now to set the title of our program.  To set the title is almost the same as getting the title.  You set service number 168Eh to AX, Subservice 00h in DX, the new titles pointer in ES:DI (asciiz), but ignore CX.
+Also, you can not have an asciiz string longer than 80 bytes.  Your title can be up to 79 chars plus the NULL byte at the end.<pre><font size=2>      mov  ax,168Eh      ; set title
+      xor  dx,dx         ;
+      mov  di,offset New ; new title (es:di)
+      int  2Fh           ; (79 byte asciiz)
+      nop                ; wait 2 clocks
+      nop                ;   (bug in 2Fh)
+      or   ax,ax         ;
+      jz   short Error   ; if ax = 0 error
+</font></pre>
+Again, ax is returned NULL if an error occurred.  If no error then the title was changed.<br>
+<br>
+This subservice has a bug in it.  It will return ok in AX even if there was an error.  Ralf Browns Interrupt list notes that if we wait at least 2 cycles before testing AX, this bug will not effect us.  As you can see in the source above, we entered two (2) NOP instructions.  On a 386 and below processor, a NOP instruction takes three (3) cycles.  This would be adequate for what we want, however on a 486 this NOP takes only one (1) cycle.  Hence, the two (2) instructions.<br>
+<br>
+See Listing 1 for a demo program.  This program simply gets the title and prints it.  Then it waits for user input so that you can view the title on the task bar.  Once you have pressed a key, this program will set the title.  Again, it will wait for user input so that you can see the title.  If the program did not wait for you to view it, the program would end and the title would go back to "MS DOS...".<br>
+<br>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+If you run this program in a DOS window rather than in a full screen DOS session, you can see the title on the task bar easier.  However, if you do run this program from a full screen DOS session, pressing the ALT-TAB key combo will switch between your DOS session and the Windows task bar.<br>
+<br>
+<b>Listing 1</b><pre><font size=2> ; - assemble with <a href="http://www.zekes.com/~blunt/newbasic.html">NBASM</a>
+.model tiny
+.code
+     mov  si,offset StartS
+     call prtstring
+
+     mov  ax,168Eh      ; get title
+     mov  dx,0002h      ;
+     mov  di,offset Org ; buffer (es:di)
+     mov  cx,256        ; size of buffer
+     int  2Fh           ;
+     or   ax,ax         ; if ax = 0 error
+     jz   short Error   ;
+
+     mov  si,offset Org ; print it
+     call prtstring     ;
+
+     mov  si,offset SettingS
+     call prtstring     ;
+     xor  ax,ax         ; wait for user input
+     int  16h           ;
+
+     mov  ax,168Eh      ; set title
+     xor  dx,dx         ;
+     mov  di,offset New ; new title (es:di) (asciiz)
+     int  2Fh           ;  (no more than 79 + null)
+     nop                ; wait at least 2 clocks
+     nop                ;   (bug in 2Fh)
+     or   ax,ax         ;
+     jz   short Error   ; if ax = 0 error
+
+     mov  si,offset GoChkS ; print 'go check it' string
+     call prtstring     ;
+     xor  ax,ax         ; and wait for user to get done
+     int  16h           ; else the title would be gone
+                        ; because we... 
+Quit:
+     int  20h           ; ...exited to DOS
+
+Error:
+     mov  si,offset ErrorS ; print error string
+     call prtstring     ;
+     jmp  short Quit    ;
+
+
+Prtstring  proc near uses ax dx si
+Ps1:       lodsb        ; Get character & point to next one
+           int  29h     ; Output a character (fast out)
+           or   al,al   ; End of string?
+           jnz  short ps1 ; (doesn't hurt to print a null)
+           ret
+Prtstring  endp
+
+StartS     db  13,10,'Windoze program TITLE demo'
+           db  13,10,'Forever Young Software 1998'
+           db  13,10
+           db  13,10,'   Current title:  ',0
+ErrorS     db  13,10,' Error returned.',07,13,10,0
+SettingS   db  13,10
+           db  13,10,'Press any key to set title to:  '
+New        db  'Title Demo Program',0
+GoChkS     db  13,10,10,'Press ALT-TAB to take a look'
+           db           ' at the DOS button,'
+           db  13,10,'  then come back and press any'
+           db           ' key to quit.',13,10,0
+Org        equ $
+
+.end</font></pre>
+<font color="blue">&#165;</font>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page12.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page14.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 13
+
+</BODY>
+</HTML>

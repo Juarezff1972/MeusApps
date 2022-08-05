@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>Printing colored text.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Printing colored text on an inkjet.</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The procedure for printing colored text on an inkjet is the same as setting underline mode on a dot matrix printer.  You send the printer an ESCape code of the color to use, and then just send the text.<br>
+<br>
+Send ESC 'r' <i>n</i><br>
+where <i>n</i> is:<br>
+0-Black<br>
+1-Magenta<br>
+2-Cyan<br>
+3-Blue<br>
+4-Yellow<br>
+5-Red<br>
+6-Green<br>
+<br>
+<font face="" size=3>
+<pre>
+'To print Blue text in QB45:
+LPRINT CHR$(27)+"r"+CHR$(3)
+LPRINT "This text should be BLUE"
+
+LPRINT CHR$(27)+"r"+CHR$(0)  '  Don't forget to set the color back to BLACK
+                             'or do the following
+LPRINT CHR$(27)+"@"          '  Resets the printer (and the color to black)
+</pre>
+</font>
+<br>
+As of now, that is all of the colors I know how to print.  I am using a Canon BJC-4300.<br>
+<br>
+Thanks to <A HREF="http://www.ccsi.canon.com"><font size=2>Canon</font></A>
+for this information.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

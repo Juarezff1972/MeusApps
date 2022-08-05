@@ -1,0 +1,67 @@
+<HTML>
+<HEAD>
+<TITLE>Information on File Handles, the System File Table, etc.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Information on File Handles, the System File Table, etc.</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+On this page, I will try to have information on DOS's file handles, the System File Table, and other information about files.  Most of this information is <b>undocumented</b> by DOS.<br>
+<br>
+<hr width="50%">
+<b>What value is specified for FILES=n in CONFIG.SYS with out reading CONFIG.SYS</b><br>
+To find out what FILES=n was set to, you have to walk through the SFTs (System File Tables).<br>
+<br>
+In the List of Lists, (service 52h of DOS returns address), offset 04h holds a far pointer to the SFTs.
+Then each SFT holds a far pointer to the next SFT and a number of entries in this table.<br>
+<br>
+If the offset to the next SFT specified is 0xFFFF then this is the last SFT.<br>
+<br>
+Here is a little code in C to count the amount file files allowed.  Please note:  DOS 1.x used FCBs, not handles, so this will not work on DOS 1.x 
+<pre><font size=2 face="">#include &lt;dos.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+union REGS regs;
+struct SREGS sregs;
+
+unsigned int  far *ptr;
+         int  files = 0;
+
+void main (void) {
+  regs.h.ah = 0x52;
+  intdosx(&amp;regs, &amp;regs, &amp;sregs);
+
+  ptr = (unsigned int far *) (((unsigned long) sregs.es << 16) | (unsigned) regs.x.bx + 4);
+  ptr = (unsigned int far *) (((unsigned long) ptr[1] << 16) | (unsigned) ptr[0]);
+  while ( FP_OFF(ptr) != 0xFFFF ) {
+    files += ptr[2];
+      ptr = (unsigned int far *) (((long) ptr[1] << 16) | (unsigned) ptr[0]);
+  }
+
+  printf("\nFILES=%u\n", files);
+}
+</font></pre>
+<hr width="50%">
+
+
+
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

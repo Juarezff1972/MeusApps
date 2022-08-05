@@ -1,0 +1,62 @@
+This Assembler routine will allow you to show, hide, or change the current
+size of the cursor.
+
+   Usage  CSIZE sf <enter>
+
+Where s = starting scan line (a number of 0 through 7)
+      f = finish scan line (a number of 0 through 7)
+      <enter> = the enter key
+  
+To hide the cursor, enter '00'
+To display the cursor, enter a non zero in both (DOS's Default is '67').
+Note:  This small routine only uses 0 through 7 as input.  Any other might
+  cause errors.  (This routine does not check the bounds)
+
+
+
+*ASSEMBLY*
+Bit 5 of CH defines whether to show or hide the cursor.  If bit 5 is set,
+ the hide cursor, if it is clear, then show cursor.
+
+CurOff:    mov  ah,01h                  ; turn off cursor
+           mov  ch,00100000b            ; bit number 5
+           int  10h                     ;
+
+Bits 0-3 of CH are the starting scan line bits (values 00h - 0Fh)
+Bits 0-3 of CL are the finishing scan line bits (values 00h - 0Fh)
+ -CGA uses 0 as top (start) and 7 as bottom (finish) (default is 6,7)
+ -MDA and EGA uses 0 as top and 13 as bottom (default is 11,12)
+ -MCGA and VGA uses 0 as top and 15 as bottom (default is 13,14)
+ -Some SVGAs allow 0 as top and 31 as bottom (allowing 32 scan lines)
+
+CurOn:     mov  ah,01h                  ; turn cursor on
+           mov  cx,0607h                ; 6 = start, 7 = finish scanline
+           int  10h                     ;
+
+
+*BASIC*
+In Quick Basic 4.5 use the following line(s) to show/hide the cursor
+
+  LOCATE , , 0         ' to hide
+  LOCATE , , 1, s, f   ' to show (with s as Start and f as Finish scan line)
+
+
+*C*
+I do not yet know of a C function to show/hide the cursor
+
+
+*PASCAL*
+In Turbo Pascal 6.0 use the following line(s) to show/hide the cursor
+
+  HideCursor;          { to hide the cursor}
+  ShowCursor;          { to show the cursor}
+
+
+This is distributed as freeware by
+Forever Young Software
+Benjamin David Lunt
+All Rights Reserved
+06/27/97
+
+blunt@zekes.com
+http://www.zekes.com/~blunt/index.html

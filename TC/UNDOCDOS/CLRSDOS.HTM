@@ -1,0 +1,78 @@
+<HTML>
+<HEAD>
+<TITLE>Changing the DOS colors</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Changing the DOS colors</H1>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+Are you tired of the plain White on Black screen of DOS?  Most people including myself, like it this way.  However on occasion, wouldn't you like to change the colors to Red on Black or White on Blue?<br>
+<br>
+DOS includes a small device driver to take over the CON device.  It is called ANSI.SYS.  If you have Windoze 9x, it should be in C:\WINDOWS\COMMAND, otherwise it should be in C:\DOS.<br>
+<br>
+Add the following line to your CONFIG.SYS:  (Please make a back up first)<br>
+For Windoze 9x:<br>
+ &nbsp; DEVICE = C:\WINDOWS\COMMAND\ANSI.SYS<br>
+For DOS (or where ever your ANSI.SYS file resides):<br>
+ &nbsp; DEVICE = C:\DOS\ANSI.SYS<br>
+<br>
+To change the screen colors to L. BLUE text on Black Background add the following to your AUTOEXEC.BAT file (Make a backup first):<font face="" size=3><pre>@echo off
+echo ESC[1;34;40m
+</pre></font>
+NOTE:  Change the ESC above to ascii char 27.  (In EDIT press the CTRL-P combination and then while holding down the ALT key and using the numeric key pad, enter 27.)  Make sure the <i>m</i> is lower case.<br>
+<br>
+Now reboot the system.<br>
+<br>
+<br>
+Here are the different codes you can use:<font face="" size=3><pre>ESC[?;?;?m 
+  
+Where the first ? = one of the following:
+    Text attributes 
+       0    All attributes off 
+       1    Bold on/LIGHT colors
+       4    Underscore (on monochrome display adapter only) 
+       5    Blink on 
+       7    Reverse video on 
+       8    Concealed on 
+  
+Where the second ? = one of the following:
+    Foreground colors 
+       30    Black 
+       31    Red 
+       32    Green 
+       33    Yellow 
+       34    Blue 
+       35    Magenta 
+       36    Cyan 
+       37    White 
+  
+Where the third ? = one of the following:
+    Background colors 
+       40    Black 
+       41    Red 
+       42    Green 
+       43    Yellow 
+       44    Blue 
+       45    Magenta 
+       46    Cyan 
+       47    White 
+</pre></font>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

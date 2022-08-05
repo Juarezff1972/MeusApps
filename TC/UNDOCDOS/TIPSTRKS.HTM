@@ -1,0 +1,188 @@
+<HTML>
+<HEAD>
+<TITLE>Programming DOS and DOS Secrets Tips and Tricks</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<font size=4>Tips and Tricks for DOS and DOS Apps.<br></font>
+See <a href="#dostips">below</a> for compiler/assembler and DOS Programming tips<br>
+See <a href="#misctips">below</a> for Misc DOS Programming tips<br>
+<br>
+<b>DIR:</b>  You can use the /p parameter with DIR to make DIR pause between pages.  You
+knew that right?  But did you know that if you put the following line in your autoexec.bat
+file, DIR will pause between pages without you having to use the /p parameter?<br>
+SET DIRCMD=/p<br>
+<br>
+<b>DIR, TYPE,</b> or any other command line program that prints to the screen:  If the display
+just keeps scrolling and scrolling and you didn't catch it all, use the '|' (above the ENTER
+key) (ascii 124) and the MORE command:<br>
+type somefile.txt|more<br>
+This will print one page at a time to the screen, waiting for a keystroke.<br>
+<br>
+<b>DIR, TYPE,</b> or any other command line program that prints to the screen:  You can also
+make the display print to a file using <i>indirection</i>:<br>
+dir somedir &gt; afile.txt<br>
+(afile.txt now holds the contents of SOMEDIR)<br>
+<br>
+<b>COPY:</b> Since about DOS 5, if you used the copy command to copy a file to a different
+directory and the file with that same name already existed there, COPY would ask you if you
+wanted to replace it.  <i>Gets on your nerves don't it?</i>  Use the following line in your
+autoexec.bat file to stop COPY from asking you if you want to replace a file:<br>
+SET COPYCMD=/y<br>
+You can always us /-y as a parameter to override.<br>
+<br>
+<b>LINK and LIB:</b>Tired of telling LINK or LIB where your libs are?  Use the following
+in your autoexec.bat file to tell LINK or LIB once and for all:<br>
+SET LINK=C:\COMPLRS\QB45<br>
+SET LIB=\COMPLRS\QB45<br>
+<br>
+<b>INCLUDE:</b>Tired of telling your C compiler(s) where your include files are?  Use the
+following in your autoexec.bat file to tell the compiler where to look:<br>
+SET INCLUDE=\COMPLRS\LEARN_C\INCLUDE<br>
+<br>
+<b>MODE:</b>Have you ever exited a program and it left the DOS prompt in different colors
+or sizes or just plane gone?  Use MODE CO80.  This sets the display to color enabled and
+80 lines per page.  Also see my page called <a HREF="misc.htm">Misc Programming Files</A>
+for a small program to fix the display, turn off the sound, and any other setting that
+might not be right.  (NORMAL.COM)<br>
+**Note:  MODE works different on all machines.  Be careful with MODE. MODE also sets the
+printer output, the PORT(s) status and much more.  Don't full around with MODE**<br>
+<br>
+<b>EDIT:</b> To enter a special character in EDIT press the 'ctrl'+'p' combination and EDIT should put a line at the status bar asking for the character.  Now you can enter one of the  256 ascii chars (except the NULL (zero) char) with the number keypad.<br>
+<i>Example:</i>  To enter the PageBreak char (ascii 12) hit 'ctrl'+'p' then hold down the 'alt' key and type '1' then the '2' at the number keypad.<br>
+<br>
+<br>
+<a name="dostips"></a>
+<hr>
+<br>
+<font size=4>Tips and Tricks for DOS Programming<br></font>
+Goto <a href="#qbasic">Quick Basic</a> Programming tips<br>
+Goto <a href="#ccomp">C</a> Programming tips<br>
+Goto <a href="#pascal">Pascal</a> Programming tips<br>
+<br>
+<b>Assembly</b><br>
+Here is a fast and easy way to setup a far proc in assembly.<br>
+<form><TEXTAREA NAME="Src1" ROWS=12 COLS=75 WRAP=off>
+
+          public  procname
+procname  PROC far basic uses ax bx,parm1:word
+           .
+           .
+           .
+           .
+           .
+           .
+          ret
+procname  endp
+</textarea></form>
+<br><br>
+This will allow you to call a far proc easier.  (You must use .model medium (or larger))<br>
+When you call this procedure from another file, push the value for parm1 on to the stack.
+When the assembler assembles this proc., it will automatically put whatever was on the stack in to parm1.  When it hits the RET, it will automatically set the stack pointer (sp) to what it should be.  ie. it will do the same as if you put (RET 2).  So on return to the parent, the stack does not need to be 'cleaned'.  SP points to where it was before you pushed the parm values.<br>
+<br>
+Note that BASIC is used after the far dir.  This tells the assembler to get the parms of the stack in basic order.  If you used pascal, it would get the parms in pascal order. etc...<br>
+<br>
+<br>
+Shift right 1 pos is the same as dividing by 2.<br>
+Shift left 1 pos is the same as multiplying by 2.<br>
+<br>
+With a 386 you can put a literal as a shift rather than using CL.<br>
+i.e. shr  ax,03 is the same as shr ax,cl (where cl = 3)<br>
+<br>
+If you have a few variables to set to the same value (clear to zero), if they
+are in consecutive order in memory, use the <i>rep stosb</i> instead of changing/clearing
+each one individually.<br>
+<br><br>
+<a name="qbasic"></a><hr>
+<b>Basic</b><br>
+The Quick Basic compiler comes with an OBJ file called: NOCOM.OBJ;  If you don't use any communications commands in you program, you can include this file with your program to make the EXE smaller and faster.<br>
+<br>
+Quick Basic allocates all available memory at startup.  This doesn't allow you to dynamically allocate any yourself.  Use the SETMEM() statement to decrease the amount it has allocated to allow you to use it.<br>
+<br>
+When you read and write to a file, Quick Basic does a lot of error checking:<br>
+- For reading;  Read in all bytes needed into a buffer, then 'read' each byte from the buffer rather than reading each byte from the file.<br>
+- For writing;  Write each byte to a buffer, then when the buffer is full or you are finished, write the buffer to the file, rather than writing each file individually.<br>
+<br>
+Boolean expressions are faster and smaller.  If you have a lot of IF/THEN/ELSE's that use TRUE/FALSE flags then rather than doing this:<br>
+--IF var = 0 THEN<br>
+or<br>
+--IF var = -1 THEN<br>
+set two const at the top of the main module:  FALSE = 0, TRUE = NOT FALSE<br>
+Now use:<br>
+--IF var THEN<br>
+or<br>
+--IF NOT var THEN<br>
+where var was defined either true or false earlier in the program.<br>
+
+
+<br><br>
+<a name="ccomp"></a><hr>
+<b>C</b><br>
+var += 22;  is same as var = var + 22;<br>
+<br>
+var++; is same as var=var+1;<br>
+<br>
+If you want to get the value of var and then increment var:<br>
+var1 = (var2++); will put the value of var2 in var1 and then inc var2.<br>
+var1 = (++var2); will inc the value of var2 and then put that value in var1.<br>
+<br>
+C contains a <i>ternary operator</i> that is most useful:<br>
+rather than doing:<br>
+-> if(condition) var = exp1; else var = exp2;<br>
+try:<br>
+-> var = condition ? exp1:exp2;<br>
+<br><br>
+<a name="pascal"></a><hr>
+<b>Pascal</b><br>
+<br><br>
+<a name="misctips"></a>
+<hr>
+<font size=4>Misc Tips and Tricks<br></font>
+<b>Getting the command line parameters:  </b>  Rather than relying on the value at bx:80h for finding the end of the command line, just test to see if the char is the CR (enter key (0Dh)).  DOS will always put this char at the end of the line, because at the DOS prompt (except for extreme hacking) there is no other way to execute a command with out hitting the enter key at the end of the command line.<br>
+<br>
+To turn on/off the Insert state set/clear bit 7 of the word at 0000:0417h<br>
+To turn on/off the Caps Lock state set/clear bit 6 of the word at 0000:0417h<br>
+To turn on/off the Num Lock state set/clear bit 5 of the word at 0000:0417h<br>
+To turn on/off the Scroll Lock state set/clear bit 4 of the word at 0000:0417h<br>
+If bit 3 is set then any Alt key is pressed, if cleared then none pressed<br>
+If bit 2 is set then any Ctrl key is pressed, if cleared then none pressed<br>
+If bit 1 is set then left shift key is pressed, if cleared then not pressed<br>
+If bit 0 is set then right shift key is pressed, if cleared then not pressed<br>
+<br>
+<br>
+Bit rep at low memory:  0040:0017h<br>
+7 - Insert state 1=active<br>
+6 - Caps Lock 1=active<br>
+5 - Num Lock  1=active<br>
+4 - Scroll Lock 1=active<br>
+3 - 1 = alt pressed<br>
+2 - 1 = Ctrl pressed<br>
+1 - 1 = L shift pressed<br>
+0 - 1 = R shift pressed<br>
+<br>
+Bit rep at low memory:  0040:0018h<br>
+7 - 1 = Ins Pressed<br>
+6 - 1 = Caps Lock pressed<br>
+5 - 1 = Num Lock pressed<br>
+4 - 1 = Scroll Lock pressed<br>
+3 - 1 = pause pressed (Ctrl num lock)<br>
+2 - 1 = Sys Req pressed<br>
+1 - 1 = L Alt pressed<br>
+0 - 1 = L Ctrl pressed<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

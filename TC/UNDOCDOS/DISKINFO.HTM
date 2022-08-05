@@ -1,0 +1,290 @@
+<HTML>
+<HEAD>
+<TITLE>Some Disk Information.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Information on How disks are made up.</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+
+<IMG SRC="dsklyout.gif" ALT="Disk Layout" ALIGN=middle WIDTH=150 HEIGHT=150 border=0>
+<br>
+<br>
+Imagine that the above image is a group of tracks (rings) with eight sectors per track (pie pieces).   The first sector number begins on the outside and goes to the inside.<br>
+<br>
+Before DOS version 3.3, DOS used 16 bit integers for the sector numbers.  This only allowed 65536 sectors.  The default size of a sector is 512 bytes, that only allowed 32meg of disk space.  (65536 x 512 bytes = 32meg)<br>
+<br>
+MS-DOS version 3.3 allowed you to partition a hard drive that was larger than 32meg into smaller partitions, but each partition still had the 32meg limit.  This allowed you to have (for example) a 64meg disk but you had to access it as if it was 2 different disks.<br>
+<br>
+MS-DOS version 4 allowed up to 2 gigabytes (2000meg) of disk space.<br>
+<br>
+A disk is formatted with four separate areas.  The <i>reserved area</i>, the <i>file allocation table</i> (FAT), the <i>root directory</i>, and the <i>files area</i>.<br>
+<br>
+The <i>Reserved Area</i> can be more than one sector long.  The first sector is always the boot sector and holds a table defining the length of this area, the amount of entries in the root directory as well as information about the FAT area.<br>
+<br>
+If the disk is bootable, it contains in the <i>boot sector</i> start-up code that the machine runs at bootup.  See table below.  Items marked with an * are DOS 4.x and higher due to larger disk sizes.
+<font face="" size=3><pre>        Size in
+Offset   bytes     Item
+------------------------------------------------------------
+ 00h     03      JMP instruction (opcode and offset)
+ 03h     08      OEM name and version
+                    (usually the name of the company that
+                     formatted the disk)
+ 0Bh     02      Bytes per sector
+ 0Dh     01      Sectors per cluster
+ 0Eh     02      reserved
+ 10h     01      Number of File Allocation Tables (FATs)
+ 11h     02      Number of Root Directory entries
+ 13h     02      Sectors in logical volume
+ 15h     01      Media descriptor byte
+ 16h     01      Sectors per FAT
+ 
+ 18h     02      Sectors per track
+ 1Ah     02      Number of sides
+ 1Ch     02      Number of hidden sectors
+ 
+ 1Eh     02      *Number of hidden sectors, cont.
+ 20h     04      *Sectors in logical volume
+ 24h     01      *Physical drive number
+ 25h     01      *reserved
+ 26h     01      *Extended boot record signature
+ 27h     04      *Serial number
+ 2Bh     11      *Volume label
+ 36h     08      *reserved (FAT name)
+ 
+ 3Eh   Bootstrap loader (no more than 445 bytes in length)
+         (your code and data and then load the kernel (COMMAND.COM)
+         .
+         .
+1FEh     02      BootSector ID  AA55h
+
+</pre>
+</font>
+See <a href="#bootsect"><font size=3>below</font></a> for info and source on boot sectors.<br>
+<br>
+The <i>FAT Area</i> holds two mirror images of the File Allocation Area.  This is so that if one is damaged, all data is not lost.<br>
+<br>
+This FAT Area is a "map" of the disk.  Where each part of a file is located on a disk.  Each Fat entry
+can be either a 12 bit entry or a 16 bit entry.  The first two entries of the FAT are reserved for DOS.  The first byte of the FAT is the same as the media descriptor in the BIOS parameter block (BPB).  The rest of the bytes are filled with FFh.<br>
+<br>
+Reading the FAT entries for 16 bit FAT's, is quite simple.  If you want entry 8, multiply by 2 = offset 16 (remember to use base 0).  Reading the Fat entries for 12 bit FAT's is a little more difficult.  Two entries occupies 3 bytes, so one entry is 1 1/2 bytes.  Let's get entry 8 again.  Multiply by 3, then divide by 2.  Now, if the desired entry number is even, read in the word (2 bytes) and shift the word right 4 bits.  If the entry number is odd, read in the word and AND it by 0FFFh (drop bits 15-12).<br>
+<br>
+Each FAT entry contains a value.  See the table below.
+<font face="" size=3>
+<pre>12-Bit value    16-bit value       Meaning
+   000h            0000h             Unused Cluster
+   FF0-FF6h        FFF0-FFF6h        Reserved Cluster
+   FF7h            FFF7h             Bad Cluster
+   FF8-FFFh        FFF8-FFFFh        Last cluster in file
+   all other values                  Next cluster in file
+</pre>
+</font>
+I have included a small CHKDISK program in C that will check a floppy disk for errors.  As of this version, it checks the actual sectors for reading, then it checks the FAT entry for each sector/cluster.  I plan to add more error checking items like:  Check both FAT's for different values, be able to move bad clusters to good clusters, etc.  I am even thinking of adding a simple DEFRAG util to it. (look for future versions).  You can get the zip file from <a HREF="chkd.zip">here</A> (6,874 bytes) (ver 1.00).  It contains C source
+compilable with QC2.5 or any other C compiler with an inline assembler. <b>This program only works on 3 1/2in - 1.44m floppy disks in the A: drive.</b>  You can easily modify it to check the b: drive by changing the appropriate register value.  I have commented the code on where and how to do this.<br>
+<br>
+The <i>Root Directory Area</i> is like a table of contents for the disk.  It can hold only so many entries depending on the disk size. (7 to 14 sectors per root directory is normal for floppies (32 for hard drives), while 512 entries is the limit on larger floppies and all hard drives).<br>
+<br>
+The <i>Files Area</i> holds all other files.  DOS 2.0 and later allowed sub directories in this area also.<br>
+<br>
+A directory entry is 32 bytes in length and contains information about the entry.
+<font face="" size=3>
+<pre>
+Offset   Description           Size   Format
+----------------------------------------------------------------------
+  00h     Filename               8     ASCII chars
+  08h     Filename Extension     3     ASCII chars
+  0Bh     Attribute              1     bit coded (6 used, 2 unused)
+  0Ch     Reserved              10     zeros
+  16h     Time                   2     word (coded)
+  18h     Date                   2     word (coded)
+  1Ah     Starting Cluster #     2     word
+  1Ch     File Size              4     long integer
+</pre>
+</font>
+<br>
+The <i>filename</i> can be up to 8 chars in length.<br>
+The <i>filename extension</i> can be up to 3 chars in length.<br>
+The file <i>Attribute</i> is defined as:
+<font face="" size=3>
+<pre>
+  Bit #
+7 6 5 4 3 2 1 0    Description
+. . . . . . . 1     Read-only
+. . . . . . 1 .     Hidden
+. . . . . 1 . .     System
+. . . . 1 . . .     Volume label
+. . . 1 . . . .     Subdirectory
+. . 1 . . . . .     Archive
+X X . . . . . .     Not used
+</pre>
+</font>
+<br>
+The file <i>Time</i> is encoded as the following:
+<font face="" size=3>
+<pre>
+  Time = (Hour x 2048)+(Min x 32)+(Sec + 2)
+</pre>
+</font>
+<br>
+The file <i>Date</i> is encoded as the following:
+<font face="" size=3>
+<pre>
+  Date = ((Year - 1980) x 512) + (Month x 32) + Day
+</pre>
+</font>
+<br>
+The file <i>Size</i> is something that needs to be explained.  This long integer (dword) is the actual size of the file, but it might not, and most of the time isn't the amount of space that it takes up on the disk.  Have you ever had a floppy disk that was almost full, say had about 1024 bytes left and copied a file to it that was less the 1024, then to find out that the floppy is now full and won't allow any more space?<br>
+This is because when a file is written to a disk, it starts with the beginning of the next available cluster.  If the file size is less than a cluster, then the full cluster is used.  If the file size is larger than a cluster then it uses all needed whole clusters to store the file while the end of the last cluster is wasted (not used).<br>
+<br>
+If I have a file size of 200 bytes and a cluster size of 512, then the whole cluster is used to save the file, but the last 312 bytes of the cluster do not get used.  If I have a file size of 600 bytes and a cluster size of 512, then two whole clusters are used while the last 424 bytes are not used.  This could eat up a drive quickly.  Imagine having 100 files that were 10 bytes each.  The total byte length of the files is 1,000 bytes (~1k) but the total bytes used on the disk with a 512 byte cluster is 51,200 bytes (50k).  OUCH!!<br>
+<br>
+If you have any other questions about disk drives, or see that I made a mistake, please let
+me know.<br>
+</font>
+<br>
+<br>
+<hr>
+<a name="bootsect"></a>
+<font face="" size=3><pre>
+                 ******** How to make your own boot code ********
+
+When your computer starts up it will do a self-test and then tries to load
+the bootsector (512 bytes) of your harddrive/floppy disk in the memory at 
+0000h:7C00h, and jumps to 0000h:7C00h. You should make a 512 byte long code,
+but the last word of the 512 bytes should be AA55h because otherwise your
+computer will not detect that this is a valid bootsector code.
+The offset 7C00h will make it difficult to jump or access variables,
+because a normal .COM file will think it will start at offset 100h. To solve
+this problem you could use "ORG" in your code. Example:
+
+(.COM file)
+	org	100h		;for stacks (NOT used in this program!)
+  jmp vender
+
+  org 7C3Eh   ; !!! the +3Eh is explained in #1
+vender:
+  ....        ; your code...
+  ....        ; and your variables
+
+	org	7DFEh
+  dw  AA55h   ; Valid-bootsector-code identifier
+
+#1 The structure of the Bootsector
+   From HELPPC 2.x by David Jurgens
+
+Offset   Size      Description
+------------------------------------------------------------------------
+00h      3 bytes   jump to executable code (E9h 3Bh 7B)
+03h      8 bytes   OEM name and version (if wanted)
+0Bh      1 word    bytes per sector
+0Dh      1 byte    sectors per cluster (allocation unit size)
+0Eh      1 word    number of reserved sectors (starting at 0)
+10h      1 byte    number of FAT's on disk
+11h      1 word    number of root directory entries (directory size)
+13h      1 word    number of total sectors (0 if partition > 32Mb)
+15h      1 byte    media descriptor byte  (see MEDIA DESCRIPTOR)
+16h      1 word    sectors per FAT
+18h      1 word    (DOS 3+) sectors per track  
+1Ah      1 word    (DOS 3+) number of heads
+1Ch      1 dword   (DOS 3+) number of hidden sectors
+20h      1 dword   (DOS 4+) number of sectors if offset 13h was 00h
+24h      1 byte    (DOS 4+) physical drive number
+25h      1 byte    (DOS 4+) reserved
+26h      1 byte    (DOS 4+) signature byte (29h)
+27h      4 bytes   (DOS 4+) volume serial number
+2Bh      11 bytes  (DOS 4+) volume label
+36h      8 bytes   (DOS 4+) reserved
+
+3Eh-1FDh           Both your code & variables
+1FEh     2 bytes   bootsector identifier (AA55h)
+
+
+It is safe to PUSH & POP things because SS:SP points to a special reserved 
+stack area (256 bytes).
+
+If at the beginning of your code DL=80h, the computer boots from the first
+harddisk if at the beginning of your code DL=00h, the computer boots from
+the first floppy disk.
+
+Now you should copy 450 bytes of this .COM file beginning at 7B3Eh and put
+this in the first sector (the bootsector) of your floppy disk at the offset
+3Eh.  You should write the following bytes to the bootsector at the offset 
+0000h: 
+
+
+db EBh  ; JMP RELATIVE instruction
+db 3Ch  ; JMP to +003Ch
+db 90h  ; NOP instruction (do nothing), important
+        ;  because if this is not 90h then DOS
+        ;  will NOT recognize your disk
+(This is a standard code for MS-DOS Formatted disks)
+
+You should now have a valid bootdisk.
+</pre></font>
+<br>
+<b>Source to a demo boot sector:</b><br>
+<font face="" size=3><pre>
+; This is an example bootsector code
+; assemble with <a href="newbasic.htm">NBASM 00.23.xx</a>
+
+.model tiny
+.code
+           org  0100h
+start:     jmp  venderinfo
+
+           org  7C3Eh
+venderinfo:
+
+; this is the part where you can write your own code and data
+;   (not more than 445 bytes total)
+
+           mov  ax,03h                  
+           int  10h
+                                        
+           mov  si,offset HangsS
+Loop1:     lodsb
+           or   al,al
+           jz   short DoneLoop
+           int  29h
+           jmp  short Loop1
+
+DoneLoop:  xor  ah,ah
+           int  16h
+
+; for demonstration purposes, we can use ret here.
+; however, in an actual boot code, you would want it to
+; start your OS.
+           ret
+
+
+; this is the part where you can put your variables
+
+HangsS     db   'This is an example bootsector code',13,10
+           db   '  Press any key to exit...',13,10,0
+
+           org  7DFEh
+
+BSId       dw   0AA55h                  ; Bootsector identifier
+
+.end Start
+</pre></font>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

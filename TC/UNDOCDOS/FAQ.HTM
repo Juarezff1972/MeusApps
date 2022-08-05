@@ -1,0 +1,1272 @@
+<HTML>
+<HEAD>
+<TITLE>The DOS Program FAQ List</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<H2 align="center">The DOS Program FAQ List</H2>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<br>
+This is the Frequently Asked Questions (FAQ) list of Forever Young Software<br>
+<br>
+All questions/answers are public domain.<br>
+<br>
+Any FAQ containing an organization other than Forever Young Software are used as declaration purposes only.  All Rights Reserved.<br>
+<br>
+FAQ List as of: &nbsp; <b>15 Nov 1998</b><br>
+<br>
+<br>
+<center>
+<table border="1" width="90%" bgcolor="white" cols=2>
+<font face="" size=1>
+  <tr>
+    <td align=center bgcolor="#EEEEEE" width="75%"><b>Subject</td>
+    <td align=center bgcolor="#EEEEEE" width="25%"><b>Last Modified</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#dos"><b>DOS & Files</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#dos1">How do I set the text mode to 80 columns and 50 rows?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos2">How do I change the screen mode at the DOS prompt?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos3">Format a disk in a batch file without prompting for input?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos4">How can I get into True Dos?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos5">How do I make Hidden Directories in a program?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos6">Where can I find a readme.txt viewer for DOS?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos7">Has microsoft stopped making dos?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos8">What is SHARE.EXE</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos9">Incorrect DOS version.  Huh?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos10">How do I free more memory for my game</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos11">How would I disable the "dangerous" commands in DOS</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos12">Where is the Master Environment?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos13">How do I get the short filename of a long filename?</a></td>
+      <td align=center>15 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#dos14">How do I totally hide a file or directory?</a></td>
+      <td align=center>15 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#comp"><b>Compilers</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#comp1">What is the 'No Stack' Link error</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp2">What is 1's complement</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp3">What do you mean 'boundary aligned'?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp4">How can I modify compiler help files?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp5">Is there any limit to the size of the .EXE you can create?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp6">How do you make libraries for QB 4.5</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#comp7">Where can I get QBASIC.EXE</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#batch"><b>Batch</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#batch1">Where can I get a .BAT to .EXE converter?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#batch2">How do I prompt the user for their choice from the menu.</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#memory"><b>Memory</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#memory1">Can I access memory directly so that I can write to a graphics screen?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#memory2">How is memory organized in DOS</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#memory3">What is Little Endian Format</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#mouse"><b>Mouse</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#mouse1">How many services does the mouse driver have?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#mouse2">How do I get my mouse to work in DOS mode?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#sound"><b>Sound</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#sound1">Sending sound to the PC Speaker</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#sound2">How do I create my own CD Player</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#sound3">Is the CD-ROM accessed the same way as you would access the hard disk</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#graphics"><b>Graphics</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#graphics1">What is VESA and how can I tell if I got one?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#disk"><b>Disks</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#disk1">How can I use Long File names in DOS</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#disk2">What is the best copy protection</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#disk3">How do you compress a large file</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+    <td align=left bgcolor="#EEEEEE"><a href="#misc"><b>Misc</b></a></td>
+    <td align=center> &nbsp; </td>
+  <tr>
+      <td align=left><a href="#misc1">Do you know any source codes for really top commercial games?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc2">CMOS size</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc3">Detecting Windoze from DOS</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc4">Where should a Newbie start?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc4">What CPU type do I have?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc5">What are TSR's and what do they do?</a></td>
+      <td align=center>09 Nov 1998</td>
+  <tr>
+      <td align=left><a href="#misc6">How to "eject" the last page</a></td>
+      <td align=center>09 Nov 1998</td>
+  </tr>
+</table></center></font>
+<br>
+<hr>
+<br>
+<!-- *********** DOS ************************************* -->
+<font size=3 face="">
+<a name="dos"></a>
+<a name="dos1"></a>
+<pre>How do I set the text mode to 80 columns and 50 rows (80x50)?
+Use the following assembler code:
+     mov  ax,0003h
+     int  10h
+     mov  ax,1112h
+     int  10h
+
+Or use the following DOS command (only if you have a VGA):
+     MODE CO80,50      ; sets (80x50)
+   to set back to normal (80x25) use:
+     MODE CO80         ; sets (80x25)
+</pre>
+<hr align=center width="50%">
+<a name="dos2"></a>
+<pre>How do I change the screen mode at the DOS prompt?
+Use the internal command MODE:
+
+  MODE CO80,50  will set the screen to Color text with 80 columns and 50 lines
+  MODE CO80 will set the screen to Color text with 80 columns
+  MODE CO40 will set the screen to color text with 40 columns
+  MODE BW80 will set the screen to B/W text with 80 columns
+  MODE BW40 will set the screen to B/W text with 40 columns
+  MODE MONO will set the screen to monochrome
+</pre>
+<hr align=center width="50%">
+<a name="dos3"></a>
+<pre>I am trying to use a batch file to format a disk and the FORMAT command prompts for
+user input.  Is there a way to bypass the input so that the .bat file doesn't wait for 
+user input?
+
+Using DOS redirection I/O we can enter the required 'user input' with the bat file before
+we call the FORMAT command.  Using the ECHO command or the &lt; redirection symbol in your batch
+file, we can now do this.
+
+Example #1:
+When you want to delete all the files in a directory you use the command 'del.'  (DEL 
+period).  DOS asks for a Y or N before it does.  To skip this, use the ECHO to 'echo' a 'y'
+into the keyboard buffer:  ECHO Y|DEL.
+The 'more' command (shift back slash key) is used to tell DOS that there is 'more' to do.
+
+Example #2:
+When you want to enter more than a single char then you must do something else.  If you 
+know exactly what you want to enter, and you will enter this all the time, then you can 
+create a text file (making sure that there is a blank line (CR) at the end) and redirect
+it into the command.  If the following command needs a file name enter at the DOS prompt
+then do the following:
+
+	commandname &lt; name.txt
+
+Where commandname is the command and name.txt is the file containing the text you want 
+entered at the prompt when commandname asks for it.  Make sure to leave a blank line at
+the end of name.txt so that there is a CR (ascii 13) at the end.
+
+Using this redirection symbol (&lt;), DOS takes the chars in the file as if they were entered
+at the DOS command line with the keyboard.  Taking this in consideration, you must have
+a CR at the end of each line to simulate the ENTER key.  Putting an extra line at the end
+of the file makes sure of this.
+
+To format a disk with out prompting for input:
+
+echo &gt; format.txt n n
+format A: &lt; format.txt
+del format.txt
+</pre>
+<hr align=center width="50%">
+<a name="dos4"></a>
+<pre>I'm running Windoze 95 - How can I get into True Dos?
+
+It is quite simple.  When you boot your machine, wait for the beep and a message
+stating:  Starting Windoze 95 (or similar to that)
+
+At this point, press F8.
+-Some machines only allow 2 to 3 seconds for this input while others allow longer
+ depending on what your setting are.
+-Some machines need this input slightly before the beep while others are slightly after,
+ depending on what BIOS you have
+-Depending on the BOIS you might not have a beep
+
+After pushing F8, you should get a menu of about 5 to 8 items.
+
+Two of the last items are 'RUN DOS COMMAND' and 'RUN DOS COMMAND SAFE MODE'
+(maybe not exactly as this but something similar).  
+
+Hit the key corresponding to the menu item number 'RUN DOS COMMAND' (usually 5) and when
+the DOS command prompt comes up you are in TRUE DOS.
+(On some systems you enter SHIFT-F5 in the above mentioned menu)
+
+To get back to WIN95 you must reboot your machine.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos5"></a>
+<pre>How do I make Hidden Directories in a program?
+
+Here are some listings:
+--- Assembler --------------
+Dir1       db   'dirname',0
+
+mov  dx,offset Dir1
+mov  ax,4301h
+mov  cx,0000000000010010b
+int  21h
+
+;Where Dir1 is an asciiz string of the dir name to hide.
+;To unhide the dir, use the same code except make 
+; cx = 0000000000010000b
+
+--- Quick Basic --------------
+QB45 does not allow you to change a dirs attributes.
+You can call an assembler routine to do this though.
+I have put a few files on my page about calling assembler
+routines.  (FEXIST) is one of them.
+
+--- Turbo Pascal --------------
+SetFAttr (F, Attrb)
+
+Where F is the file 'pointer' and Attrb is the value of the attrib to set.
+Attrib would be $12 (12h) in this case.
+Remember:  SetFAttr and GetFAttr use the DOS unit.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos6"></a>
+<pre>Where can I find a readme.txt viewer for DOS?
+ 
+DOS provides a editor called EDIT.COM
+
+If you have DOS 6.22 or before, it is in your c:\DOS dir.
+If you have DOS 7.0 (Windoze 95) then it is in your C:\WINDOWS\COMMAND dir.
+
+If you want to read a file called README.TXT, type the following at
+the prompt:
+
+  edit readme.txt
+
+</pre>
+<hr align=center width="50%">
+<a name="dos7"></a>
+<pre>Has microsoft stopped making dos?
+
+DOS 7.x is shipped with Windoze 95
+I do not not what version is shipped with Windoze 98.
+It is rumored that when MS comes out with Windoze 2000/NT, they will stop
+including DOS.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos8"></a>
+<pre>I am installing a program on my computer.  It says I need Share.exe.
+Is this a dos application?
+
+Yes.  Share is a DOS app.  SHARE allows two or more applications to
+access one single file at a time not allowing one to change the file without
+letting the others know about it.
+
+If I have 2 applications opening a single file and I want to read in a
+sentence from this file using app #1 but only can read in one half of the
+sentence at a time, I must lock this part of the file from being changed or
+app #2 can change the words in the sentence before I can read the second
+half with app #1.
+
+SHARE provides this security.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos9"></a>
+<pre>How do you format the hard drive, even when you get the error 'incorrect
+DOS version' when you try FORMAT.EXE?
+ 
+First I recommend that you try the CMOS setup of your machine.
+When you first boot the machine, it should say something like:
+  Press F1 to go to setup
+or
+  Press DEL to go to setup
+Go ahead and press the key combination it asks for.  One of the items on
+the CMOS setup (depending on the version) should be "format harddrive"
+
+If your setup does not have this, you can get the DOS disks (or Windoze
+CD) and let the machine boot from the disks.  Then used the FORMAT and
+FDISK off of the disks.
+
+If this doesn't work, then you must use a third party utility.
+If you (or your company) is willing to spend about $100, get Norton's
+Utilities.  It is an excellent set of software utilities including formatting 
+the harddrive.
+
+If you are after shareware/freeware stuff, check out Microsoft's search
+feature and search for "FORMAT".  There is a small routine to format a
+disk ( ? harddrive ?)
+
+There are a few Format utilities on the web.  Try one of the SIMTEL mirrors.
+(look on my favorites page for the link to the SIMTEL mirror I use).
+
+The book called "Advanced Assembly Language" by Allen Wyatt has a FMT.ASM
+listing that will format floppies.  This should be hard to change for
+harddrives (if you know assembler)
+
+</pre>
+<hr align=center width="50%">
+<a name="dos10"></a>
+<pre>How do you free up memory in DOS to run a DOS game that needs more than
+I currently have?
+ 
+The NOEMS is in one of your startup files (Autoexec.bat or Config.sys), more
+likely in your config.sys file.  Find the line that has the /NOEMS parameter
+on it and delete just this parameter.  (for safety sake, make a copy of the
+config.sys file, as either hardcopy, or as a backup)
+
+To let DOS have all the memory (conventional memory) that it can handle, do
+the following:
+Restart your machine
+When you see the line "STARTING WINDOZE 95" displayed, press the F8 key.
+This will give you a small menu. choose "MS-DOS command prompt only"
+This will not load Windoze.
+Now you will have more memory to run your DOS apps.
+
+If you have MEMMANAGER, this program allows you to put a lot of your programs
+in high memory, freeing up the wanted memory for your game.
+
+Also, I would create a temp AUTOEXEC.GAM file that has very little in it.  No
+drivers (except the ones needed for your game) etc.  Then when you are going to
+play your game:
+-rename the original AUTOEXEC.BAT file to AUTOEXEC.ORG
+-rename your AUTOEXEC.GAM file to AUTOEXEC.BAT
+-reboot the system
+-when you are done playing your game, restore the file names and reboot the system.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos11"></a>
+<pre>How would I disable the "dangerous" commands in DOS, like FORMAT, DEL,
+ERASE, etc.?
+ 
+DOS includes a DOSKEY program that is a TSR and "grabs" the command line
+before the COMMAND prompt can get it.  DOSKEY allows you to use macros and
+other features and also includes a history.  Read your DOS manual for more
+on this program.
+
+The way that DOSKEY works is that it grabs the command line entered at the
+prompt when the CR (enter key) is pressed.  It then checks to see if it is a
+predefined macro or command and does accordingly.  If it is not a predefined
+command (macro) then it sends the command line to the COMMAND interpreter.
+Using DOSKEY you can disable the FORMAT, DEL, and other commands be defining
+different macros for these functions.
+
+If you wrote a program that did similarly the same thing as DOSKEY, you could
+accomplish the task that you want to do.
+
+The COMMAND.COM program is just an interface between the user and the
+computer (DOS and BIOS).  You could easily write a program that would allow
+the user to input data (command lines) and then your program would do
+accordingly.  You just need to know a few things about DOS and BIOS
+interrupts.
+
+Also, you could rename the external commands to something else.  i.e.:  FORMAT
+is an external command of DOS.  Rename it to FRMT.  DEL is an internal command
+and you will have to use DOSKEY or another TSR.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos12"></a>
+<pre>Where is the Master Environment?
+
+The surest way to find the "master" environment "list" is to find its address
+in the PSP of COMMAND.COM.
+Viewing the MCB's we can find the address of the PSP of COMMAND.COM and then
+go to address 002Ch of this segment address.
+
+I have some source on my page to get and change the master environment.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos13"></a>
+<pre>How do I get the short filename of a long filename?
+
+See my page on <a href="longfile.htm">Long FileNames</a>.
+
+</pre>
+<hr align=center width="50%">
+<a name="dos13"></a>
+<pre>How I totally hide a file or directory?
+
+Windoze sets a files attribute to "Read/only, hidden, system. and Volume Label" 
+to "hide" any directory entry it wants to.  Mostly used for Long Filenames.
+
+All you have to do is set the directory's attribute to 1Fh (0x1F).
+Using service 4301h of int 21h, put 0Fh (0x0F) in CX.  If you put
+1Fh (0x1F) in CX, DOS will return an error.
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Compilers ************************************* -->
+<a name="comp"></a>
+<a name="comp1"></a>
+<pre>I am compiling a program with a tiny model.  It gave me a "no stack" warning when I
+tried to link it.  What does this mean?
+
+When you write a 'tiny' or a .COM file you can not assign a stack segment other than
+the code segment.  This error should be ignored.
+
+</pre>
+<hr align=center width="50%">
+<a name="comp2"></a>
+<pre>What is 1's complement
+
+Reverses each bit in a byte or word.
+00001111b  becomes 11110000b
+
+
+</pre>
+<hr align=center width="50%">
+<a name="comp3"></a>
+<pre>What do you mean 'boundary aligned'?
+
+A 16 bit processor with 16 bit segments access data and code a word
+at a time.  If you have a word on an odd location, the processor must
+access the word at the even location before and again at the next even
+location.  Hence the processor actually reads two words (16 bits) to
+get the one word (16 bits) at the odd location.
+
+The 32 bit processors and 32 bit segments do the same thing except
+with 32 bit addressing.
+
+Look in your documentation of the assembler you are using for something 
+like the .ALIGN reference.
+
+</pre>
+<hr align=center width="50%">
+<a name="comp4"></a>
+<pre>Where can I get a program in 'C' about create/read HELP compiler files
+and read/write files .INI (windows)?
+ 
+Each compilers HELP file is just a little different while each
+manufacturers compilers help files are totally different.
+Try a web site that I visit often.  It has formats to a lot of file
+types:
+
+http://www.wotsit.org
+
+As far as INI files in Windoze, these are just ascii files.  Each line has
+a format of:
+
+Variable   equals   value or field.
+
+Most INI files have sections also.  SYSTEM.INI has a  [386ENHANCE] 
+(or similar) section as well as [DRIVERS] and [BOOT] sections.
+
+Find the section you want by reading each line one at a time then read each
+in this section, looking for the variable that you want to set/change.  If
+you find it, replace this line.  If you don't find it (You ran into another
+section), add the wanted line at the end of this section.
+
+Microsoft has a program that will let you modify the QB45 help files.
+It is called: HMAKE100.EXE
+Since MS changes the links so often, I will not even try to leave a link
+to this file.  Go to the search feature at www.microsoft.com and search
+for this file.
+
+</pre>
+<hr align=center width="50%">
+<a name="comp5"></a>
+<pre>Is there any limit to the size of the .EXE you can create?
+
+QB uses the MEDIUM model.  1024k of code, 64k of data. 
+If you use the $DYNAMIC directive and the /AH command switch will allow you
+to create a code size of ~1024k (or about one meg) and a data size of 64k.
+
+Most other compilers let you define the model.
+
+</pre>
+<hr align=center width="50%">
+<a name="comp6"></a>
+<pre>How do you make libraries for QB 4.5 to allow more memory for the main
+module in the interpreter?
+ 
+To create a Library of QB45 code, create a few SUBs and/or FUNCTIONS only,
+(leave the main module empty) and then go to DOS and compile it to an OBJ
+file.
+
+  BC filename.bas /o
+
+Then use LIB to change it to a LIB file.
+
+  LIB filename.lib
+(Lib will ask you for the filenames (.obj files) to add to the lib.
+
+Then you can link this lib to your code using LINK.
+
+LINK source.obj
+(Link will ask for the lib name)
+(To tell LINK to use more than one lib, put a plus (+) sign at the end of each libname to denote one more.
+  i.e.:
+   LINK
+     filename.obj
+     filename.exe
+     null
+     firstlib.lib+
+     secondlib.lib+
+     lastlib.lib
+ )
+
+If you want to use this lib in the interpreter, use 
+
+LINK /q filename.obj,filename.qlb,,bqlb45.com;
+
+Then load it into the interpreter like:
+
+  QB /l filename.qlb source.bas
+
+This will allow you to use the lib when you run your code.
+
+</pre>
+<hr align=center width="50%">
+<a name="comp7"></a>
+<pre>Where can I get QBASIC.EXE or other Basic compiler/interpreter?
+ 
+If you have DOS 5.0 or later you have qbasic on your system or system disks.
+
+If you have Windoze 95, it is on the CD under
+
+  D:\other\oldmsdos
+
+You can get a shareware BASIC compiler on one of the SIMTEL mirrors (see
+my favorite page for a link to a SIMTEL mirror) then go under the basic
+directory.
+
+You can get Quick Basic 4.5 from a few places on the web.  One is
+  http://www.wdn.com/ems/oldtools/ms.htm
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** batch Files ************************************* -->
+<a name="batch"></a>
+<a name="batch1"></a>
+<pre>Where can I get a .BAT to .EXE converter?
+
+If you are looking for a util to change a BAT file to an EXE file
+then try the following simtel mirror at:
+
+http://www.coast.net/SimTel/msdos/batutil.html
+
+I found at least one 'compiler' there.  If this one doesn't meet your
+needs, do a search for "BAT2EXE" with your fav search engine.  This is
+bound to bring some up.
+
+</pre>
+<hr align=center width="50%">
+<a name="batch2"></a>
+<pre>How do I prompt the user for their choice from the menu.
+
+Method 1:
+Make 9 batch files.  (1 - 8) plus the main (menu) batch file.
+
+In the menu batch file, display the menu and exit to dos.
+Then make 8 batch files for each choice and let them enter 1 - 8 at the DOS
+prompt, calling 1.bat (or 2.bat etc).  When 1.bat is done executing what
+ever is needed, have it call menu.bat (the first one again.)
+
+Example:
+
+(menu.bat)
+
+@echo  off
+echo                Main menu
+echo      1.  1st choice
+echo      2.  2nd choice
+echo      3.  3rd choice
+echo      4.  4th choice
+echo      5.  5th choice
+echo      6.  6th choice
+echo      7.  7th choice
+echo      8.  8th choice
+echo.
+echo  Please enter (1-8) at the dos prompt.
+
+
+
+(1.bat)
+@echo off
+      ... do what ever here
+
+menu.bat             ( then call menu bat to redisplay the menu)
+
+(2.bat)
+@echo off
+      ... do what ever here
+
+menu.bat             ( then call menu bat to redisplay the menu)
+
+
+(etc.)
+
+
+Method 2:
+Use the CHOICE command.
+
+@echo off
+:LOOP
+cls
+echo main menu
+echo.
+echo A - Choice A
+echo B - Choice B
+echo C - Choice C
+echo.
+CHOICE /c:ABC Enter Choice:
+
+now use the ERRORLEVEL to find out where to go.
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** memory ************************************* -->
+<a name="memory"></a>
+<a name="memory1"></a>
+<pre>Can I access memory directly so that I can write to a graphics screen?
+
+It depends on what graphics mode you want to use though.
+For instance.  Text modes are extremely fast.
+Once you know what segment to write to (depends on CGA, MCGA, HGA, etc.)
+ROW 1, COL 1 is at offset 0000h. ROW 1, COL 2 is at offset 0002h etc.
+A byte for the attrib and a byte for the char.
+
+EGA graphics use pages for each color.  For instance, Pixel pos 0,0 is
+at offset segment:0000h but you must tell the graphics card with page
+to write to on each color (4 pages = 4 colors = R,G,B,I ).
+This is quite fast also, but you must know how to program the cards
+registers.
+
+VGA (mode 13h) is extremely fast and easy.  Pixel pos 0,0 is at offset
+0000, pos 1,0 is at offset 0001, etc.  Since a 256 color pixel takes up
+one byte, each pixel is in a single byte.  320 x 200 = 64000
+(see my web page on Programming Graphics for more on MODE 13h programming)
+
+SVGA's are a lot harder to program directly.  Especially when some use
+4meg of RAM for one screen of graphics.  Example:  If I set my screen to
+1600 x 1200 pixel res.  That is 1,920,000 pixels.  If Each pixel had the
+capabilities of 256 colors I would need just shy of 2meg of RAM to display
+that single screen shot.  Lets say the I had this res set at 65536
+(2 bytes each) colors.  Now I need 4meg ram for a single screen shot.
+If you plan to program the SVGA, I would suggest allowing the compiler
+to do the work, or find a great library.
+
+</pre>
+<hr align=center width="50%">
+<a name="memory2"></a>
+<pre>How is memory organized in DOS
+
+The first 640k of memory is call conventional memory.  When Bill
+Gates first designed DOS, he and the rest of the guys had no idea that anyone
+would ever use or need more than this amount of memory.  (The earlier machines
+only had 64k of memory (65536 bytes) total!!!)
+
+Anyway, the lower part (0000:0000h -> 0050:FFFFh) is used for DOS and BIOS
+variables.  The systems information as well as the keyboard buffer and other info
+are in this area.
+
+DOS allows 640k (655360 bytes) of memory allocated for program use.  Out of this
+640k mem is the area I described above.  This leaves the most seen 550k (563200
+bytes) left to run programs.  Of this 550k, you might have some TSR's and drivers
+loaded.  These can take up some of this memory.  After all TSR's and drivers are
+loaded, you have about 500k (512000 bytes) left to run your program.  I will talk
+about this area later in this article.
+
+The memory above the 640k of the 1meg is used mainly for Video memory.  The
+VGA in mode 12h (640x480x16) can use up to 153600 bytes of memory and in
+mode 10h (640x350x16 x 2 pages) can use up to 224000 bytes of memory.
+This leaves about 140k left.  This 140k is used for UPPER memory loading of
+some special drivers and other items and the BIOS.
+
+Now back to the 500k that is allowed for program use.  This memory is divided up
+in blocks of memory called Memory Control Blocks or MCB's.  If the memory is
+'clean' and unfragmented then you can allocate one single block of the whole 500k.
+In fact this is what the Quick Basic compiler does.  A program that was compiled
+by this compiler allocates all available memory at startup.  Actually, the compiler
+puts a value in the programs EXE header telling DOS to allocate all available memory
+for the program.  (we will talk about this a little later)
+
+If your program doesn't allocate all available memory at startup, then you can allocate
+any amount of memory that is left in 16 byte blocks which are called paragraphs.  If
+your program has allocated all available memory, then you must (the programmer)
+free some of that unused memory to allow other programs or data blocks to be allocated.
+
+Now for the hard part.  If I have 640k of accessible memory how can I access all of it?
+DOS uses 16 bit registers which can have a value of up to 65535, so how can I access a
+value with an offset past 65535?
+DOS uses segmented addressing.  In other words, DOS uses a 16 bit segment and a 
+16 bit offset address to allocate a byte of memory.
+Example:  To allocate the first of the VGA video memory, (which is at A000:0000h) put
+0A000h in the segment register and 0000h in the offset register.
+First we need a segment of the memory to access.  Once we have the segment of that
+memory, we can now use an offset from the first of the segment to access memory in
+that segment.  This offset can only be from 0000h up to 0FFFFh (65535).  If I need to access
+memory past this point, I need to set my segment address to that point and then
+I have access to 65536 more bytes.
+
+To find a segment address in memory:
+To access the physical address 16661h I can use the following segment addresses:
+  1234:4321h or
+  1666:0001h or
+  1665:0011h or
+  1664:0021h and
+  many more (4096 different ways to access the same physical address)
+
+Explained: (Take 1234:4321h and convert it to 16661h)
+shift the segment part left one pos (1234h now = 12340h) and add the offset part.
+   12340h	16660h
++   4321h      +	  0001h
+--------------       --------------
+   16661h	16661h
+
+Now to explain how DOS loads a program into memory.  When DOS loads a program into
+memory, it needs to know how much memory it needs.  That is why most EXE files have a 256
+byte header.  This header has information on where the stack (if any) is to be, where entry
+code is to be, and how much memory to allocate, along with other info.
+
+COM files only allow  a total of 64k (65536 bytes) of memory to be used.  This memory must
+hold all code, data, and stack info.  Because DOS already knows that it needs only 64k
+of memory, and assumes that the programmer knows where the Code, Data, and Stack
+will be inside the 64k, it does not need the info that an EXE header has.
+
+Then DOS allocates a 256 byte block of memory (the PSP) and puts the used command line at offset 80h
+of this block.  It also has other data and info for use of the program.  This block has the offset
+of the 24h interrupt vector as well as the 21h interrupt and the exit code interrupt.  This block
+also has the 2 FCB's (File Control Blocks) but are not used in DOS 2.x and later.  This block also
+holds the address to the environment address.
+
+After DOS allocates this 256 block and fills it with this necessary data, it allocates the required
+memory for the program, its data, and its stack.  Then DOS points the IP register (Instruction
+Pointer) to the first instruction to be executed (a value in the EXE header had this value) and sets
+DS to the Data segment, CS to the Code Segment, and SS and SP to the Stack.
+Now DOS gives control to your program and this is when your program starts to run.
+
+As soon as your program is finished.  DOS regains control, and frees that memory for other programs.
+It doesn't actually clear it.  You program is still there, DOS has just released the memory for future
+use.
+
+See my "Viewing the MCB's" for this.  It describes every MCB that is being use at the time.
+It shows the address and size of each MCB also.
+
+</pre>
+<hr align=center width="50%">
+<a name="memory3"></a>
+<pre>What is Little Endian Format?
+
+If I write the double word 12345678h into memory...
+it's asm'ed as 78 56 34 12 ...
+Now let's say I want to read the high half of the number I put in...
+I reset offset to beginning of string, read 2 bytes: 78 56 ... the word
+I get is 5678h ... that is the low half of my number????
+
+If you write a 32 bit number to memory Intel assumes you will read it
+as a 32 bit read rather than just 16 bits at a time.
+
+If I write the 32 bit value of 12345678h to memory using EAX
+
+mov  eax,12345678h
+stosd
+
+Then when I read this number back I point (E)SI to the starting offset
+and read it 32 bits at a time.
+
+mov  si,offset numoffset
+lodsd
+
+EAX now holds 12345678h
+
+If I want to read only the HI order (HI half) of the word using 16 bit then
+remember that the HI order is at the end of the memory offset.
+
+If you want the HI order part in AX and you can use 32 bit processes,
+just do the following.
+
+mov  si,offset numoffset
+lodsd
+shr   eax,16
+
+or
+
+mov  si,offset numoffset
+mov  ax,[si]
+
+This will put the HI order part in the LO order part of EAX with is AX.
+
+If you want to get the HI order part of the number, and you CAN'T use
+32 bit processes, then use the following:
+
+mov  si,offset numoffset
+inc    si
+inc    si
+lodsw
+
+or
+
+mov  si,offset numoffset
+mov  ax,[si+2]
+
+(remembering that the HI order is at the end of the memory location)
+
+A little more:
+When I have 12345678h in EAX and I write this number to memory,
+I get 78 56 34 12 in memory.  So If I want to access the HI order part
+then remember that I need to skip the first 2 bytes to get the HI order.
+
+When EAX is written to memory, the processor writes 78 then 56 then
+34 then 12.
+
+A little different perspective:
+Lets look at the stack.  Think of the stack as a 'stack of plates' on a
+table.  If I hold these plates in my hands I can get anyone one in any order
+I want.  If I set one down on the table, (or place it on the stack) i have access
+to it too.  But if I set another one on that plate (or place it on the
+stack) I must remove this plate before I can get the bottom plate:
+
+Example:
+If I have plates 1,2,3, and 4 in my hand and I set them on the table (on
+the stack) as 4, 3, 2, and 1.  Now I must pick them back up as 1, 2, 3,
+and 4.  I can't pick them up in any other order or the stack will fall.
+
+When bytes, words, and double words are written to a file, they are
+written Little-Endian style (INTEL style).
+
+If a byte is written, it is written AS IS because it is only a byte
+long (8 bits)
+If a word (2 bytes) is written, it is written as LO byte then HI byte.
+If a double word (4 bytes) is written (as in the case at hand) it is
+written LO byte of LO word, then HI byte of LO word, then LO byte of
+HI word, then HI byte of HI word.
+
+Examples:
+  If I write the byte of 12h to a file, it looks like:
+	12h
+  if I write a word of 1234h to a file, it looks like:
+	34h 12h
+  if I write a double word of 12345678h, it looks like:
+	78h 56h 34h 12h
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Mouse ************************************* -->
+<a name="mouse"></a>
+<a name="mouse1"></a>
+<pre>I am looking for a list if the int 33h functions. My copy of Advanced
+MS DOS Programming (1988) only goes up ax = 36 (24h) but I think it goes
+beyond that in DOS 5.0 and higher.
+
+It really depends on what version of mouse driver you have rather
+than what DOS version you have.  INT 33h is loaded through a driver at
+startup or another time and is not part of DOS or the BIOS like INT 21h
+(MS-DOS) or INT 16h (keyboard) or many others.
+
+If you purchase a program for DOS and it uses the mouse, then depending on
+how new it is, it should contain a Mouse driver.  If you purchase a newer
+program for DOS and you still have DOS 3.x then you can possibly have the
+latest mouse driver.
+
+Now on with the question:  The latest MS-DOS mouse driver that I know of
+is 6.14  The book that I have (Advanced Assembly Language by Allen L.
+Wyatt, Sr.  1992) describes 50 services for the mouse (INT 33h).
+
+You asked what where the services 25h and above:
+Service		Short Description
+25h		Get General Driver Info
+26h		Get Maximum Virtual Coordinates
+27h		Get Cursor Masks and Mickey Counts
+28h		Set Video Mode
+29h		Get Supported Video Modes
+2Ah		Get Cursor Hot Spot
+2Bh		Set Acceleration Curves
+2Ch		Get Acceleration Curves
+2Dh		Set or Get Active Acceleration Curve
+2Eh		???????
+2Fh		Mouse Hardware Reset
+30h		Set or Get Ballpoint Info
+31h		Get Virtual Coordinates
+32h		Get Active Advanced Functions
+33h		Get Switch Settings
+34h		Get MOUSE.INI
+
+If you would like a more detailed description and how to use them, see my
+home page and go to the mouse library page.  It has an assembly written
+mouse lib and includes all code and most services of the mouse driver.
+(I think I left out 1 or 2 because they where either obsolete or not
+applicable)
+
+Also, the mouse driver that Windozes95 uses is designed to work for Win95
+and would be useless in DOS.  The version mentioned above (6.14) could
+contain a few more that I don't know about (35h and above) but I haven't
+the use for them even if they where there.  Maybe if you find some info
+on the services (if any) that are 35h and up you could let me know and I
+will post them for all to see.  [maybe look in Ralf Browns Interrupt list][Ed.]
+
+</pre>
+<hr align=center width="50%">
+<a name="mouse2"></a>
+<pre>I just got Win95 installed. Mouse works fine in Win95, but not in DOS
+mode.   How do I get my mouse to work in DOS mode?
+
+You need to load a mouse driver when in the DOS prompt.
+
+Either load it at the command prompt by finding the DIR that
+your mouse driver is in (C:\mouse ??) then type MOUSE
+
+or find this dir and put it in you autoexec.bat file.
+  C:\mouse\mouse.exe
+This way the mouse driver will be loaded each time you go
+to a DOS session.
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Sound ************************************* -->
+<a name="sound"></a>
+<a name="sound1"></a>
+<pre>I'm programming a DOS game to run on a 286 without a sound card,
+and I would like to learn how to send output to the PC Speaker.
+
+See my site for the code I included for this message.
+      http://www.zekes.com/~blunt/index.htm
+ 
+Q: If you can recommend a book that might include this info, or an
+article or something, I'd greatly appreciate it.
+
+Peter Norton's PC Programmers Bile has a chapter on Sound
+Generation through the speaker.
+
+</pre>
+<hr align=center width="50%">
+<a name="sound2"></a>
+<pre>I was wondering if you would list all the important things that there
+are to know in order for me to make my own cd player using Turbo Pascal.
+
+I have some code on my page to show you how to create your own CD player.
+
+There is a nice little bit of info on this subject on most SIMTEL mirrors
+and even on Microsoft site.
+It is called MSCDEX21.ZIP
+If has a lot of info on the MSCDEX driver and the such.
+
+</pre>
+<hr align=center width="50%">
+<a name="sound3"></a>
+<pre>Is the CD-ROM accessed the same way as you would access the harddisk
+or disk drives?
+
+The CD is accessed as if it where a network.  So you must read data
+from it like you would read data from a network.
+Microsoft provides a driver for this:  MSCDEX.EXE
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Graphics ************************************* -->
+<a name="graphics"></a>
+<a name="graphics1"></a>
+<pre>Are Vesa drivers present in "all" computers capable of SVGA graphics?
+
+NO.  VESA stands for Video Electronic Standards Association.  This is an association
+to help keep standards in all video hardware.  If everyone made a different video system
+then a programmer would have to program his code to be able to use every one.  With VESA
+a programmer can program for a VESA compatible system and assume that it will work on
+most systems.  There are snippets of code to check to see if you have a vesa compatible
+system.
+
+Q: I am making a Vesa game with a resolution 640x480x256. I allocate 640*480 bytes of
+conventional memory. I draw everything in there then I "flip" it, moving a word at a time,
+on to conv mem seg 0xA000h with bank switching.  Would this have the optimal minimum
+speed using 286 instructions? (the drawing and flipping is done continuously to achieve
+animation etc.)
+
+There are advantages of using 16 bit (286) and 32 bit (386+) processing when doing
+graphics like you have mentioned.  First do a lot of little stuff to make your code
+and buffers in the right place.  If you paragraph align you buffers so that the processor
+doesn't have to, and you use registers rather than memory operands, and other things 
+like this then using MOVSx is considerably faster. 
+NOTE:  This is only compares between a 286 and a 386.  
+If you have a Pentium, the 16 bit (286) MOVSW is faster than the Pentiums MOVSD. (There
+are faster ways to move data with the Pentium chip than using MOVS(B,W,D)).  286s used 
+16 data and code segments where 386+ use 32 bit data and code segments.
+
+Q: Do you know what percentage of all comps have VESA capable of SVGA?
+
+If your machine is 'IBM compatible' and has an 'IBM compatible SVGA' then you
+can assume that it is VESA compatible.  About 90% of video cards are VESA
+compatible.  Some video systems for 'odd ball' machines like extra large
+video screens and the such might be different.
+
+Q: How do you check to see if your system is VESA compatible?
+
+see source code on http://www.zekes.com/~blunt/vesa.htm
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Disks ************************************* -->
+<a name="disk"></a>
+<a name="disk1"></a>
+<pre>Is there a driver to allow long filenames in DOS?  I am not a programmer, but
+would like to access long filenames.
+
+If you are running a DOS session under Win95 then you can use long file names.
+In a TRUE DOS session you can use the tilde char (~) to access a long file name.
+
+'progra~1'   is the same as 'Program Files' on my machine.
+
+Also, in a DOS session under Win95 you can access a long file name that has spaces using
+quotes:
+If I typed 
+  CD Program Files
+at the DOS prompt, I would get an error returned.  But I if type
+  CD "Program Files"
+it would be OK.
+
+Most older DOS programs do not allow long filenames at all.
+
+</pre>
+<hr align=center width="50%">
+<a name="disk2"></a>
+<pre>I have been trying to find a decent form of internal copy protection, but
+how to do that is beyond me.  Can I use the serial number on the disk?
+ 
+There are many ways to do copy protection and the serial number on the floppy
+is the most used technique.  BUT, anyone (that has a little programming
+knowledge) can change the serial number on a different disk to the number of
+the original and then copy the files to it.
+
+If you want to go a different route, try one of the following:
+- You could put special code in the boot sector (or other unused spot)
+   of the disk (one or two bytes) where the OS would just skip it but your
+   program (when ran) would check for the value of this area.  It would take
+   a 'clever' person to notice that this/these byte(s) meant something.
+   (This technique works, but is unstable on some platforms)
+   (also, an OS could overwrite this 'unused' area if the disk was writeable)
+- You could check the date on the EXE file every time it ran.  If you didn't
+   give out the info that it checks the date, then no one would know to
+   change the date of the copy to the date of the original.  (BUT, some
+   Platforms keep the date of the org. when copying a file(s)).
+- You could ask for a password everytime someone ran the program. As long as
+   the user didn't "share" the password to the "copy user". (When a friend
+   copies a disk for a friend, (s)he will "share" the password, or why would
+   (s)he be doing it in the first place)
+- You could, and maybe the hardest way, is to format part of the disk
+   unreadable by the OS but readable by your program and then write/read
+   some of the info to that disk location.  When the OS copies the disk, it
+   will think that these sectors are bad and skip over them.  This is the
+   technique used by "highly skilled" copy protection programmers.  Not
+   recommended by novices and the like.  (You can try it if you would like,
+   but it takes assembler language and a bit of knowledge about disks).
+
+There are many other ways to go at this.  There is still a large debate on
+the best way to copy protect software.
+
+</pre>
+<hr align=center width="50%">
+<a name="disk3"></a>
+<pre>How do you compress a large file (~25,000,000 bytes) to fit on
+1,400,000 byte disk(s)?
+
+use:
+PKZIP -ex
+for extra compression.
+
+Also, use:
+PKZIP -&[f|l|u|ul|w|v][s[drive]]
+for spawn disk with format
+
+type
+PKZIP /?
+at the dos prompt for all of these examples.
+
+</pre>
+<hr align=center width="50%">
+
+<!-- *********** Misc ************************************* -->
+<a name="misc"></a>
+<a name="misc1"></a>
+<pre>Do you know any source codes for really top commercial games?
+
+You can find the source to DOOM and WOLF3D on most freeware and/or shareware ftp's.
+WOLF3D was written in C/C++ and Assembly.  Look for wolfsrc.zip at:
+<a href="http://sunsite.lanet.lv/ftp/mirror/x2ftp/msdos/programming/gamesrc/00index.html">
+http://sunsite.lanet.lv/ftp/mirror/x2ftp/msdos/programming/gamesrc/00index.html</a>
+
+If you are interested in programming high quality games, there is a book that you must
+have.  (maybe you've heard of it)
+
+	Tricks of the Game Programming Gurus
+	LaMothe, Ratcliff, Seminatore & Tyler
+	SAMS Publishing
+	1st ed.  1994    ISBN: 0-672-30507-0
+
+It has everything from frame switching, scrolling, and hi-res graphics to sound, music, and 
+'noise' to 'smart' enemy programming.  It also has a detailed (source included)
+documentation on creating a game just like WOLF3D and very similar to DOOM.
+
+</pre>
+<hr align=center width="50%">
+<a name="misc2"></a>
+<pre>I would like to know if you have some source code (C, Assembly or Pascal)
+for to know the CMOS memory size. I know that many CMOS's can have 64 or 128
+bytes. Do you have code about this, or a text teaching how to do this,
+showing this in a clear form?
+
+To check whether you have 64 or 128 byte CMOS:
+Make a loop that accesses 128 bytes of the CMOS.
+ If you have only a 64 byte CMOS then the second 64 bytes will be the same
+ as the first 64 bytes.
+
+</pre>
+<hr align=center width="50%">
+<a name="misc3"></a>
+<pre>I need ASM routine that detect if Windows active or not active.
+
+Check out my site for checking if Windoze is active in QB45.
+http://www.zekes.com/~blunt/index.htm
+
+</pre>
+<hr align=center width="50%">
+<a name="misc4"></a>
+<pre>I am just starting to program in DOS and was wondering what language to
+use and where/what I should start with?
+
+Look at the Assembler column of issue 1 of DHMag for a good explanation to this
+question. 
+
+</pre>
+<hr align=center width="50%">
+<a name="misc5"></a>
+<pre>How to detect what type of CPU is installed in the box and at which
+frequency CPU runs? (under DOS)!
+ 
+Go to http://www.zekes.com/cputype.htm for a small util to get the CPU and
+FPU "types".
+
+</pre>
+<hr align=center width="50%">
+<a name="misc6"></a>
+<pre>What are TSR's and what do they do?
+ 
+TSR's or Terminate and Stay Resident programs are programs very much similar
+to regular programs except that the TSR stays resident when terminated.
+(hence the name)
+
+If I want to write a small routine to check the keyboard for an ALT-F1 key
+combination, all I have to do is "link" into the keyboard interrupt check for
+the scan code that = ALT-F1 and do accordingly.  Now when I exit this program,
+my routine no longer checks for the key combo, because I have told DOS to clear
+my program from memory.
+
+To allow DOS to always check for this key combo., I need DOS to terminate my
+program and allow other programs to run without removing mine from memory.
+This allows me to check for the ALT-F1 key all the time.
+
+</pre>
+<hr align=center width="50%">
+<a name="misc7"></a>
+<pre>When I use LPRINT in Basic, I have to press the page feed button on
+my printer to kick the last page out.  Why?
+ 
+Qb45 doesn't send a FF (form feed) to the printer.
+After you print all you want enter the line
+LPRINT CHR$(12)
+This will kick it out.
+</pre>
+</font>
+</font>
+
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=2>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</td>
+</font></font>
+</table>
+</BODY>
+</HTML>
+

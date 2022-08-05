@@ -1,0 +1,178 @@
+<HTML>
+<HEAD>
+<TITLE>Alt Key routine</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Alt Key routine</H1>
+<H2>A small example to show how to call an assembly routine in Turbo Pascal.  (assembly code included)</H2>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+This file is distributed to show how to call and assembler
+routine and send parameters w/TP.  It calls the assembly
+routine to see if the Alt-key was pressed.  The assembly
+routine returns a boolean expression.<br>
+   (0 - False, non 0 - True)<br>
+<br>
+When you call an assembler routine through TP, you must tell the TPC
+that there will be a standard external function call.  It is the same
+as if you had a sub or a function in TP code, except for the external
+command.<br>
+<form><TEXTAREA NAME="Src1" ROWS=15 COLS=100 WRAP=off>
+Example  (TP6.0 code):
+
+	program GetAltKey;
+
+	uses Crt;
+
+	var Prsd : string[25];
+
+	{$L pas2asm.OBJ}  { link in the Assembly .OBJ module }
+
+	function AltKey(P:word): boolean; external;
+
+	begin
+	  Prsd := 'The alt key was pressed.$';
+	  repeat
+	  until AltKey(Ofs(Prsd));
+	end.
+</TEXTAREA></form>
+<br>
+First, declare the variable Prsd as a string with a length of 25.<br>
+<br>
+The next line tells the compiler to link the assembly files object code
+with the pascal code.  The $L for link, then the name of the .obj file.
+make sure to put them in comment brackets {}.<br>
+<br>
+Next we declare the function:<br>
+        function AltKey(P:word): boolean; external;<br>
+  AltKey is the name of the function.<br>
+  (P:Word) is the parameter that we are going to send w/ len of WORD<br>
+  boolean is the type of function. (true or false)<br>
+  external tells the compiler that we have written this<br>
+    procedure/function in a different file. (external can<br>
+    still point at a external pascal procedure/function).<br>
+<br>
+Next we assign the string to the contents we want.<br>
+  Note:  TP will only assign the length amount you declared in the<br>
+    declare variable above.  If you need a longer string, increase<br>
+    the value of the declare variable above.<br>
+  Note:  Notice the $ at the end of our string.  The assembly routine uses<br>
+    an interrupt call that uses the $ for an end-of-string descriptor.  If<br>
+    you don't put this at the end of the string, the interrupt will keep<br>
+    printing chars until it hits a $ in memory.<br>
+<br>
+Next we have the program loop until the function call returns a true boolean<br>
+  expression.  Each time the current execution line gets to the until line,<br>
+  it will call the AltKey function and return a new boolean expression.<br>
+<br>
+  Notice we sent the offset of the string each time it loops.  I could have<br>
+  just allowed TP to print a message, but then I couldn't show how to send a<br>
+  string parameter.<br>
+  TP6.0 assigns strings with a single byte descriptor at the front.  This<br>
+  unsigned byte has the string length.  So each string can be up to 255<br>
+  chars in length.<br>
+<br>
+<br>
+The below code has comments for each line.  I will explain some of the major
+parts any way.<br>
+<br>
+The DOSSEG directive is used because I have had errors if it is not
+there.  It tells DOS to use standard DOS segment addressing.<br>
+<br>
+The MODEL large, pascal directive says to use large model memory and
+make the code pascal compatible.<br>
+<br>
+The 286 directive says to use 16 bit processes.  No 32 bit stuff needed
+here.<br>
+<br>
+The STACK directive says use this amount for the stack.  If there is no
+amount after the directive, then use the default stack size (1k).<br>
+<br>
+The DATA directive says to put the following data in the data segment.<br>
+<br>
+The CODE directive says to put the following code in the code segment.<br>
+<br>
+PUBLIC says to make the procedure public to external sources.<br>
+<br>
+AltKey     PROC near pascal uses bp dx, P:word<br>
+<br>
+AltKey is the proc. name<br>
+PROC says start here with this proc.<br>
+near means near addressing<br>
+pascal means code to pascal compatible<br>
+uses means save these registers (save all used registers including bp)<br>
+P is a parameter as type word<br>
+<br>
+When saving registers, always save the bp (base pointer) register.  TP<br>
+uses the bp register when accessing memory.  If you don't save it, TP most<br>
+likely will lock up.<br>
+<br>
+Next, save the registers that you want saved on return to TP.  Don't
+save the ax (accumulative) register when using a function call.  If you do
+this then the return code will not be correct (see below for more info.).
+Also, don't save the dx (data) register if using a long integer function.<br>
+<br>
+Vars that where strings in TP are declared as a WORD in assembly.  When you
+send the parameter as a string, the WORD that gets sent is the offset of the
+strings' descriptor.  The string itself is not sent.  That is why a WORD is
+to be used to tell where the string is located in memory. (see next for TPs'
+string descriptors)<br>
+<br>
+TP saves strings in memory with a single unsigned byte descriptor at the
+first of the string.  This byte is the length of the string.  So strings
+in TP can be up to, but not more than 255 chars in length.<br>
+<br>
+The return code is put into the ax register and then a ret command is
+executed.  When the program is back at the TP code, it takes the
+function as the RC.  If the function you defined is an integer, then
+the ax register is the RC only.  If you declare the function as a long
+integer then both the ax and dx registers are used.  dx as the high
+order word and ax as the low order word.<br>
+<br>
+We return a boolean expression, so we need only to use the ax register.<br>
+<form><TEXTAREA NAME="Src2" ROWS=15 COLS=100 WRAP=off>
+DOSSEG
+.MODEL large, pascal
+.286
+.STACK
+.CODE
+
+Even						; align on even byte (word)
+		PUBLIC	AltKey
+AltKey	PROC near pascal uses bp dx, P:word ; Save registers
+
+		mov	ah,02h			; get shift status
+		int	16h			; call interrupt
+		mov	ah,al			; save al in ah
+		or	al,00001000b		; set bit number 3
+		cmp	al,ah			; compare al and ah
+		je	alttrue			;
+		xor	ax,ax			; false flag
+		jmp	short AltDone		; Done
+alttrue:		mov	dx,[P]			; print 'pressed' message
+		inc	dx			; skip passed string descriptor
+		mov	ah,09h			; print string function w/$ as EOS
+		int	21h			;
+		mov	ax,0FFFFh		; true flag
+Altdone:		ret				; R2TP
+Altkey		endp				; end of procedure
+		end
+</textarea></form>
+<br><br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

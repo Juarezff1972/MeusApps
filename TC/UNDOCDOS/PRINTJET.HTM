@@ -1,0 +1,142 @@
+<HTML>
+<HEAD>
+<TITLE>Printing to a HP laser Jet.  Forever Young Software</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Printing to a HP laser Jet</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+This source code was authored by Brian H. Alsop in the October 1991 issue of PCM Magazine (Falsoft, Inc. by the Tandy Corp).<br>
+I am including this code by request.<br>
+<br>
+<font face="" size=3>
+<pre>
+1 'Printing VGA High-Resolution Graphics Screens
+2 'Written by Brian H. Alsop
+3 'Copyright (c) October 1991
+4 'Falsoft, Inc.
+5 'PCM
+10 'LASERJET II PICTURE 620 X 480 PIXEL SCREEN DUMP PROGRAM
+20 'BRIAN H. ALSOP, 113 BOONE RD. TRAFFORD, PA 15085
+30 SCREEN 12: WIDTH 80, 60: KEY OFF
+40 FOR I = 1 TO 15: LINE (10 * I, 5 * I)-(640 - 10 * I,480 - 5 * I), I, B: NEXT I
+50 COLOR 12
+60 LOCATE 27, 25: PRINT "640 X 480 VGA SCREEN DUMP PROGRAM";
+70 LOCATE 29, 38: PRINT "F O R";
+80 LOCATE 31, 31: PRINT "LASERJET 2 PRINTER";
+85 CIRCLE (320, 240), 150, 12
+90 GOSUB 50000
+100 SHELL "COPY/B PIX.FIL LPT2"              *
+50000 'SUB PIXDUMP
+50010 DEFINT C, J-K, M-N, P-Q, T-V
+50020 'WIDTH "LPT1:", 255                    *
+50030 'OPEN "LPT1:" FOR RANDOM AS #1         *
+50040 OPEN "O", #1, "PIX.FIL"                *
+50050 PRINT #1, CHR$(27); "E";
+50060 '75 DPI
+50070 PRINT #1, CHR$927); "*t75R";
+50080 'FOR 150 DPI (SMALL PIX) CHANGE ABOVE 75 TO 150 AND INCLUDE NEXT CARD (LINE)
+50090 'PRINT #1, CHR$(27); "&k5H";           *
+50100 'COLUMN 5 ORIGIN
+50110 PRINT #1, CHR$(27); "&a05C";
+50120 'ROW 3 ORIGIN
+50130 PRINT #1, CHR$(27); "&a04R";
+50140 'RELATIVE CURSOR MOVEMENT
+50150 PRINT #1, CHR$(27); "*r1A";
+50160 CT = 1
+50170 GOSUB 50220
+50180 PRINT #1, CHR$(27); "E";
+50190 PRINT #1, CHR$(27); "&10O";
+50200 CLOSE:BEEP
+50210 RETURN
+50220 'MAIN LOOP CHECK TO SEE IF PIXEL ON
+50230 FOR K = 0 TO 15
+50240 IF K < 1 THEN GOTO 50410
+50250 FOR I = 639 TO 0 STEP -1
+50260 J = (K - 1) * 32: T = J + 8: U = T + 8: V = U + 8
+50270 FOR L = 0 TO 7:  PIJ(L) = POINT(I, J + L): PIT(L) = POINT(I, T + L)
+50280 PIU(L) = POINT(I, U + L): PIV(L) = POINT(I, V + L)
+50290 IF PIJ(L) > 0 THEN PIJ(L) = 1
+50300 IF PIT(L) > 0 THEN PIT(L) = 1
+50310 IF PIU(L) > 0 THEN PIU(L) = 1
+50320 IF PIV(L) > 0 THEN PIV(L) = 1
+50330 NEXT L
+50340 N = 128 * PIJ(0) + 64 * PIJ(1) + 32 * PIJ(2) + 16 * PIJ(3) + 8 * PIJ(4) + 4 * PIJ(5) + 2 * PIJ(6) + PIJ(7)
+50350 M = 128 * PIT(0) + 64 * PIT(1) + 32 * PIT(2) + 16 * PIT(3) + 8 * PIT(4) + 4 * PIT(5) + 2 * PIT(6) + PIT(7)
+50360 P = 128 * PIU(0) + 64 * PIU(1) + 32 * PIU(2) + 16 * PIU(3) + 8 * PIU(4) + 4 * PIU(5) + 2 * PIU(6) + PIU(7)
+50370 Q = 128 * PIV(0) + 64 * PIV(1) + 32 * PIV(2) + 16 * PIV(3) + 8 * PIV(4) + 4 * PIV(5) + 2 * PIV(6) + PIV(7)
+50380 PRINT #1, CHR$(27); "*b4W"; CHR$(N); CHR$(M); CHR$(P); CHR$(Q);
+50390 NEXT I
+50400 'END GRAPHICS AND MOVE CHARACTER
+50410 PRINT #1, CHR$(27); "*rB";
+50420 X$ = STR$(5 * (CT + 1) + 1):  X$ = RIGHT$(X$, LEN(X$) - 1): X$ = "&a" + X$ + "C"
+50430 PRINT #1, CHR$(27); X$;
+50440 PRINT #1, CHR$(27); "&a4R";
+50450 PRINT #1, CHR$(27); "*r1A";
+50460 CT = CT + 1
+50470 NEXT K
+50480 RETURN
+</pre>
+</font>
+The commented lines with an '*' at the end are to be used if you want to copy the "printed code" directly to the printer rather than a file.  If you do it this way, you need to uncomment each of these commented lines and comment each of these uncommented lines including line 100.<br>
+<hr>
+Also included with this article was a detailed description on how to "screen dump" to an epson dot-matrix printer.<br>
+This routine prints directly to the printer.<br>
+<font face="" size=3>
+<pre>
+1 'Printing VGA High-Resolution Graphics Screens
+2 'Written by Brian H. Alsop
+3 'Copyright (c) October 1991
+4 'Falsoft, Inc.
+5 'PCM
+10 'VGA 620 X 480 SCREEN DUMP PROGRAM FOR EPSON/EPSON COMPATIBLE PRINTERS
+20 'BRIAN H. ALSOP, 113 BOONE RD. TRAFFORD, PA 15085
+30 SCREEN 12: WIDTH 80, 60: KEY OFF
+40 FOR I = 1 TO 15: LINE (10 * I, 5 * I)-(640 - 10 * I,480 - 5 * I), I, B: NEXT I
+50 COLOR 12
+60 LOCATE 27, 25: PRINT "620 X 480 VGA SCREEN DUMP PROGRAM";
+70 LOCATE 29, 38: PRINT "F O R";
+80 LOCATE 31, 26: PRINT "EPSON AND COMPATIBLE PRINTERS";
+85 CIRCLE (320, 240), 150, 12
+90 GOSUB 50000:STOP
+50000 'SCREEN DUMP
+50010 DEFINT K, R-S, X
+50020 WIDTH "LPT1:", 255
+50030 LPRINT CHR$(27); "A"; CHR$(7);
+50040 FOR R = 479 TO 0 STEP -8
+50050 LPINRT CHR$(27); "K"; CHR$(128); CHR$(2);
+50060 FOR X = 639 TO 0 STEP -1
+50070 S = 0
+50080 FOR K = 0 TO 7
+50090 IF POINT(X, R - K) <> 0 THEN S = S + 2 ^ (7 - K)
+50100 NEXT K
+50110 LPRINT CHR$(S)
+50120 NEXT X: LPRINT
+50130 NEXT R
+50140 LPRINT CHR$(27); "@"
+50150 RETURN
+</pre>
+</font>
+If I have made any typo's, I am sorry.  Please let me know.<br>
+<br>
+Please see <A HREF="prntgrax.htm"><font size=2>Printing graphics on a dot matrix printer</font></A> for more on printing graphics to the printer.<br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

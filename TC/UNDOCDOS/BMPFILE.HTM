@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+<TITLE>BMP graphics files explained</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>BMP graphics files explained</H1>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The BMP file was originated in 1991 when Microsoft had Windows 3.0 as the latest
+Windoze platform.  BMP is a Microsoft Device Independent Bitmap file and can contain
+images that are 1, 4, 8, or 24 bits/pixel.  The 1-, 4- and 8-bit images have color maps
+while the 24-bit images are direct color (RGB).<br>
+<br>
+BMP files store the Lo byte first, i.e. they use Intel conventions.  Each file contains
+a file header, a bitmap header, a color map (not in 24-bit) and the image data.  Some
+BMP files can be compressed using the RLE scheme.  (See my description on PCX files
+for more info on RLE)<br>
+<br>
+<b>THE HEADER(s):</b><br>
+<form><TEXTAREA NAME="Src1" ROWS=15 COLS=100 WRAP=off>
+Offset     Size(bytes)	  Contents	  Meaning
+---------------------------------------------------------------------------------
+  00	02	"BM"		Microsofts' BMP ID byte
+  02	04	varies		Size in bytes of the file
+  06	04	00,00		Reserved
+  10	04	varies		Offset in file where image starts
+  14	04	40		Size of bitmap header
+  18	04	varies		Width in pixels
+  22	04	varies		Height in pixels
+  26	02	1		Number of image planes (only one)
+  28	02	varies		Bits per pixel (1,4,8, or 24)
+  30	04	varies		Compression type
+  34	04	varies		Size of compressed image (or zero)
+  38	04	varies		Horizontal Res. in pixels/meter
+  42	04	varies		Vertical Res. in pixels/meter
+  46	04	varies		Number of colors used
+  50	04	varies		Number of 'important' colors
+  54	04*	varies		Color Map
+
+* The length of the Color Map is 4 bytes plus the difference to 
+the end of the bitmap header.
+</textarea></form>
+<br><br><br>
+The Color Map sizes are normally 2 ,16, or 256 entries, but can
+be smaller if the image does not need a full set of colors.  If the value at
+offset 46 in the header above is nonzero, it contains the number of colors used,
+which is also the number of entries in the color map.  If the entry is zero then
+the color map is full size.<br>
+<br>
+If the display device can not display all the colors available in the image, then
+BMP files put the 'important' color values at the front of the color map for better
+display.<br>
+<br>
+<b>Color map entries are four bytes each:</b><br>
+<form><TEXTAREA NAME="Src2" ROWS=8 COLS=50 WRAP=off>
+offset	Description
+---------------------------------
+  00	Blue value
+  01	Green value
+  02	Red value
+  03	zero (reserved)
+</textarea></form>
+<br><br>
+The bitmap image follows the color map.  If the data is a 4- or an 8-bit image then
+it can be compressed using the RLE compression scheme.<br>
+<br>
+Bits are stored a row at a time.  Each row is padded to a 4-byte boundary with zero
+bytes.  Rows are stored in order from the bottom of the image to the top.<br>
+<br>
+<b>Monochrome images</b> (1-bit images):  Each pixel is a single bit.  The hi-order
+bit is the leftmost pixel.<br>
+<br>
+<b>Uncompressed 16 color images</b> (4-bit images):  These images are packed two
+pixels per byte, with the hi-nibble being the leftmost pixel.<br>
+<br>
+<b>Compressed 16 color images</b> (4-bit images):  These images are compressed using
+the RLE encoding scheme and consist of a sequence of groups.  There are 3 kinds of groups:
+repeating, literal, and special.<br>
+<b>A repeating group</b> is 2 bytes, with the first byte as a pixel count and the second byte
+is a pair of pixels.<br>
+For example:  05h 16h translates to five pixels long of 01h 06h 01h 06h 01h.  Notice you don't
+use the lo-order of the pixels byte if the count is odd.<br>
+<b>A literal group</b> is a zero byte, a byte with the pixel count, and the literal pixels.
+The pixel count must be at least 3.  The literal pixels are padded out with zeros to an even
+number of bytes.<br>
+For example:  00h 05h 12h 34h 50h 00h translates to 01h 02h 03h 04h 05.<br>
+<b>A special sequence</b> of 00h 00h represents the end of a row.  The special sequence
+of 00h 01h represents the end of the bitmap.  The special sequence 00h  02h  xx  yy represents
+a position delta, saying to continue the image xx pixels to the right and yy pixels down.<br>
+<br>
+<b>Uncompressed 256 color images</b> (8-bit images):  These images are packed one pixel to
+a byte, with each row padded to a 4 byte boundary.<br>
+<br>
+<b>Compressed 256 color images</b> (8-bit images):  These images are packed using the RLE
+encoding scheme, consisting of a sequence of groups.  There are three kinds of groups.  (See
+compressed 4-bit color scheme above)<br>
+<br>
+<b>24-bits/pixel</b> scheme consist of three bytes per pixel.  The first byte being BLUE,
+the second GREEN, and the third being RED.  Each row is zero padded to a 4-byte boundary.<br>
+<br><br>
+If you have any other questions or see a mistake that I made, please e-mail me and I will
+do my best to help out.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

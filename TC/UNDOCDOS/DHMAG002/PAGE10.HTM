@@ -1,0 +1,186 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 10</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page9.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page11.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Basic</font></h1>
+<h4><font color=purple>Getting the actual command line</font></h4>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+<td width="48%" valign=top>
+<p align=left><font color="black" size=3>
+<! - column one starts here >
+<br>
+Have you ever wanted to get the actual command line in Basic?  You know, the one that isn't upper case.  Sure you have seen it done by calling an external assembler routine that you have to link to your program, but you don't like those because you can't see what is happening and could modify it if you tried.<br>
+<br>
+How about a routine in basic.  The only assembler code used is to get the current PSP (program segment prefix) and it is in-line assembly called by CALL ABSOLUTE.  If you know DEBUG, you can modify it all you want, and there is no external program to link to your code.  All you have to do is load the QB.QLB at start up.  If you compile your program within the IDE, then basic does it all for you.<br>
+<br>
+Well, lets get started.  First we need to get the address of the Program Prefix Segment.  The command line is at offset 0080h with in the PSP  (If you need more info on the PSP, see last issue).  We must use inline assembler and CALL ABSOLUTE to get the PSP.  So we need to set up our assembler code and then call it.  (for more information on inline assembler in basic, see <a href="http://www.zekes.com/~blunt/fexist.html">here</a>.  Here is our assembler code in DATA form.<pre><font size=2>DATA &H55           : '  PUSH BP
+DATA &H53           : '  PUSH BX
+DATA &H89,&HE5      : '  MOV  BP,SP
+DATA &HB4,&H62      : '  MOV  AH,62h
+DATA &HCD,&H21      : '  INT  21h
+DATA &H93           : '  XCHG BX,AX
+DATA &H8B,&H5E,&H08 : '  MOV  BX,[BP+08]
+DATA &H89,&H07      : '  MOV  [BX],AX
+DATA &H5B           : '  POP  BX
+DATA &H5D           : '  POP  BP
+DATA &HCB,&H02,&H00 : '  RET  2
+</font></pre>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - column two starts here >
+Now that we have the PSP, we can get the command line.  The length of the command line is at offset 0080h.  This length includes the space after the program name and before the command line.<pre><font size=2>  DEF SEG = PSP
+    Cnt% = PEEK(&H80)
+    .
+    .
+    .
+  DEF SEG
+</font></pre>
+<br>
+Now the command line starts at offset 0082h.<pre><font size=2>  DEF SEG = PSP
+    Cnt% = PEEK(&H80)
+    IF Cnt% > 0 THEN
+      PRINT "Command line length:  "; Cnt% - 1
+      FOR i% = 2 TO Cnt%
+        Cmnd$ = Cmnd$ + CHR$(PEEK(&H80 + i%))
+      NEXT
+    END IF
+  DEF SEG
+</font></pre>
+<br>
+Now you can do what you want with Cmnd$.  I just print it in the demo code below.<br>
+<br>
+Be sure to load the code with the /L switch:
+<pre><font size=2>QB filename.bas /L</font></pre>
+If you don't compile it in the IDE, make sure to link the QB.LIB library included with QB45.
+
+
+
+<font color="blue">&#165;</font><br>
+</td>
+</table>
+<br clear=all>
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="6%"></td>
+<td width="94%">
+<hr>
+<pre><font size=2>
+
+' load the QB.QLB at start up:
+'   QB filename /L
+
+'$DYNAMIC
+DECLARE SUB ABSOLUTE (Par1 AS INTEGER, address AS INTEGER)
+DECLARE FUNCTION GetPSPa% ()
+
+CONST SizeofAsm = 19
+
+' get the PSP address (segment)
+PSP = GetPSPa%
+PRINT "PSP address:  "; HEX$(PSP); "h"
+
+DEF SEG = PSP
+	Cnt% = PEEK(&H80)                          ' length is at PSP:[0080h]
+	IF Cnt% > 0 THEN                           ' if 0 then we don't want whats there
+		PRINT "Command line length:  "; Cnt% - 1 '
+		FOR i% = 2 TO Cnt%                       ' start with 2 (skip over space)
+			Cmnd$ = Cmnd$ + CHR$(PEEK(&H80 + i%))  ' get it
+		NEXT
+	END IF
+DEF SEG
+
+PRINT
+' print QBs command line
+PRINT "Quick Basic command line: ", COMMAND$
+' print actual command line
+PRINT "     Actual command line: ", Cmnd$
+
+END
+
+
+GetPSPd:
+' Get PSP address of program
+'   on entry:  nothing
+'  on return:  PSP address
+DATA &H55           : '  PUSH BP      ; let's set up our own BP
+DATA &H53           : '  PUSH BX
+DATA &H89,&HE5      : '  MOV  BP,SP   ;
+DATA &HB4,&H62      : '  MOV  AH,62h  ; get PSP
+DATA &HCD,&H21      : '  INT  21h   ; do it
+DATA &H93           : '  XCHG BX,AX
+DATA &H8B,&H5E,&H08 : '  MOV  BX,[BP+08]  ; put RC = first param passed
+DATA &H89,&H07      : '  MOV  [BX],AX   ;
+DATA &H5B           : '  POP  BX
+DATA &H5D           : '  POP  BP    ; restore base pointer
+DATA &HCB,&H02,&H00 : '  RET  2   ; Restore stack for 1 param passed
+' end code
+
+REM $STATIC
+'  This function returns the current PSP address
+'   Using inline assembly
+'
+FUNCTION GetPSPa%
+
+' An array of 256 bytes  (more than plenty)
+	REDIM GetPSP%(1 TO 256 \ 2)
+ 
+	P% = VARPTR(GetPSP%(1))
+	DEF SEG = VARSEG(GetPSP%(1))  ' point DS to the array
+	RESTORE GetPSPd                ' start 'reading' DATA at our asm code section
+	FOR i% = 0 TO SizeofAsm - 1    ' and put it in the array a byte at a time
+		READ J%
+		POKE (P% + i%), J%
+	NEXT i%
+	CALL ABSOLUTE(RC%, P%)  ' now call it
+	DEF SEG                   ' restore DS
+
+	ERASE GetPSP%
+
+	GetPSPa% = RC%
+END FUNCTION
+
+</font></pre>
+<hr>
+</td>
+</table>
+<br clear=all>   <!- drop back to the bottom of the page ->
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page9.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page11.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 10
+
+</BODY>
+</HTML>

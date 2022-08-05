@@ -1,0 +1,181 @@
+Please see end of this list for some notes.
+
+History:
+  v00.23.29 - (18 Jan 1999)
+    - if target file was already there and read/only, then NBasm
+        assembled source and did not return an error while leaving
+        the target file unchanged.  (no new .com file)
+    - xor now works correctly (was swapping dest/src)
+    - added the %out macro (see documentation)
+    - fixed the and, or, xor, sub, add, cmp, adc, & sbb instructions
+        using  -129 > immed < 128   (see v00.22.52 history item)
+    - fixed displacement issue with   mov  ax,[bx+immed8]
+    ? added 32 bit registers/instructions support
+        ****for test only, should be done in next release version****
+    - fixed minor bug(s)  (1)
+    - added minor item(s) (1)
+  v00.23.22 - (23 Dec 1998)
+    - added the .EXIT 'macro'
+    - added the .X86 directive (see NBASM.DOC)
+    - fixed bug where if you had a char in a DB string that was ascii 12
+        or less, NBasm would change it to a space.  not anymore, however
+        you still can not have a char of 13 in your string.  You must
+        give a number of 13, rather than the actual ascii char.
+    - now returns error if a string doesn't have a closing quote(s) mark
+    - now gives error if a count of 0 in DUP
+    - added the use of the underscore (_) at the end of a line.
+        see NBASM.DOC for more details
+    - added the call [bx]  ; (near)
+    - fixed minor bug(s) (1)
+  v00.23.14 - (13 Dec 1998)
+    % fixed bug created with version 00.23.13 below
+  v00.23.13 - (11 Dec 1998)
+    * changed xlat to xlatb  (please see note #1)
+        (the instruction is unchanged except for the 'name')
+    - added/fixed the mem referencing by symbol with +/- immed
+        mov  ax,[symbol]
+        mov  ax,[symbol+100h]
+        mov  ax,[symbol-100h]
+        mov  ax,[100h+symbol-100h]
+        Label1 equ $                 ; equals this location
+        Label2 equ [Label1+100h]     ; equals location of label1 + 100h
+        (you can have multiple immed's, but only one symbol reference)
+        (spaces between symbols and immed's are not allowed)
+    - fixed errors with more than one ORG in source file.
+    - added the % Pseudo-Operation (see NBASM.DOC for more)
+    - fixed minor bug(s) (1)
+
+  v00.23.06 - (03 Dec 1998)
+    - added the /B parameter (beep if an error encountered)
+    - Now NBasm returnes valide error in ERRORLEVEL
+    - fixed so that a hex number must start with 0-9, not A-F
+    - changed push immed8 to push byte immed8
+    - added div byte [0000]
+    - minor bugs/fixes/changes (1)
+
+  v00.23.00 - (01 Nov 1998)
+    - fixed bug with strings if no ending delimitor ( ' or " )
+    - added strings so that    mov  ax,'AB'   is allowed
+    - fixed 'proc far'.  Now you can assemble far proc's.
+       (however, you can not call them yet cause the .obj part isn't done)
+    - Now allows label on ENDP line so that we can be MASM compatible
+    - Now includes the .JUMPS directive (see documentation)
+
+  v00.22.89 - (24 Oct 1998)
+    - added the CALL FAR immd16,immd16  (offset,seg)
+    - fixed minor bugs (3)
+
+  v00.22.85 - (14 Oct 1998)
+    - fixed the RETF instruction
+    - gives error if not NEAR or FAR after PROC and before USES
+    - now will search path(s) denoted in the LIB= environment variable
+        for NBASMC.LIB
+    - fixed so that if more than one RET in a proc block and 'USES' used,
+       NBASM now properly pops registers for each RET
+
+  v00.22.81 - (07 Oct 1998)
+    - if didn't use .external, now doesn't try to add lib stuff
+      (no noticable error unless nbasmc.lib not found)
+
+  v00.22.80 - (01 Oct 1998)
+    - added the ALL and ALLF keywords to the USES keyword
+    - added code to optimizer #1 and #2 for EQU symbols that = 0
+    - added file i/o error checking for the lib stuff
+    - modified the start up code to nbasm.exe to allow a 'full' data segment
+    - now will allow more than one external symbol given on one line
+       (.external symbol1, symbol2, symbol3)
+
+  v00.22.75 - (29 Sept 1998)
+    - now allows use of the library (NBASMC.LIB)
+         Library also included (see nbasm.doc and nbasmc.doc for usage)
+    - now allows reverse long jumps
+    - fixed bug in reverse short jumps
+    - cleaned up the symbol table dump in .lst file
+    - revised error checking a little
+    - removed the optimizer item for xchg reg16,accum16
+         (does it automatically now)
+    - fixed bug so that you can 'push offset var1'
+    - added
+       mul  reg   (8086)
+       imul reg   (8086)
+       div  reg   (8086)
+       idiv reg   (8086)
+       imul reg16,immd (186)
+       imul reg16,reg/mem (386)
+
+  v00.22.52 - (13 Sept 1998)
+    - fixed bug that didn't allow:
+        mov  reg,[immd]   (mov  ax,[0000])
+    % added the code to create smaller code for:
+        add  reg16,immd7
+        (add, adc, sub, sbb, cmp)
+        (reg16 above does not include ax)
+
+  v00.22.50 - (02 Sept 1998)
+    - now allows indirection to be within backets:
+      - before  --->        mov ax,02[bx]
+      - now will allow      mov ax,[bx+02]
+    - added  shl/r  mem/reg,immd8
+             rcl/r  mem/reg,immd8
+             rol/r  mem/reg,immd8
+             sal/r  mem/reg,immd8
+    - fixed bug if a tab was in source file
+    - improved the .start directive
+      (read nbasm.doc for more info on .start, .stack, and
+       the RET instruction)
+
+  v00.22.38 - (25 Aug 1998)
+    - fixed code to allow up to ten nested include files
+    - fixed some bugs with the create .LST file code
+    - modified the code for 386 opcode prefix's
+    - fixed .x86/x87 directive attributes
+    - added .x87 co-processor directives
+    - added .x86P processor directives
+    - added the fs: and gs: segment override
+    - added code to allow .386+ instructions (no 32-bit registers yet)
+    - added the following instructions:
+       LFS, LGS, LSS (386+)
+       MOVSX, MOVSZ  (386+)
+       CWDE, CDQ     (386+)
+         (somewhere I read that the following instructions were for 8086+.)
+         (I found out different but elected to leave them in anyway)
+       CMOVcc        (Pentium Pro/II)
+    - fixed other minor bugs
+
+  v00.22.22 - (22 Aug 1998)
+    - add optimization software
+       read NBASM.DOC for the 6 items that NBasm will
+       optimize for if '/o' is on the command line
+       or .OPTON is in your code
+      I hope to add more optimizations in later
+       (beta) versions
+    - made NBasm a little faster by optimizing a 'select case'
+       structure
+
+  v00.22.11 - (12 Aug 1998)
+    - added the BYTE and WORD type specifiers
+       example:
+         movb [bx],00       ; is the same as
+         mov  byte [bx],00  ; this line
+    - fixed bug if a count of 0 (zero) was given in
+       a DUP declaration line:
+         TEMP  dup 0,1    ; now is the same as
+         TEMP  equ $      ; this line
+    - added the code to allow RET as the 'exit to DOS'
+      code in .COM files and gives an error in .OBJ files
+    - added the undocumented instruction SALC
+    - modified code so NBasm only needs a 80186+ processor and
+       only needs DOS version 2.0 and up
+    - NBasm now checks to see if running on a 186+ with DOS 2.0+
+
+  v00.22.06 - (11 Aug 1998) - Original Beta release
+    
+
+Notes:
+1. An item starts with one of the following chars, means:
+    -   = normal item.
+    *   = makes previous versions of NBASM not work with this addition.
+    %   = newer version contains a fix for this item
+           (known or unknown bug at this items version)
+    ?   = undocumented item (for test only) (may stay, may go)
+           (no support for) (use with caution) (you get the idea)

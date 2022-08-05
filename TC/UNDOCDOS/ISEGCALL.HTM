@@ -1,0 +1,127 @@
+<HTML>
+<HEAD>
+<TITLE>Inter-Segment calls in assembler</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Inter-Segment calls in assembler</H1>
+</p>
+
+<p align=left><font color=black size=3 face="">
+<br>
+-----------<br>
+> I wish to load an external piece of code from a file, and then execute<br>
+> it from within my program, but to do this, I have to update both CS and<br>
+> IP at the same time. I have read the explanations for JMP and CALL<br>
+> several times, but there is no description of HOW to perform a 'long'<br>
+> jmp (or call). <br>
+   [...]<br>
+> I know how to make a ea. JMP 0000:0001, but it's a pain to modify the <br>
+> code in memory during run-time. btw this is in REAL mode.<br>
+   [...]<br>
+> Thanks for one of the most interresting and useful pages on the net.<br>
+> RayMan DK<br>
+<br>
+
+It is not as hard as you might think.  As you stated above, when you use the CALL instruction, DOS puts the offset of the next instruction on the stack.  Then when your code uses the (near) RET, the RET instruction POP's this offset off the stack and places it in IP.  The Code Segment register (CS) is untouched.<br>
+<br>
+Now for inter-segment calls.  All you have to do is the same thing plus the code segment.  Using the CALLF (Call Far) instruction pushes the offset of the next instruction on the stack just like before (call near), but it also pushes CS on to the stack.  Now your 'overlay' code must use the RETF (RET Far) instruction which pops both IP and CS.<br>
+<br>
+This technique works well on simple code routines.  If you get more technical and start using 32 bit to 16 bit inter-segment calls or protected 32 bit calls, you might have to use the <i>call gates</i> of the CPU.<br>
+<br>
+But for this demonstration, we will just do a simple call.<br>
+Please note that I use NBASM from <a href="newbasic.html">here</a>.<br>
+However, with minor modifications, this code should work with MASM, A86, and other assemblers.<br>
+<pre><font size=2>
+
+;Assemble with <a href="newbasic.html">NBASM 00.23.xx</a>
+
+; we will allocate some memory, load some executable code
+; in to it and then call it as a procedure
+
+.model tiny
+.code
+.186
+
+; We need to resize the memory block DOS allocated for this
+;  program so that we can allocate our own memory below.
+;  We could do this manually, but the NBASM directive .START
+;  uses below does this for us.
+           .start
+           mov  ah,48h
+           mov  bx,16                   ; 256 bytes should be plenty
+           int  21h                     ;  adjust to your needs
+           push ax                      ; save segment
+           push ds
+           push ax
+           mov  ax,3D00h                ; open file for read
+           mov  dx,offset File          ;
+           int  21h                     ;
+           mov  bx,ax                   ; bx = handle
+           mov  ah,3Fh                  ; read from file
+           mov  cx,25                   ; size of file (adjust to your needs)
+           xor  dx,dx                   ;
+           pop  ds                      ; put it at ds:0000h
+           int  21h                     ;
+           pop  ds                      ;
+           mov  ah,3Eh                  ; close the file
+           int  21h                     ;
+           pop  ax                      ; restore seg
+           mov  di,offset TheSeg        ; put the seg:offset in to our var
+           mov  [di+2],ax               ; remember offset goes first
+           xor  ax,ax                   ; 0000:seg
+           mov  [di],ax                 ;
+           callf [di]                   ; call far using the address at TheSeg
+
+           mov  ah,4Ch                  ; exit to DOS
+           int  21h                     ; (and free the mem for us)
+
+File       db  's2.bin',0
+TheSeg     dw  00h           ; offset  (0000h)
+           dw  00h           ; segment
+.end
+</font></pre>
+
+Now for the called code.  We must assemble this with the IP locater starting at offset 00h.  Notice the <b>ORG 00h</b>.<br>
+
+<pre><font size=2>
+
+;Assemble with <a href="newbasic.html">NBASM 00.23.xx</a>
+
+.model tiny
+.code
+.8086
+           org  00h             ; must be 00h for offsets used
+
+           push ds              ; we must set DS to our new CS
+           push cs
+           pop  ds
+           mov  dx,offset Msg
+           mov  ah,09
+           int  21h
+           pop  ds
+           retf                 ; must use RET FAR
+
+Msg        db 'Temp Message$'
+.end
+</font></pre>
+<br>
+As stated above, you could create your own <i>Overlays</i> with this technique.  Once you load the code and run it, you could free the memory used and beable to use it for other resources.  If your program needs to be small so that it has alot of free memory, this technique will help you out.<br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.html"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.html"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.html">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

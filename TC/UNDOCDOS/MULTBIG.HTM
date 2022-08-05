@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<TITLE>Multiply extremely large numbers.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Multiply two extremely large numbers</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  09/17/97<br>
+Compiler:  Quick Basic 4.5<br>
+<br>
+<font face="" size=3>
+<pre>
+' This is an example program written in QB45 to
+' multiply two numbers using the handwritten way.
+'
+'  ie:
+'   12
+'   12
+' -----
+'   24
+'  12
+' -----
+'  144
+'
+' This routine does not work for all numbers, though it
+'  will calculate 2 numbers that are larger than a calculator
+'  can handle.
+' Remember, this is for learning purposes only.  The resultant
+'  number can not always be trusted as the correct number.
+'
+'   Forever Young Software (1997)
+'
+'
+DIM TcA AS STRING * 1, TcB AS STRING * 1
+DIM ALen AS INTEGER, BLen AS INTEGER
+
+A$ = "14395613774750208"     ' both must by same length
+B$ = "05974790569203456"     ' add 0's at first if needed
+ALen = LEN(A$)
+BLen = LEN(B$)
+
+REDIM AddA(BLen, ALen * 2 * 2)  AS INTEGER
+
+CLS
+PRINT
+PRINT STRING$(BLen, " "); "   "; A$
+PRINT STRING$(BLen, " "); " X "; B$
+PRINT STRING$(BLen, " "); "---"; STRING$(ALen, "-")
+
+BPos% = BLen
+T% = BLen
+FOR R% = 1 TO ALen
+  TcB = MID$(B$, BPos%, 1)
+  Carry% = 0
+  AddA(R%, T% + 1) = 0
+  APos% = ALen
+  FOR T% = BLen TO 1 STEP -1
+    TcA = MID$(A$, APos%, 1)
+    Temp% = (VAL(TcB) * VAL(TcA)) + Carry%
+    IF Temp% > 9 THEN
+      Temp1% = Temp% MOD 10
+      AddA(R%, T% + 1) = Temp1%
+      Carry% = (Temp% - Temp1%) \ 10
+    ELSE
+      AddA(R%, T% + 1) = Temp%
+      Carry% = 0
+    END IF
+    APos% = APos% - 1
+  NEXT T%
+  AddA(R%, 1) = Carry%
+  BPos% = BPos% - 1
+NEXT R%
+
+FOR R% = 1 TO BLen
+  PRINT STRING$(BLen + 3 - R%, " ");
+  FOR T% = 1 TO ALen + 1
+    PRINT RIGHT$(STR$(AddA(R%, T%)), 1);
+  NEXT T%
+  PRINT
+NEXT R%
+PRINT "   "; STRING$(BLen * 2, "-")
+
+
+'  start to print answer
+
+DIM Ans((BLen * 2) + 1) AS STRING * 1
+AnsP% = (BLen * 2) + 1
+Ans(AnsP%) = RIGHT$(STR$(AddA(1, ALen + 1)), 1)
+
+Carry% = 0
+FOR T% = ALen TO 1 STEP -1
+  Temp2% = 0
+  Temp% = 0
+  FOR Tt% = 1 TO BLen
+    Temp% = Temp% + AddA(Tt%, T% + (Tt% - 1))
+  NEXT
+  Temp% = Temp% + Carry%
+  IF Temp% > 9 THEN
+    Temp1% = Temp% MOD 10
+    Temp2% = Temp1%
+    Carry% = (Temp% - Temp1%) \ 10
+  ELSE
+    Temp2% = Temp%
+    Carry% = 0
+  END IF
+  AnsP% = AnsP% - 1
+  Ans(AnsP%) = RIGHT$(STR$(Temp2%), 1)
+NEXT T%
+
+FOR Rr% = 2 TO BLen
+  T% = 0
+  Temp% = 0
+  FOR R% = Rr% TO BLen
+    T% = T% + 1
+    Temp% = Temp% + AddA(R%, T%)
+  NEXT
+  Temp% = Temp% + Carry%
+
+  IF Temp% > 9 THEN
+    Temp1% = Temp% MOD 10
+    Temp2% = Temp1%
+    Carry% = (Temp% - Temp1%) \ 10
+  ELSE
+    Temp2% = Temp%
+    Carry% = 0
+  END IF
+  AnsP% = AnsP% - 1
+  Ans(AnsP%) = RIGHT$(STR$(Temp2%), 1)
+NEXT
+
+PRINT "=>";
+FOR R% = 1 TO (BLen * 2) + 1
+  PRINT Ans(R%);
+NEXT
+</pre>
+</font>
+<br>
+Notice that there are 17 digits in each number.  Most calculators and regular computer programs can not except more than about 13 digits with out going to exponential values.  When you go to exponential values with this magnitude, you lose precision.<br>
+<br>
+Remember, this is for learning purposes only and the resultant might not be always correct.<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

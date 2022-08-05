@@ -1,0 +1,149 @@
+<HTML>
+<HEAD>
+<TITLE>Programming the INT 24h error handler.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Programming the INT 24h error handler</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+INT24H.ASM allows you to use your own error handler in your program instead of the normal <i>abort, ignore, retry</i>.<br>
+Version:  1.00b<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  08/01/97<br>
+Assembler:  MASM 5.10<br>
+<br>
+<form><TEXTAREA NAME="Src1" ROWS=15 COLS=100 WRAP=off>
+.MODEL small, basic
+.386
+.stack
+.data
+
+   OldSeg	dw	00h
+   OldOff	dw	00h
+   testfile	db	'testcd',0
+
+.code
+start:	mov	ax,DGROUP	; .STARTUP  (6.1)
+	mov	ds,ax		;
+	mov	bx,ss		;
+	sub	bx,ax		;
+	shl	bx,04		;
+	mov	ss,ax		;
+	add	sp,bx		;
+
+	mov	ax,3524h		; get and save original vector
+	int	21h		;
+	mov	OldSeg,es	;
+	mov	OldOff,bx	;
+
+	push	ds		; set int24h vector to our handler
+	push	cs		;
+	pop	ds		;
+	mov	ax,2524h		;
+	mov	dx,offset cs:OurHandler
+	int	21h		;
+	pop	ds		;
+	call	DoErr		; make an error (deliberately)
+
+	push	ds		; restore original vector settings
+	mov	ax,2524h		;
+	mov	dx,OldOff	;
+	mov	ds,OldSeg	;
+	int	21h		;
+	pop	ds		;
+
+Done:	mov	ah,4Ch		; exit to DOS
+	int	21h		; 
+
+DoErr	proc	near uses ax dx	; make an error (deliberately)
+	mov	ah,19h		; get disk drive
+	int	21h		;
+	push	ax		; and save it for later
+	mov	ah,0Eh		; set drive to a:
+	xor	dl,dl		;
+	int	21h		;
+	mov	ah,39h		; try to change a dir to on drv a:
+	mov	dx,offset testfile	;
+	int	21h		;
+	pop	dx		; restore current drive
+	mov	ah,0Eh		;
+	int	21h		;
+	ret			;
+DoErr	endp
+
+OurHandler proc far			; our handler
+	pusha			; save all registers
+	mov	ax,cs		; make sure ds = cs
+	mov	ds,ax		;
+
+	mov	dx,offset cs:OurErrS	; we can make it do what we want
+	mov	ah,09h		; as long as we don't use non-
+	int	21h		;  conventinal interrupts
+
+	xor	al,al		; tell DOS 'NO ERROR'
+	popa			; restore registers
+	iret			; interrupt return
+OurHandler endp
+
+; this must be in code segment for our handler to work
+OurErrS	db	'This should print when our error handler is active',36
+
+	end	start
+
+</textarea></form>
+<br><br><br>
+
+** Some info on a int24h handler **<br>
+DOS restores the INT24h handler on exit of your program.  Because of this, you can not make a TSR and have DOS use your interrupt handler.<br>
+<br>
+You must be careful using the stack in your handler.  PUSHA and POPA are about all I recommend.  If you need to use the stack, then save SS and SP and set up your own stack (allocate memory and point SS and SP to this block)<br>
+<br>
+You can use most of the MSDOS interrupts that don't produce a critical error.  If you use an DOS interrupt that produces a critical error while in your error handler, then you could/will get very strange results and even crash your system.<br>
+<br>
+If you need to use data, then put this data in the code segment near this routine.  Make sure that ds = cs.  Also make sure that your routine is a far proc.<br>
+<br>
+If you need anymore help on the INT24h handler, send me some email.<br>
+<br>
+<br>
+********* Just for fun.<br>
+You can look at the code that DOS uses for its own int24h handler.  Each int vector has a length of 4 bytes (a word for the segment and a word for the offset.)<br>
+<br>
+Since int24h vector is the 36th vector, multiply this by 4 (size of each vector) and this is where the address is for this interrupt.<br>
+<br>
+36 * 4 = 144   (90h)(see below)<br>
+<br>
+To get the interrupt vector address of int 24h, use debug and at the (debug) prompt type (where (enter) is the enter key):<br>
+d 0000:0090 L 4 (enter)<br>
+<br>
+this will display 4 numbers (in hex)<br>
+<br>
+  01 02 03 04<br>
+<br>
+(please note that these numbers will not be the same for each session and that I use 1 - 4 as an example.  Also remember that these are in Little-Endian format (backwards compatibility))<br>
+<br>
+  So now we know where in memory DOS's int 24h code is.  Now use the following line to view this code:<br>
+<br>
+  u 0403:0201 (enter)<br>
+<br>
+  This will display the first few lines of code for int 24h.  To view some more, just enter a 'u' and the <enter> key.<br>
+<br>
+  u (enter)<br>
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

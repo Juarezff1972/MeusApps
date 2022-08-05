@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<TITLE>Programming DOS and DOS Secrets</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<h2>Misc files and DOS utilities</h2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+You may download any of these files and use them as you would like, as long as you don't
+do it for profit.  All I ask is that you send me your comments and error findings so that I
+may fix the errors and possibly post them (with code) on <a HREF="index.htm">my home page</a>.<br>
+<br>
+* Please see <A HREF="legal.htm"><font size=2>legal notice</font></A> for info on copyrights and legal information.<br>
+<br>
+<b>Listing:</b><br>
+<img src="whatsnew.gif" align=middle alt="New Item" border=0 width=40 height=40>
+<a HREF="cddoor.asm">CDDOOR.ASM</a>  (3k) and  <a HREF="cddoor.pas">CDDOOR.PAS</a> (2k) - 07 Dec 1998<br>
+ - A utility to open or close the CD tray in a batch file.  See sources for usage.<br>
+<br>
+<img src="whatsnew.gif" align=middle alt="New Item" border=0 width=40 height=40>
+<a HREF="tolow.com">TOLOW.COM</a> - 695 bytes - 04 Dec 1998 - version 1.00 <br>
+ - A utility to change all long filenames to lower case.  Must be in a DOS session under Win9x.  Will not work in True DOS.  Use <font size=3><code>TOLOW /?</code></font> to get version.<br>
+<br>
+<a HREF="qbptch.zip">QBPTCH.ZIP</a> - 2,230 bytes - 04 June 1998 - version 1.00b <br>
+ - A patch to make QB4.5 save all source files as Text files rather than 'QuickSave' files.  (<i>includes assembly source code</i>)<br>
+<br>
+<a HREF="nosound.zip">NOSOUND.ZIP</a> - 1,904 bytes - 01 April 1998 - version 1.00b <br>
+ - TSR routine to 'silence' the internal speaker.  (<i>includes assembly source code</i>)<br>
+<br>
+<a HREF="shftstat.zip">SHFTSTAT.ZIP</a> - 1,434 bytes - 24 Jan 1998 - version 1.00b <br>
+ - Routines callable from a batch file or directly on the command line to turn on or off the num lock and the caps lock states.  (<i>includes assembly source for each</i>)<br>
+<br>
+<a HREF="isempty.zip">ISEMPTY.ZIP</a> - 2,162 bytes - 25 Sept 1997 - version 1.00b <br>
+ - a file callable from a DOS batch file to see if a file is a null sized file.<br>
+It is included here to show how to write and call routines from batch files.  It uses the environment table to pass arguments to the routine and the RC (ERRORLEVEL) to return variables.  (<i>includes assembly and batch script source</i>)<br>
+<br>
+<a HREF="findit.com">FINDIT.COM</a> - 756 bytes - 01 Aug 1998 - version 1.14b <br>
+ - A find file util for DOS.  To use it, type <b>FINDIT</b> <i>filename.ext</i>  at the DOS prompt.  Wildcards are accepted.<br>
+ - Thanks to D. Bächli for catching a bug that had to do with the directory and the read-only file attributes.<br>
+<br>
+<a HREF="exe2com.exe">EXE2COM.EXE</a> - 2,930 bytes - 20 Oct 1997 - version 1.15b <br>
+ - A replacement for the forgotten MS-DOS EXE2BIN, but with better error checking and more file information.  Now shows actual size of COM/BIN size rather than size + PSP (100h)<br>
+<br>
+<a HREF="normal.com">NORMAL.COM</a> - 245 bytes - version 1.10b<br>
+ - If you are tired of exiting a DOS app and it leaves the cursor screwy, or the color is
+wrong, etc., then run this small utility to set the color to white on black, reset the cursor,
+turn off the internal speaker, and other things like that.<br>
+<br>
+<a HREF="int21.obj">INT21.OBJ</a> - 287 bytes<br>
+ - Allows you to make an assembler interrupt call within QuickBasic<br>
+Parameters:<br>
+ - AX% - ES%  are as if you where in assembly (see note on DS%)<br>
+ - Flags%   takes nothing on entry but returns the flags register.<br>
+Note:  If you don't use the DS register, make sure you put a -1 as it's value on input<br>
+<br>
+<i>DECLARE SUB Int21 (AX%, BX%, CX%, DX%, SI%, DI%, DS%, ES%, Flags%)<br>
+<br>
+S$ = "Ben Lunt was here$"<br>
+AX% = &H900<br>
+DX% = SADD(S$)<br>
+DS% = VARSEG(S$)<br>
+Int21 AX%, BX%, CX%, DX%, SI%, DI%, DS%, ES%, Flags%</i><br>
+<br>
+<a HREF="prtsngl.asm">PRTSNGL.ASM</a> - 3,698 bytes<br>
+This is a small snip of code to print a single precision, fixed floating point number to the screen. (fixed to 5 decimal places).  Call with EAX holding the floating point number to print.<br>
+<br>
+<a HREF="addr2bit.asm">ADDR2BIT.ASM</a> - (3k)<br>
+This is a small snip of code to see what the bit status of a specified word in memory.  I use it for checking the Keyboard word status.  (0040:0017h)<br>
+It also contains a snip of code to change an unsigned word to an ascii binary string ready for output to this screen.<br>
+<br>
+<a HREF="clck.asm">CLCK.ASM</a> - (20k)<br>
+This is a small example of VGA mode 13h screen programming.  It has the intent to show how to program in the specified mode, therefore does not contain small or efficient code. It is however quite fast, though probably could be a bit faster.<br>
+<br>
+See <a HREF="cdp.htm">CDPlayer</a> for a DOS utility for playing audio CD's.<br>
+<br>
+<br>
+<i>Please write me with any errors that you may find.</i><br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,108 @@
+<HTML>
+<HEAD>
+<TITLE>A Font changing routine</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+<H1>Font</H1>
+Changes the font of the text mode 8x14 character set.  ** Only works on an EGA or better card **<br>
+<br>
+*Description<br>
+        Changes the font of the text mode 8x14 character set<br>
+        ** Only works on an EGA or better card **<br>
+<br>
+*Programming description<br>
+        Use the BIOS video interrupt service 11h, subservice 00h<br>
+        put offset of your bit pattern in es:bp<br>
+        put in cx, the number of chars to change<br>
+        put in dx, the starting ascii number to change<br>
+        put in bh, the amount of bytes per char in your bitmap pattern<br>
+<br>
+<pre><font size=2>
+
+Assemble with <a href="newbasic.htm">NBASM 00.23.xx</a>
+
+.MODEL tiny
+.code
+	push	ds			;
+	pop	es			; make sure ES = DS
+	mov	bp,offset OurFont	;
+	mov	cx,02			; we'll change just 2 of them
+	mov	dx,65			;   A and B --> our A and B
+	mov	bh,14			; 14 bytes per char
+	mov	ax,1100h		; change font to our font
+	int	10h			; video interrupt
+	mov	ax,4C00h		; exit to DOS
+	int	21h			;
+
+OurFont	db	00000000b
+	db	01111111b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01111111b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	00000000b
+	db	00000000b
+
+	db	00000000b
+	db	01111110b
+	db	01100110b
+	db	01100110b
+	db	01100110b
+	db	01111111b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01100011b
+	db	01111111b
+	db	00000000b
+	db	00000000b
+
+.end				; End of assembly code
+</font></pre>
+<br><br><br>
+Get the same routine in C from <a href="font.c">here</a> (2k)<br>
+Get the same routine in Pascal from <a href="font.pas">here</a> (3k)<br>
+<hr>
+To retrieve the bitmaps of the current character sets used by BIOS you can look at the following memory positions:<br>
+<br>
+If you are in CGA graphics modes 06h (640x200x2) or 04h (320x200x4) (X x Y x bpp) the BIOS keeps the bitmap of the second half of the character set (128 - 255) at the position pointed to by Interrupt Vector 1Fh, which is address 0000:007Ch.  The address in this memory position is the address of the character set 8x8 starting with ascii 128.<br>
+<br>
+The EGA+ BIOS will allow you to get the bitmap addresses of the whole character set for 8 different character sets, which include the 8x14 character set mentioned in the above program.<br>
+<br>
+If we use INT 10h, service 11h, sub-service 30h, and tell the BIOS to return the address of the 8x14 character set, we would do the following:<br>
+<br>
+<font face="" size=3>
+<pre>
+  mov  ax,1130h    ; service 11h, sub-service 30h
+  mov  bh,02h      ; BIOS 8x14 character set
+  int  10h
+<br></pre></font>
+On return, ES:BP will contain the segment address of the first char in the set (ascii 0).<br>
+Since we have the EGA+ BIOS, we can get the contents of the CGA char set mentioned above if we put 01h in BH.  (This service does the same thing as getting the address at INT VECT 1Fh, were the CGA BIOS doesn't have this sub-service.)<br>
+
+
+<br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

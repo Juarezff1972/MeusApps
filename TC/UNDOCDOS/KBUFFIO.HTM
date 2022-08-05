@@ -1,0 +1,67 @@
+<HTML>
+<HEAD>
+<TITLE>Using the Keyboard Buffer.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Using the Keyboard Buffer</H2>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The BIOS has a default memory area for the keyboard buffer which holds up to 16 keystrokes.<br>
+This area starts at 0040:001Eh and is 32 bytes in length. (16 2-byte scancodes)<br>
+The word (2 bytes) at 0040:001Ah hold the current head of the BIOS keyboard buffer.<br>
+The word (2 bytes) at 0040:001Ch hold the current tail of the BIOS keyboard buffer.<br>
+If these two pointers are different, then there is a keystroke ready for extraction.<br>
+<br>
+<br>
+<a href="keybuff.c">KEYBUFF.C</A> (1,728 bytes) is a small example on how to get keystrokes from the keyboard buffer.<br>
+Version:  1.00<br>
+Author:  Ben Lunt (Forever Young Software(R))<br>
+Date:  24 May 1998<br>
+Compiler:  Quick C 2.5<br>
+<br><br>
+<H4>Checking to see if a key is pressed with out the annoying keyboard delay.</H4>
+
+From an email message:<br>
+> I'd like to know how to control the keyboard buffer in QuickBasic so<br>
+> that you don't have to wait a few secs for something to happen when you<br>
+> press and hold down a key.<br>
+> Like when you program actiongames in QB you want the thingie on the<br>
+> screen to start moving at once if u press and hold down let us say the<br>
+> SPACE-key, or an arrow-key.<br>
+<br>
+<br>
+When you press a key on the keyboard, the keyboard hardware sends a 'make' code to the interrupt.  Then when you release this key, the hardware sends a 'break' code.<br>
+<br>
+In most cases, the software interrupt grabs the first 'make' code and then ignores the rest for the amount of time you have the delay set.<br>
+<br>
+Also, you probably know what happens when you press two keys at the same time.  Aaauugggg.  Your space ship goes the wrong way.<br>
+<br>
+So we have to create an assembler routine to get this code.<br>
+<br>
+Here is <a href="getkeyh.zip">Getkeyh.zip</A> (4k) that includes assembler source, callable from basic, a basic demo to show how to call and use this code, and the quick library to use it in the IDE.<br>
+<br>
+To assemble getkeyh.asm:  MASM GETKEYH;<br>
+To create getkeyh.qlb:  LINK /Q GETKEYH,GETKEYH.QLB,,QBLIB45;<br>
+To load it in the IDE:  QB /L GETKEYH.QLB GETKEY.BAS<br>
+<br>
+The number returned by the function GETKEYH%, is the hi-order (AH) of the number of the scan code.  See <a HREF="newbinfo.zip">newbinfo.zip</A> (16k) for a list of scan codes.  For instance:  The scan code for 'A' is 1E61h, so the function above would return 1Eh (30d).<br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<br></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

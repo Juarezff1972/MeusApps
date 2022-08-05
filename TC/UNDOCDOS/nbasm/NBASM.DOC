@@ -1,0 +1,1403 @@
+
+                        NewBasic++ Assembler
+                          Version 00.23.29
+                          *A Beta version*
+                              Freeware
+     
+                      Forever Young Software
+                      (C)opyright  1984-1999
+                        All rights reserved
+                            18 Jan 1999
+
+
+
+Please note:  Being that this is a beta version, not all of
+               the documentation is correct.  If there is
+               a B (or *Beta*) in the first position of the
+               line, that means that this sentence/paragraph
+               does not pertain to this beta version, but to
+               the final release when it is done.
+
+
+
+                       Table of Contents
+     
+     What can NBasm do ...................................?
+     What won't NBasm do .................................?
+     Syntax ..............................................?
+     Operands ............................................?
+     Pseudo-Operations ...................................?
+     Running NBasm .......................................?
+     Using the Library ...................................?
+     Optimizer and precautions ...........................?
+     Assembler-time Macros ...............................?
+     Difference Between Other Assemblers .................?
+     Errors ..............................................?
+     Miscellaneous .......................................?
+     Bug report ..........................................?
+     Examples ............................................?
+     Appendixes ..........................................?
+
+
+-=-=-=- NewBasic++ Assembler -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Page ?
+
+
+     What can NBasm do:
+      - NBasm takes a text file, consisting of mnemonics,
+         user-defined symbols, numbers, and pseudo-ops, and
+         produces a file of corresponding machine language for
+         the 8086/88, 186, and 286, 16-bit processors and the
+         386 32-bit processor.
+         (Source file can be of any size)
+        *Note:  See 'The following characters or reserved'
+           under Syntax below.
+      - NBasm is capable of processing two output file types:
+          1. COM files that are ready to execute by DOS
+B         2. Microsoft compatible OBJ files ready for linking
+            to other OBJ files or libraries.
+
+    *Beta*  The .model small directive is allowed, however
+            it does not create workable .obj files yet.
+
+B     - External variables and procedures are supported
+      - NBasm is 'fairly' fast (for real mode):
+         The source to NBasm is assembly.  I hope to modify it
+         so that it will soon assemble itself.
+*Beta*             *a self assembling assembler*
+         Builds a complete COM file at 2500 lines/sec on a P133
+
+     What won't NBasm do:
+B     - Macros are not supported.
+B     - Expressions (such as SYMBOL - 2) are not supported.
+B     - NBasm is not capable of 486 and higher operations/instructions
+B     - NBasm is not capable of 386 and higher register use
+
+     Syntax
+      - NBasm accepts a standard DOS text file for input. Lines
+        may be any combination of upper and lower case
+        characters. NBasm does not distinguish between the two
+        cases:  everything except quoted strings are
+        automatically converted to upper case during the
+        parsing process. Thus, SYMBOL, Symbol, and symBol all
+        refer to the same symbol.
+     
+      - The following characters or reserved by NBasm:
+          space (ascii 32)
+          comma (ascii 44)
+          single quote (ascii 39)
+          double quote (ascii 34)
+          semi-colon (ascii 59)
+          underscore (ascii 95)
+        Note:  Most editors, including MS EDIT.COM, won't
+          allow the following ascii characters:
+            ascii char 0, 9, 10, and 13
+          For this reason and a few others, NBASM will change
+            these four (4) chars to ascii 32 (space) if found
+            in your source code.
+          This happens in all lines, including quoted strings.
+            So if you want to use these four (4) chars in a
+            quoted string, you must use the ascii value.
+            Example:
+              string  db  00,'',09,10,'',13,' etc...
+     
+      - Each line must be less than 1024 characters long and
+          have the following format:
+     
+         Label:  Operation  Operand(s)     ; comment
+     
+      - The different fields of an input line are separated
+          by the delimiters space or comma.  Any number of
+          either delimiter may be used to separate fields.
+          If a line is too long to fit on the screen, you
+          may use the underscore (_) char to tell NBasm you
+          want the next line to be added to this line.
+        Note:  If you use the underscore you must of a CR
+          as the next char.  No spaces between the _ and the
+          CR.  Also, the _ must be between operands.   The
+          underscore can not be used with quoted strings
+     
+     Explanation of Fields:
+      - Label: A label is a string of characters, beginning in
+         column 1. Depending on the operation field, the label
+         might represent a program location for branching, or a
+         memory location. Note that anything beginning in
+         column 1, except a comment, is considered a label.
+         - NBasm allows the use of the 'Unique' Label directive.
+           '@LABEL' is this directive.  When NBasm comes to this
+           directive it will do one of two things depending on
+           if this will be a label or an other type of symbol.
+             If it is to be a label, then NBasm will put an 'Unique'
+           name.  NBasm starts with 'NB0000' as the label and then
+           increments to 'NB0001' for the next and so on.  So if you
+           put a label that has this name and also use @LABEL, you
+           might receive errors.
+             If @LABEL is to represent a symbol other than a label,
+           it will put the current 'unique' name in as this symbol.
+             So with this technique, every '@LABEL' reference other
+           than a label will point to the next label that is a
+           @LABEL'.  This allows you to use more than one to point
+           to the same label reference.  Please note that this will
+           only work in the forward direction.  See Example #1 at
+           end of this document.
+     
+      - Operation: Either a pseudo-op or an instruction mnemonic.
+     
+      - Operand(s): A list of one or more operands, as defined
+         on page ?, separated by delimiters.
+     
+      - Comment: Any string of characters, beginning with a
+         semicolon.  Anything to the right of a semicolon
+         will be ignored.
+         - If you use a semicolon (;) then everything after this
+           semicolon is ignored (on that line).  If you want to have
+           a lot of text and don't want to start each line with a
+           semicolon, then use the COMMENT <char> ... <char> command.
+           The word COMMENT must start in the first column of the
+           line and then the following char (after the space) will
+           denote the start of the comment.  NBasm will start with
+           the next line and search for that char again.  Once found,
+           assembly starts on the NEXT line after the found char.
+           Please Note:  COMMENT <char> ... <char> will not work
+           on the same line.  Use the semicolon (;) for this.
+           Example:
+           COMMENT # all the text and code that is on this line
+             and this line
+             and this line
+             up to this line
+             # and any thing on this line will NOT be assembled.
+             ASSEMBLY resumes here
+
+     
+
+     Operands
+      - The following operand types are allowed.
+        - Immediate data: A number, stored as part of the
+           program's object code.  Immediate data are classified
+           as either byte; expressible as an 8 bit binary
+           integer; or word, expressible as a 16 bit binary   
+           integer. If context requires it, NBasm will left-pad
+           byte values with zeroes to convert them to word values.     
+           Attempts to use a word value where only a byte will    
+           fit will cause an error message to be printed.
+     
+      - Immediate data may be represented in 6 ways:
+        - An optionally signed decimal number in the range
+           -32768 to 32767. Example:
+     
+            MOV AL,22
+            MOV BX,-1000
+     
+        - A series of up to 4 hex digits, followed by the
+           letter H (lower or upper case). Example:
+     
+            MOV CX,1234H
+            ADD DL,0FDh
+     
+        - A series of up to 16 (0|1) digits, followed by the
+           letter B (lower or upper case). Example:
+     
+            MOV CX,0100000011111111b
+            AND DL,00010010b
+     
+        - A symbol representing the two types above,
+           defined using the EQU pseudo-op.  Example:
+     
+            TEMP  EQU $             ; temp  = this location
+            TEMP1 EQU %             ; temp1 = this location + size
+                                                 of all externals
+            TEMP2 EQU [TEMP1+100h]  ; temp2 = location of temp1 + 100h
+            TEMP3 EQU [TEMP2+10h]   ; temp3 = location of temp2 + 10h
+            MASK  EQU 10h
+            MASK  equ 1000
+                  or   CL,MASK
+                  xor  ax,mask
+
+          CAUTION:  If you use the .external directive to include
+           code at the end of your file a you use EQUates at the
+           end of your code to denote buffers, then you must use
+           the % symbol to denote THIS LOCATION plus SIZE OF all
+           externals.
+
+B         CAUTION:  If you use the .start directive and EQUates
+            for buffers (ie.  temp  equ [temp+100h]), then
+            your stack will be overwritten by the buffer.  This
+            is a know error in NBASM and I plan to remove it.
+
+        - The offset of a label or storage location returned
+           by the OFFSET operator.  OFFSET always returns a
+           word value. OFFSET is used to get the address of a
+           named memory location, rather than its contents. 
+           Example:
+     
+                   mov di,offset Buffer
+            Buffer dup  100h,0
+     
+        - The ASCII value of a printable character,
+           represented by the character enclosed in single
+           or double quotes.  Thus, the following lines will
+           generate the same object code:
+           (please see note about ascii values below 20h in
+            the first part of this documentation)
+     
+                  MOV AL,65  ;ascii code for 'A'
+                  MOV AL,'A'
+                  MOV AL,"A"
+            ; all of of the following are the same
+                  MOV AX,4142h
+                  MOV AX,'AB'
+     
+      - Register Operands:
+        - An 8 bit register:
+           AH, AL, BH, BL, CH, CL, DH, DL
+     
+        - A 16 bit register:
+           AX, BX, CX, DX, SP, BP, SI, DI
+
+B       - A 32 bit register:
+           EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI
+     
+        - A segment register:
+           CS, SS, DS, ES, FS, GS
+             (FS and GS are on .386+ only)
+
+      - Memory Operands: The contents of a memory
+         location addressed by one of the following
+         methods. Note that none of the memory
+         addressing options specifies that whether a
+         byte or word operand is being referenced.
+         - Direct address.
+          - A number, or symbol representing a
+             number, enclosed in brackets, indicating
+             an offset into the data segment. Example:
+     
+              Buffer EQU 2222h
+                     MOV BH,[Buffer]
+                     MOV [80h],DI
+     
+          - A symbol, defined to be a variable (i.e.
+             a named memory location) using the EQU
+             pseudo-op. Example:
+
+                  CmmdLen EQU [81h]
+                          MOV DI,CmmdLen
+         
+          - A symbol, defined to be a variable by its
+              use on a storage defining pseudo-op.
+              Example:
+         
+                    MOV AX,FLAG
+                    MOV Pos,BX
+               FLAG dw 22
+               Pos  dw 22h
+         
+        - Indirect Address:  The address of the operand is
+           the sum of the contents of the indicated
+           register(s) and a displacement. The register, or
+           sum of registers, are enclosed in square
+           brackets: [] 
+     
+           The displacement is optional, and takes the
+           form of an immediate operand, placed without
+           intervening delimiters to the left of the first
+           bracket or at the end before the last bracket.
+           Displacements in the range -128 to 127 (i.e. hex 0 - 7F,
+           FF80 - FFFF) are interpreted as signed 8 bit quantities.
+           All other displacements are interpreted as unsigned 16 bit
+           quantities. (Note that although the 8086/88 supports
+           unsigned 16 bit displacements up to hex FFFF for indirect
+           addressing, NBasm does not distinguish between -1
+           and 0FFFFh)
+     
+           The following indirect modes are allowed:
+            - Indirect through a base register (BX or BP).
+              Example:
+         
+              PosLen EQU 6
+                 MOV AX,PosLen[BP]
+                 MOV AX,[BP+PosLen]
+                 MOV DL,-2[BX]
+                 MOV DL,[BX-2]
+                 MOV CX,[BP]
+                 MOV 3434h[BX],AX
+                 MOV [BX+3434h],AX
+                 MOV AL,[Buffer+100h]
+                 MOV AL,[100h+Sum1-Buffer]  ; Buffer is an equate
+                 MOV AL,[100h+Buffer-100h]
+                 MOV AL,[Sym1+Sym2]  ; returns an error
+         
+            - Indirect through an index register (DI or SI).
+               Example:
+
+               MOV CX,[SI-2]
+               MOV CX,-2[SI]
+         
+            - Indirect through the sum of one base register
+               and one index register. Example:
+
+               MOV [BP+DI],SP       ; note that no spaces are
+               MOV BX,10H[BX+SI]    ; allowed within the
+               MOV BX,[BX+SI+10h]   ; brackets.
+               MOV CL,[BP+SI]       ;
+               MOV DH,-2[BX+DI]     ;
+               MOV DH,[BX+DI-2]     ;
+     
+      - Labels
+         - A label on a machine instruction may be used as
+           an operand for call and jump instructions.
+           Example:
+            DoIt PROC NEAR
+                 CALL DoIt
+                 JMP  Place
+         
+      - Strings
+         A string is any sequence of characters (including
+         delimiters) surrounded by single or double quotes.
+         Note:  Empty strings are ignored
+           Example:
+     
+            DB 'Forever Young Software'
+            DB "Copyright 1984-1999"
+            DB ''         ; this is ignored
+            DB 12,'',30   ; the empty string is ignored
+                          ;   returns 12,30
+
+
+     Resolution of Ambiguities.
+      - Memory references:
+         When one specifies the address of a memory
+         location, it is unclear how large an operand is being
+         referenced. An operand might be a byte, or a word.
+         - If a register is present as an operand, it is
+           assumed that the memory operand matches the
+           register in size. An exception to this rule are
+           the shift and rotate instructions, where the CL
+           register is used as a counter, and has nothing
+           to do with the size of the other operand. Examples:
+         
+            MOV MASK,AX   ;mask is a word
+            MOV AL,[BX]   ;BX points to a byte
+            AND [SI]      ;error, operand of unknown size
+            SHR MASK,CL   ;error, mask is of unknown size
+         
+         - If no register is present, (or if the only
+           register is CL being used as a counter) the size
+           of the memory operand is specified by adding the
+           suffix "B" or "W" or type specifer "BYTE" or "WORD"
+           to the instruction mnemonic.
+           Examples:
+
+            INCB [BX]       ;BX points to a byte
+            INC  BYTE [BX]  ;BX points to a byte
+            MOVW TEMP,00H   ;TEMP is a word
+            MOV  WORD TEMP,00H
+            MOVB DH,[BX]    ;error, register already specifies size
+         
+     - Indirect Branching
+        The 8088 supports two flavors of indirect  branching:
+        intra, and inter segment. A register is set to point at
+        a memory location which contains a new value for the
+        program counter, and in the case of intersegment branching,
+        a new value for the CS register as well.
+         
+         CALLN [BX]    ;intrasegment call
+         JMPF  [DI]    ;intersegment jump
+         JMP   [BP]    ;error, unspecified flavor
+         JMP   FAR  offset,segment  ;jump 'very far'
+
+     - Long and Short Jumps
+        Two types of relative jumps are supported by the
+        8086/88: short (specified by a signed 8 bit displacement)
+        and long (specified by an unsigned 16 bit displacement).         
+        Both are implemented in NBasm as a jump to a label.
+     
+        The short jump is specified by mnemonic JMPS or JMP SHORT.
+        Since one of the displacement bits is used as a sign bit,
+        only seven are left to express the magnitude of jump.
+        JMPS (and similarly, all the jump on condition instructions)
+        is thus limited to branching to labels within a range of -128
+        to +127 bytes.
+        Note: See .JUMPS for more info.
+             
+        NBasm reserves mnemonic JMP for the long jump.
+         Example:
+
+          Start:
+               JMPS Start        ;short jump
+               JMP  SHORT Start  ;short jump
+               JMPS End          ;short jump
+               JMP  End          ;long jump
+               JMP  Start        ;long jump
+          .End
+
+     - Instruction Prefixes.
+        The 8086/88 supports three instruction prefixes:
+         - SEG: segment override. An alternate segment
+           register is specified for a reference to memory
+         - REP, REPE, REPNE, REPZ, REPNZ: repeat. A string
+           primitive is repeated until a condition is met.
+         - LOCK: Turns on the LOCK signal. Only useful in
+            multiprocessor situations (8086/88 and 8087).
+         
+        NBasm implements these prefixes as separate instructions,
+        rather than prefixes to another instruction.  They can appear
+        on a separate line or on the same line, immediately before
+        the operand they modify.
+         Example:
+         
+          SEG ES
+          MOV AX,FLAG     ; flag is in the extra segment
+          MOV AX,ES:FLAG  ; this line is the same as the two above
+          REP
+          MOVSB           ; move bytes until CX decremented to 0
+
+     - Pseudo-Operations
+        The following pseudo-ops are implemented:
+         - $: This location
+           The '$' symbol can be used as an operand to find
+           the offset of a pos relative to the start of the
+           segment.
+
+           Examples:
+           (code segment)
+               mov  ax,$
+               mov  ThisLoc,ax       ; ThisLoc = offset of POS in segment
+            ThisLoc equ $
+
+           (data segment)
+             ThisPos  dw  $
+             ThisPos  db  $  ; returns an error.  $ is sizeof word
+
+         - %: This location plus size of all external code
+           The '%' symbol can be used as an operand to find
+           the offset of a pos relative to the start of the
+           segment plus the size of all external code to this
+           point.  Used only in .COM file formats (tiny)
+
+           Mostly used with the example below.  This is so that
+           NBASM will leave room between your last byte of
+           code/data and the first undefined data item for all
+           the external code that will be added to the .COM file
+           when using the .external directive.
+
+           (code segment)
+             Temp   equ  %
+             Temp1  equ  [Temp+100h]
+
+         - DB: Declare Bytes
+           Memory locations are filled with values from the
+           operand list. Any number of operands may appear,
+           but all must fit on one line. Acceptable operands
+           are numbers between 0 and 0FFh (0-255 decimal), or
+           strings enclosed in single or double quotes.  You
+           can use any ascii char from 00d to 255d except 13d.
+           If you need to use ascii char 13d you must give
+           the ascii value instead of the literal char.
+
+           If a label appears, it is considered a variable, and the
+           location may be refered to using the label, rather
+           than an address.  The reason for the use of single
+           or double quotes is so that you can put a single quote
+           as a char in a string delimited by double quotes and
+           vise-versa.   Example:
+         
+              MASK  DB  00h,01h,02h,03h
+              Strg1 DB  'A string'
+              Strg2 DB  "A string"
+              Strg3 DB  "A string's single quote"
+              Strg5 DB  'Can NOT use ascii char 13d.  Ascii 13d =',13
+
+         - DW: Declare words
+           Identical to DB (above) except uses words instead of
+           bytes. Uses a range of 0 and 0FFFFh (0-65535 decimal)
+         
+         - DUP: Declare Storage
+         
+            Used to declare large blocks of identically
+            initialized storage.  The first operand is
+            required, a number specifying how many bytes
+            are declared.  If a second operand in the form
+            of a number 0-0FFh appears, the locations will
+            all be initialized to this value. If the second
+            operand is not present, locations are initialized
+            to 0. As with DB, any label is considered a 
+            variable.  To save space, the object code does not
+            appear on the listing.  Example:
+     
+               DUP 22         ; 22 locations initialized to 0
+               DUP 100h,22h   ; 256 locations initialized to 22h
+          TEMP DUP 22         ; 22 locations initialized to 0 and
+                              ;  pointed to by TEMP
+               DUP 0          ; error: 55h
+
+         - ENDP: End of Procedure
+            See PROC (below) for details.
+         
+         - EQU: Equate
+            Used to equate a symbolic name with a number.
+            The symbol may then be used anywhere the
+            number would be used.  Use of symbols makes
+            programs more understandable, and simplifies
+            modification. 
+         
+            An alternate form of EQU encloses the number
+            in square brackets: [].  The symbol is then
+            interpreted as a variable, and may be used as an
+            address for memory access.  This version is
+            provided to allow symbolic reference to locations
+            outside the program segment.
+     
+            Warning: Difficult to debug errors may result
+            from using a symbol prior to its being defined
+            by EQU.  All Equates should be defined at the
+            beginning of the code.
+         
+                MOFFSET    EQU B000H
+                MONOCHROME EQU [0000H]
+
+         - INCLUDE: Include a file
+            NBasm supports include files nested up to 10 max.
+            An include file can have any name and ext as long
+            as it fits the 8.3 DOS format for a filename.  The
+            file can contain most anything that a main module
+            would.  If you use an include statement and file,
+            you must put the include file below any of the
+            following directives:  .model, .stack, .186, .286,
+            and .start (unless you use EQU's only).  Syntax for
+            the include statement is:
+             (This statement must start in col one as a label would)
+
+                 INCLUDE filename.inc
+
+            You can use the /I{} parameter at the command line to
+            tell NBasm what path to look in for the include file.
+            Example:
+
+              NBASM demo.asm /i{c:\includes}
+
+            This will tell NBasm that the include file is in the
+            directory:  c:\includes\*.*
+
+            An included file must be 65535 bytes or less and end
+            with the .end directive.  (NBasm will still assemble
+            the file(s) correctly, but will return an error if the
+            .end directive is not used in the include file(s).)
+
+
+         - ORG: Origin
+            Allows direct manipulation of the location
+            counter during assembly.  By default, NBasm
+            assembles code to start at offset 100h, the
+            origin expected by COMMAND.COM for .COM
+            programs.  Using ORG you may override this
+            default. Example:
+         
+               ORG 0   ;Code will be assembled for starting
+                       ;offset of 0
+         
+         - PROC ...ENDP: Procedure Definition
+            Declares a procedure.  One operand is required on
+            PROC, either the word NEAR, or the word FAR.
+            This pseudo-op warns NBasm whether to assemble
+            returns as intra (near) or intersegment (far).
+            Procedures called from within your program should
+            be declared NEAR. All others should be FAR.
+            ENDP terminates the procedure, and requires no
+            operands.  Procedures may be nested, up to 10 deep.
+            The word USES may follow the NEAR|FAR word to tell
+            NBasm to save the specified registers listed after
+            the word USES.  The label is not required on the ENDP
+            line. Example:
+     
+             MAIN   PROC  NEAR USES AX BX SI
+                   ...
+                   ...
+                   RET
+             MAIN  ENDP        ; the label 'MAIN' is not required here
+
+
+           This example will declare a near procedure and
+           save the following registers:  AX, BX, and SI
+           Then NBasm will restore these registers just before
+           the RET is encountered.
+
+           You can also use the ALL and ALLF keywords.  The ALL
+           keyword is the same as if you used PUSHA/POPA (186+)
+           and the ALLF keyword is as if you used PUSHA/POPA and
+           PUSHF/POPF.
+             Please Note:  Saves only the registers PUSHA saves.
+
+             MAIN   PROC  NEAR USES ALL   ; save all registers (Pusha)
+                   ...
+                   ...
+                   RET
+             MAIN  ENDP
+
+             MAIN   PROC  NEAR USES ALLF  ; save all registers and the flags
+                   ...
+                   ...
+                   RET
+             MAIN  ENDP
+
+           Note:  See the documentation for PUSHA/POPA for the registers
+           ALL uses.
+
+           If a RET is encountered outside of a declared procedure
+           in a .COM file, NBasm will put the opcode value of 0C3h
+           (ret) so that you can exit with one byte.  If this happens
+           in an .OBJ (.model small) file or if the .start directive
+           is used, and error will be given.
+
+     - Directives
+         - .8086
+           Enables usage 8086/87 instructions (default)
+           (for returning to 8086 after .186, .286, etc.)
+
+         - .186
+           Same as .8086 above and allows 80186 instructions
+
+         - .286
+           Enables all non-privileged instructions up to the
+             80286, and enables all instructions up to the
+             80287 coprocessor
+
+         - .286P
+           Same as .286 above and allows all 80286 privileged
+             instructions
+
+         - .386
+           Enables all non-privileged instructions up to the
+             80386, and enables all instructions up to the
+             80387 coprocessor
+
+         - .386P
+           Same as .386 above and allows all 80386 privileged
+             instructions
+
+         - .486
+           Enables all non-privileged instructions up to the
+             80486, and enables all instructions for a math
+             coprocessor
+
+         - .586  (same as .x86 below)
+           Enables all non-privileged instructions up to the
+             80586 (Pentium), and enables all instructions
+             for a math coprocessor
+           Please note:  Some of the instructions that NBasm
+             allows with this directive are use for a
+             Pentium Pro or Pentium II.
+
+         - .87
+           Enables usage 8087 instructions (default)
+           (for returning to 8087 after .187, etc.)
+
+         - .187
+           Same as .87 above and allows 80187 instructions
+           (Please note:  Will give error if not in .186+ mode)
+
+         - .287
+           Same as .187 above and allows 80287 instructions
+           (Please note:  Will give error if not in .286+ mode)
+
+         - .387
+           Same as .287 above and allows 80387 instructions
+           (Please note:  Will give error if not in .386+ mode)
+
+         - .ALGNW
+           Aligns the next statement/data on a word boundary.  Pads
+           with a NOP if necessary.
+
+         - .ALGNP
+           Aligns the next statement/data on a paragraph boundary. Pads
+           with NOP if necessary.
+
+         - .ALPHA
+           Tell NBasm to write the segments in alphabetical order.  Used
+           only in OBJ files.  If in a COM file, it is ignored.
+
+         - .CODE
+           Specifies that all that follows will be put in the code
+           segment until a .DATA or .END is reached.  A .CODE
+           directive must be in both types of output files.
+
+*beta*   - .DATA
+           Specifies that all that follows will be put in the data
+           segment until a .CODE or .END is reached.  A .DATA can
+           not be in a COM file (.model tiny (see below)).
+
+         - .DOSEG
+           Specifies to the assembler to include all segments in
+           this order: CODE (DGROUP), DATA, BSS, STACK
+
+         - .END
+           Specifies to NBasm that end of file was reached.  Any text
+           after the .end directive will be ignored.
+
+         - .EXTERNAL symbol1, symbol2, symbol3, ...
+           Specifies that the following symbol(s) is/are external.
+           COM files:
+             If .external is used in the TINY model (see below),
+             then NBASM loads the correct library and adds the
+             code to the end of the .com file for these external
+             procedures.  Please see 'Using the Library' for more
+             info on calling external procedures in .com files.
+*beta*     EXE files:
+             If .external is used in the SMALL model (see below),
+             then NBASM creates the correct entry in the OBJ file
+             for the linker to include the symbol in the .exe file.
+
+          Note: If a symbol is declared external via .external
+           but is not used in the code, NBasm will not add that
+           symbols code to the end of the .com file.
+
+          CAUTION:  If you use the .external directive to include
+           code at the end of you file a you use EQUates at the
+           end of your code to denote buffers, then you must use
+           the % symbol to denote THIS LOCATION plus SIZE OF all
+           externals.
+
+         - .JUMPS
+           Tells NBASM to substitute a JNcc $+3 and a JMP label
+           for a short conditional jump that is to far away.
+           Example:
+                   jz  short There      ; ** one byte to far **
+                   dup 128,0            ; can be any code or data
+            There:
+
+           Gets replaced with:
+
+                   jnz short Here       ; (jnz $+3)
+                   jmp There
+            Here:  dup 128,0            ; can be any code or data
+            There:                      ; *But why would you jump to data?*
+
+           You can also use the /J on the command line instead of this
+           directive.  Both are the same and both can be used together
+           with no error.
+
+         - .MODEL (TINY or SMALL)
+           Defines the output file as either a COM file or an OBJ
+           file.  If no .model directive is encountered, the COM
+           file format is assumed.  If a .model directive is found,
+           it must be before the .CODE or .DATA directives.
+            Example:
+
+              .MODEL TINY   ; declares a COM file for output
+*Beta*        .MODEL SMALL  ; declares an OBJ file for output
+  **Even though the small model is allowed, remember that NBasm
+     does NOT produce acceptable OBJ files (yet) **
+
+         - .OPTOF
+           Turns the optimizer off
+
+         - .OPTON
+           Turns the optimizer on
+
+         - .STACK
+           Specifies the amount to reserve for the stack.  If an
+           operand is not specified, then 256 is assumed.  If an
+           operand is specified, it must be in the range of 1 - 65534,
+           and tells NBasm to assign that many bytes for the
+           stack.
+
+              .STACK       ; default 256 bytes
+              .STACK 128   ; use 128 bytes
+
+         - .START
+           Specifies to NBasm to do the startup code.  This directive
+           must be before any other code, but it is not required by
+           NBasm to assemble.
+           - In the TINY model (COM), this directive calculates the
+           amount of memory that the program needs, adds the stack
+           size, (given by the .stack directive or 256 if .stack not
+           used), and resizes the memory block to this size.  Then
+           the .start directive points SP to the top of this block.
+           *** Please note ***
+            If you use this directive in a COM file, you can not use
+           the RET instruction to exit to DOS because SP doesn't point
+           to offset 0FFFEh anymore.  i.e.:  [SP] isn't 00h, and doesn't
+           point to the INT 20h vector in the PSP.
+            If you use the optimizer option and the .start directive,
+           NBasm will not change INT 20h to RET.
+
+           - In the SMALL model (OBJ), this directive processes the
+           segment addressing parameters (puts the correct values in
+           the segment registers) as well as free the unused memory
+           blocks.  If this directive is not used in the SMALL model,
+           you will have to write your own startup code, and segment
+           addressing.
+
+             Example:
+
+              .START                    ; thats it, nothing else needed.
+
+         - .x86  (same as .586 above)
+           Allows all instructions to .586 (see .586 above)
+
+
+     - Outside the Program Segment
+       - Memory references
+          To access memory outside the program segment, you
+          simply move a new segment address into the DS
+          register, then address using offsets in the new
+          segment.  The memory option of the EQU pseudo-op
+          allows you to give a variable name to offsets in
+          other segments. For example, to access the graphics
+          character table in ROM:
+     
+            BIOS       EQU  F000H
+            CHARTABLE  EQU  [FA6EH]
+                       MOV  AX,BIOS       ; can't move immed. to DS 
+                       MOV  DS,AX
+                       MOV  AL,CHARTABLE  ; 1st byte of char. table
+         
+         - Code Branching
+            NBasm supports 4 instructions for branching
+            outside the program segment.
+            - Direct CALL and JMP
+               New values for the IP and CS registers are
+               included in the instruction as two immediate
+               operands. Example:
+         
+                BIOS        EQU  F000H    ;RAM bios segment
+                DISKETE_IO  EQU  EC59     ;disk handler
+                           JMP  DISKETE_IO,BIOS
+     
+            - Indirect CALLF/CALL FAR and JMPF/JMP FAR
+               Four consecutive bytes in memory are
+               initialized with new values for the IP and CS
+               registers.  The CALLF or JMPF then references
+               the address of the new values. Example:
+         
+                BIOS        EQU   F000H    ;RAM bios segment
+                PRINTER_IO  EQU   EFD2H    ;printer routine  
+                            MOV   [DI],PRINTER_IO
+                            MOV   [DI+2],BIOS
+                            CALLF [DI]
+                            CALL FAR [DI]
+
+
+     - The following list is a list of all mnemonics that are allowed
+       with NBasm and a short description.  In the column before the
+       mnemonics is the lowest allowed processor.  If it is blank, then
+       an 8086/88 is assumed.  (186+ = 80186 or better, etc)
+
+       If you know of and try to use a 386 or less mnemonic/instruction
+       not listed here or usable in NBasm, please let me know.  (I am
+       sure I am missing a few (*beta* quite a few *beta*) )
+
+        AAA     - Adjust after BCD addition
+        AAD     - Adjust before BCD division
+        AAM     - Adjust before BCD multiplication
+        AAS     - Adjust after BCD subtraction
+        ADC     - Arithmetic addition with carry
+        ADCB    -    (byte)
+        ADCW    -    (word)
+        ADD     - Arithmetic addition
+        ADDB    -    (byte)
+        ADDW    -    (word)
+        AND     - Logical AND
+        ANDB    -    (byte)
+        ANDW    -    (word)
+        CALL    - Call Procedure
+        CALLF   -    (far)
+        CALLN   -    (near)
+        CBW     - convert signed byte (AL) to word (AX)
+ 386+   CDQ     - convert signed dword (EAX) to dword pair (EDX:EAX)
+        CLC     - Clear carry
+        CLD     - Clear direction flag
+        CLI     - Clear Interrupt flag
+        CMC     - Complement the carry flag
+ 586+   CMOVcc  - Conditional MOV reg, reg/mem
+        CMP     - Compare
+        CMPB    -    (byte)
+        CMPSB   - Compare String Byte
+        CMPSW   - Compare String Word
+        CMPW    -    (word)
+        CWD     - convert signed word (AX) to word pair (DX:AX)
+ 386+   CWDE    - convert signed word (AX) to dword (EAX)
+        DAA     - Adjust after addition
+        DAS     - Adjust after subtraction
+        DEC     - Decrement
+        DECB    -    (byte)
+        DECW    -    (word)
+        DIV     - Unsigned divide
+        HLT     - wait for an interrupt
+        IDIV    - Signed divide
+        IMUL    - Signed integer multiplication
+ 186+   IMUL    -  (reg16,immd8)
+ 386+   IMUL    -  (reg16,reg/mem)
+        IN      - Get byte (AL) from port (DX)
+        INC     - Increment
+        INCB    -    (byte)
+        INCW    -    (word)
+ 186+   INSB    - In String Byte (AL)
+ 186+   INSW    - In String Word (AX)
+        INT     - Software interrupt
+        INTO    - Interrupt on Overflow
+        IRET    - Return from interrupt
+        JA      - Jump if above (CF=0, ZF=0)
+        JAE     - Jump if above or equal (CF=0)
+        JB      - Jump if below (CF=1)
+        JBE     - Jump if below or equal (CF=1, ZF=1)
+        JC      - Jump if carry (CF=1)
+        JCXZ    - Jump if CX = 0
+        JE      - Jump if equal (ZF=1)
+        JG      - Jump if greater than (ZF=0 or SF=OF)
+        JGE     - Jump if greater than (ZF=OF)
+        JL      - Jump if less than (ZF!=OF)
+        JLE     - Jump if less than or equal (ZF=1 or ZF!=OF)
+        JMP     - Unconditional Jump
+        JMPF    -    (far)
+        JMPN    -    (near)
+        JMPS    -    (short)
+        JNB     - Jump if not below (CF=0)
+        JNC     - Jump if no carry (CF=0)
+        JNE     - Jump if not equal (ZF=0)
+        JNO     - Jump if no OverFlow (OF=0)
+        JNP     - Jump if no Parity (PF=0)
+        JNS     - Jump if no Sign (SF=0)
+        JNZ     - Jump if no Zero (ZF=0)
+        JO      - Jump if overflow (OF=1)
+        JP      - Jump if Parity (PF=1)
+        JPE     - Jump if Parity Even (PF=1)
+        JPO     - Jump if Parity Odd (PF=0)
+        JS      - Jump if Sign (SF=1)
+        JZ      - Jump if Zero (ZF=1)
+        LAHF    - Load into AH lower byte of flags
+        LDS     - Load DS segment offset of
+        LEA     - Load affective address
+        LES     - Load ES segment offset of
+ 386+   LFS     - Load FS segment offset of
+ 386+   LGS     - Load GS segment offset of
+        LOCK    - Lock out other processors until finished
+        LODSB   - Lode String Byte (AL)
+        LODSW   - Lode String Word (AX)
+        LOOP    - Loop until CX = 0
+        LOOPE   - Loop with equal (CX >0 and ZF=1)
+        LOOPNE  - Loop with not equal (CX >0 and ZF=0)
+        LOOPNZ  - Loop while CX >0 and ZF=0
+        LOOPZ   - Loop while CX >0 and ZF=1
+ 386+   LSS     - Load SS segment offset of
+        MOV     - Move right operand into left operand
+        MOVB    -    (byte)
+        MOVSB   - Move String Byte
+        MOVSW   - Move String Word
+ 386+   MOVSX   - Move and sign extend
+ 386+   MOVZX   - Move and zero extend
+        MOVW    -    (word)
+        MUL     - Unsigned Multiplication
+        NEG     - Negate (two's complement; multiply by -1)
+        NEGB    -    (byte)
+        NEGW    -    (word)
+        NOP     - No Operation
+        NOT     - Logical NOT (one's complement)
+        NOTB    -    (byte)
+        NOTW    -    (word)
+        OR      - Logical OR
+        ORB     -    (byte)
+        ORW     -    (word)
+        OUT     - Send byte (AL) to port (DX)
+ 186+   OUTSB   - Out String Byte (AL)
+ 186+   OUTSW   - Out String Word (AX)
+        POP     - Pop top of stack into operand; inc SP by 2
+ 186+   POPA    - Pop all general registers (DI SI BP SP BX DX CX AX)
+        POPF    - Pop top of stack int flags reg; inc SP by 2
+        PUSH    - Push operand on to top of stack; dec SP by 2
+                   (push ax  or  push [bx]  or push tempvar)
+ 186+   PUSH    - Push CONST on to top of stack; dec SP by 2
+                   (push 1234h   or   push offset tempstr)
+ 186+   PUSHA   - Push all general registers (AX CX DX BX SP BP SI DI)
+        PUSHF   - Push Flags onto top of stack; dec SP by 2
+        RCL     - Rotate left with carry
+        RCLB    -    (byte)
+        RCLW    -    (word)
+        RCR     - Rotate right with carry
+        RCRB    -    (byte)
+        RCRW    -    (word)
+        REP     - Repeat (used with STOS)
+        REPE    - Repeat while equal (used with STOS)
+        REPNE   - Repeat while not equal (used with STOS)
+        REPNZ   - Repeat while not zero (used with STOS)
+        REPZ    - Repeat while zero (used with STOS)
+        RET     - Return from procedure
+        ROL     - Rotate Left
+        ROLB    -    (byte)
+        ROLW    -    (word)
+        ROR     - Rotate Right
+        RORB    -    (byte)
+        RORW    -    (word)
+        SAHF    - Restore from AH to lower byte of flags
+        SAL     - Shift Left (Adjust) (signed numbers)
+        SALB    -    (byte)
+        SALC    - *Undocumented* opcode (see Appendix 1)
+        SALW    -    (word)
+        SAR     - Shift Right (Adjust) (signed numbers)
+        SARB    -    (byte)
+        SARW    -    (word)
+        SBB     - Arithmetic subtraction with borrow
+        SBBB    -    (byte)
+        SBBW    -    (word)
+        SCASB   - Scan String Byte
+        SCASW   - Scan String Word
+        SEG     - Next Operation uses this operands seg (DS ES CS SS)
+        SHL     - Shift Left
+        SHLB    -    (byte)
+        SHLW    -    (word)
+        SHR     - Shift Right
+        SHRB    -    (byte)
+        SHRW    -    (word)
+        STC     - Set carry flag
+        STD     - Set direction flag
+        STI     - Set interrupt flag
+        STOSB   - Store String Byte
+        STOSW   - Store String Word
+        SUB     - Arithmetic subtraction
+        SUBB    -    (byte)
+        SUBW    -    (word)
+        TEST    - Same as AND but neither operands are changed
+        TESTB   -    (byte)
+        TESTW   -    (word)
+        WAIT    - wait for coprocessor to finish
+        XCHG    - Exchange operands
+        XLAT    - Translate from table (BX=address, AL=offset from 0 (1st))
+        XOR     - Exclusive OR
+        XORB    -    (byte)
+        XORW    -    (word)
+
+
+     - Running NBasm
+         
+        From the DOS prompt, type:
+         
+         NBASM source[.asm,target.(COM|OBJ),parameter list]
+         
+        Items in brackets are optional.
+
+        Parameter list:
+         /a   - align segments in alphabetical order
+         /b   - beep if errors were encountered during assembling
+         /h   - help screen
+         /i{} - include path  (if {} only then start from root dir)
+         /j   - same as the .jumps directive
+         /o   - optimize for size
+         /s   - check syntax only (does not create com/obj file)
+         /x   - Tells NBasm to create a list file
+                (the list file as the .LST extension)
+
+        NBasm makes two passes over your source file, outputting
+        the listing and object code on the second pass.
+
+        NBasm returns an error code in ERRORLEVEL for use in .bat
+        files.  The following codes are returned.
+          00h     - No error Encountered
+          02h     - Error opening file
+          03h     - Invalid path used with /I{} parameter
+          08h     - Not enough memory
+          0Bh     - Invalid command line
+          0Eh     - Need DOS 2.0+  or  an 80186 or higher CPU
+          13h-FEh - error code of last assembler error
+          FFh     - Unknown error
+
+*** Using the Library *************************************************
+B       NBasm includes a library for both the Tiny, and Small Model.
+         -For the Tiny model, the library NBASMC.LIB is included.  It
+          is a library of binary code that NBasm appends parts of it to
+          the end of the .com file when the .external directive is used.
+          For example, the following source would be assembled and
+          then NBasm would include the binary code for 'prtstring'
+          at the end of the .com file from the NBASMC.LIB library file:
+             .external prtstring         ; include the code for prtstring
+             .186                        ; allow 186 instructions
+             .model tiny                 ; create COM file
+             .code                       ; start of code segment
+                push offset msg1         ; use library function (prtstring)
+                call prtstring           ;
+                int  20h                 ; exit to DOS
+
+             msg1    db  'This string gets printed to the screen',0
+
+             .end
+
+          Please see Example #2 at the end of this documentation for another
+           example on the .external directive.
+           (Also see DEMO1.ASM for another example.)
+          Please read the documentation for the library on how to use each
+           procedure included in the library(s).
+
+*Beta*   -For the Small model, the library NBASMO.LIB is included.
+          This part is not finished yet and is not documented until then.
+
+
+*** Optimizer and notes/precautions ***********************************
+
+        NBasm includes an optimizer with different levels:
+          - Level 0:  optimizes for size
+            (as of now, this is the only level of optimizing)
+
+        If you include the /o switch on the command line and/or
+         use the .OPTON/.OPTOF directive, then NBasm will optimize
+         in the following areas:
+
+        ** Optimization #1: ************************* (Level: 0)
+             if      MOV  REG,00
+           then      XOR  REG,REG
+
+          example:
+             if      MOV  DX,00h
+           then      XOR  DX,DX
+
+          notes/precautions:
+           - if you are relying on the flags register from a previous
+             instruction and the optimizer changes the above item, the
+             flags register will be destroyed by the XOR instruction.
+             If you want to use MOV  dest,00h so that the flags won't
+             be affected by the instruction then do the following
+             example:
+
+                 AND  AX,45h          ; want to use flags latter
+                 .OPTOF
+                 MOV  DX,00h          ; MOV doesn't change the flags
+                 .OPTON
+                 JZ   ....            ; use flags from AND above
+
+
+        ** Optimization #2: ************************* (Level: 0)
+             if      CMP  REG,00
+           then      OR   REG,REG
+
+          example:
+             if      CMP  DX,00h
+           then      OR   DX,DX
+
+          notes/precautions:
+           - none
+
+
+        ** Optimization #3/#4: ********************** (Level: 0)
+             if      ADD  REG/MEM,1   or  SUB  REG/MEM,1
+           then      INC  REG/MEM         DEC  REG/MEM
+
+          example:
+             if      ADD  AX,01       or  SUB  AX,01
+           then      INC  AX              DEC  AX
+
+          notes/precautions:
+           - none
+
+
+        ** Optimization #5: ************************* (Level: 0)
+             if      INT  20h
+           then      RET
+
+          notes/precautions:
+           - only works in .Tiny model (.COM files) with out
+              the use of the .start directive.
+
+*** Assembler-time Macros *********************************************
+
+        These macros are assembler time macros.  All macros start with
+         the percent sign (%).  Each macro can have one or more parameters,
+         while some may not.  Some macros may require an ending macro
+         declared as the same macro name but with two percent singes (%%)
+
+        %OUT 1 'text to print'
+         This macro outputs text to the stdout device (screen) when
+          the assembler gets to this location in the source.  Prints
+          what is on this line only, and requires no ending macro name.
+         The pass number can be 1 or 2. If anything else, doesn't print.
+         'text to print' must be any assembler compatible string and
+         NBasm prints this string to the stdout (screen).
+
+
+
+
+*** Difference Between Other Assemblers *******************************
+
+  Here I will try to explain the differences between NBASM and
+   some other assemblers and how to modify your source code to
+   work with NBASM.
+  While maybe some of the following assemblers support them, NBASM
+   does not support the following (yet?):
+B    - macros
+B    - structures
+B    - 80x87 instructions
+B    - model other than tiny
+B    - conditional assembly (IF,THEN,ELSE)
+
+  MASM 5.1x  (Microsoft)
+   There are little differences between NBASM and MASM 5.1x (further
+    known as MASM).  I have tried to make NBASM as close to MASM as
+    I could and still satisfy my wants.  If you use the newer/easier
+    segment directives of MASM, you will have to change your source
+    very little to assemble on NBASM.  NBASM does not support the
+    .DATA?, .FARDATA, & .FARDATA? segment directives.  NBASM has the
+    segment directive DOSEG for MASM's .DOSSEG directive.
+                MASM                       NBASM
+     -   end   label                 .end  label
+     -   repx  movsx                 repx
+                                     movsx
+     -   count dup(value)            dup count,val
+     - more when I find them
+
+  TASM (Borland (Inprise))
+    I have not used this assembler.  However, I have heard that this
+     assembler has a directive to make it 'act' like MASM.
+
+  NASM (NetWide Assembler)
+    I have not used NASM.  I am planning to look at it though.
+
+  CHASM 4.1x (David Whitman)
+    NBASM is similar to CHASM 4.1x.  However, NBASM uses segment
+     directives, the .model directive, and some other advanced
+     features.  There are a few modifications to CHASM besides the
+     segment directives to make your source assemble with NBASM.
+                CHASM                      NBASM
+     -   mov  bx,offset(symbol)      mov  bx,offset symbol
+     -   symbol  ds  10,0            symbol dup 10,0
+     -   SHx reg/ROx reg             SHx reg,1/ROx reg,1
+     -   label                       label:
+     - more when I find them
+
+     NBASM also wants the .end directive at the end of your source.
+
+
+*** Errors ************************************************************
+
+  NBasm will return any errors to the screen in the following format:
+
+filename.[asm|inc](line number):  error number:  short description
+
+       Symbol space free:  amount of byte(s) free
+       Error(s) detected:  number of errors
+   Diagnostic(s) offered:  number of 'D' errors
+
+
+  filename.asm is the source file that NBasm found the error.  This is
+    usually the initial source file.  However, if you have included files,
+    this could be one of the include filenames.
+  (linenumber) is the line number of the 'filename.asm' that NBasm found
+    the error.
+  error number is the number of the error found.
+  short description is just that.
+  Symbol space free will display the amount of bytes left in the symbol
+    table.
+  Error(s) detected is the number of critical errors
+  Diagnostic(s) offered is the number of items that could be changed to
+    make the source 'better'.  Most of the time it will say things like:
+      'Use short jmp'                    - use short rather than long
+      'Specify word or byte operation'   - use a type specifier
+  See Running NBasm for errors returned in ERRORLEVEL
+
+***********************************************************************
+
+     DISCLAIMER:  NBasm is distributed as is...
+       If NBasm destroys your computer, kills you or your family,
+       or any other thinkable and unthinkable thing, I take no
+       responsibility.  USE AT YOUR OWN RISK...
+
+     The software package is distributed as freeware.  No fee except
+     for small copying fees can be charged.  There is no fee for any
+     executable file produced with this package as long as this
+     executable file is for non-commercial use.  If you use this
+     package for commercial use, a small users fee is required.
+
+     However, as an incentive to continue the whole NewBasic package,
+     a donation in US currency would be very helpful.
+
+
+     SYSTEM REQUIREMENTS:
+       The system requirements to use NBasm is as follows:
+        - a 186 or better Intel based system
+        - MS DOS 2.0 or better.
+        - a CGA or better monitor ( Monochrome should be fine too. :) )
+        - a disk drive with a minimum of 64k of free disk space
+            (is that all?) plus room for the .COM and .LST file(s).
+        - Memory: a minimum of 200k plus the following:
+           - the size of the source file (up to 64k more)
+           - the size of the included file(s) used (up to 64k more each)
+        - a Keyboard   ( Duuhh! =:o) )
+        - a printer capable of text printing (for hard-copies right?)
+
+     SOFTWARE REQUIREMENTS:
+       - as stated above, DOS 2.0 or better
+           (NBasm works in a Windoze DOS session just fine)
+       - some sort of viewer to view this document.  (But you are
+          reading this right now, so you got at least that much, right?)
+       - a similar editor to create DOS ascii text files.  (EDIT.COM|EXE)
+       - PKUNZIP/WINZIP to unzip the zip file.  Again, you are reading
+          this file, so you must have one of these :0)
+
+     BUG REPORT:
+       Being that this is a beta version, there are bound to be
+        bugs in it.  Please report bugs to:
+
+        blunt@zekes.com
+        http://www.zekes.com/~blunt/newbasic.html
+
+     KNOWN BUGS:
+      - need to fix the .obj 'overhead'
+      - pushs/pops FS and GS wrong
+      - The use of the .start directive and equ buffers
+      - if USES on proc line, doesn't work with RETF, or IRET
+
+
+*****************************************************************
+Examples:
+(See the included DEMO1.ASM file for another example)
+
+-- Example #1: ------------------------------------------------------
+     ; this example shows the use of the '@LABEL' directive.
+     .Model tiny
+     .code
+           mov  ah,09                ; print string
+           mov  dx,offset @label     ; use 'unique' name
+           int  21h
+           mov  ah,09                ; print string once more
+           mov  dx,offset @label     ; use same 'unique' name
+           int  21h
+           jmp  short SkipData
+
+@label     db  'Both of the @label above points to this place (1)',36
+
+SkipData   mov  ah,09                ; print string again
+           mov  dx,offset @label     ; use same 'unique' name
+           int  21h
+           int  20h                  ; exit
+
+@label     db  'The above @label points to this place (2)',36
+.end
+
+-- Example #2: ------------------------------------------------------
+.external prthex, prtstring ; include the code for prthex and prtstring
+.186                        ; allow 186 instructions
+.model tiny                 ; create COM file
+.code                       ; start of code segment
+           push offset msg1         ; use library function (prtstring)
+           call prtstring           ;
+           mov  ax,offset msg2      ; use library function (prtstring)
+           push ax                  ;
+           call prtstring           ;
+           push 1234h               ; put 1234h on the stack
+           call prthex              ; and print it as hex
+           mov  dl,'h'              ; print the trailing 'h'
+           mov  ah,02               ;
+           int  21h                 ;
+           int  20h                 ; exit to DOS
+
+msg1    db  13,10,'This is an example of the .external directive',0
+msg2    db  13,10,"For this example we use the 'prtstring' and 'prthex' routines"
+        db  13,10,'We will print the value 1234h here: ',0
+
+.end
+
+*****************************************************************
+Appendix 1 - Undocumented instructions supported by NBasm
+
+** SALC **
+   Instruction:  SALC  (accepts no arguments)
+          Name:  "Set AL to Carry"
+ Min Processor:  .8086
+Flags modified:  none
+
+This instruction sets AL to 0FFh if the Carry Flag is set (CF=1),
+or clears AL (00h) if the Carry Flag is clear (CF=0).

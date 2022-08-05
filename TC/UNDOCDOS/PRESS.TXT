@@ -1,0 +1,94 @@
+                              NewBasic++ v1.00
+                          Forever Young Software (r)
+                            (C)opyright 1984-1999
+                                 11 Dec 1998
+
+
+Please see REMARKS below.
+
+NewBasic++ is a package for the beginner wanting to learn Basic and Assembly
+as well as the advanced programmer interested in programming Basic and
+Assembly in one intergraded environment.
+
+INTERPRETER:
+NewBasic++ package includes a Graphic User Interface (GUI) for the
+interpreter.  It allows the user to enter the program and run it within
+the GUI without having to exit the interpreter and taking all the steps to
+compile the source until there is no more errors.  The display for the
+GUI is changeable for better viewing and less eye strain.  You can change
+the background color (paper color), the menu color(s), and the text of
+the current document.  You can also make the comments, the NewBasic commands,
+the NewBasic++ commands, and the rest of the code different colors to match
+your tastes.
+
+The NewBasic++ GUI interpreter will display the line of the current error,
+allow the user to fix the error and, if able, to continue the program from
+that point.  If it is not able to continue, it will start from the beginning.
+It is also equipped with a lot of utilities to debug your program.  A 'jump
+to next line to execute' command; a 'jump to previous line executed'; a
+variable 'status'; a calculator, with DEC, HEX, OCT, and BIN conversions; and
+also contains an inline help interface.
+
+The NewBasic++ GUI interpreter will also allow inline assembly.  This inline
+assembler is not a detailed or involved assembler, but allows the programmer
+to do simple assembler programming as well as most DOS and BIOS interrupts.
+
+ASSEMBLER:
+The reason for the lacking of full capabilities for the inline assembler is
+that the NewBasic++ package contains a full capability, separate assembler
+package capable of creating OBJ and COM files.  The assembler takes an ascii
+text file as source input and creates a COM file (if applicable) as default,
+or, if specified, will create a Microsoft compatible OBJ file, ready for the
+linking process.
+
+COMPILER:
+The compiler is included to compiler your NewBasic++ source code from the
+command line.  The compiler takes an ascii text file for source input and
+creates an assembler source file ready for the assemler above.
+
+LINKER:
+The NewBasic++ package also includes a linker to link a compiled or assembled
+OBJ file to an EXE file.  The linker is a Microsoft compatible linker.
+
+THE LIBRARIES:
+The NewBasic++ package contains libraries that are/may be necessary for the
+linker to create the EXE files.  The libraries are listed below.
+  NBCOM10.LIB - is the basic command library for the compiler.
+  NBCPP10.LIB - is the basic++ command library for the compiler.
+  MOUSE.LIB   - a mouse library fully capable of all mouse functions
+  MATH.LIB    - a math library which includes the x87 coprocessor instr.s
+
+
+THE FILE UTILITIES:
+The NewBasic++ package also includes a few file and memory utilities.
+  EXE2COM - will test and convert an EXE file to a COM file.
+ SHRNKEXE - will shrink an EXE files header by up to 512-28 bytes
+  MEMORY  - will display Memory Control Blocks (MCB's) to allow you
+             to view the memory used by your program and others.
+
+
+REMARKS:  The NewBasic++ package is not completed at this time.  
+Once the whole package is finished it will contain all files and
+utilities listed and be released as a registered version.
+
+Any questions, comments, or suggestions may be sent to me via the addresses
+listed below.  The first released beta version will be announced and posted
+on  http://www.zekes.com/~blunt/newbasic.html, with any bug fixes/patches
+posted thereafter on the same place.  Thank you for your interest in
+NewBasic++.  Any feedback will be welcome.
+
+Forever Young Software:
+  http://www.zekes.com/~blunt/index.html
+  email: blunt@zekes.com
+
+  snail-mail:
+    Forever Young Software
+    %Benjamin David Lunt
+    PO Box 1562
+    Thatcher, AZ  85552
+
+
+Microsoft is not in any way associated with NewBasic++ and may be reserved as
+a trademark.  Forever Young Software is owned by Benjamin David Lunt (CEO).
+                            All rights reserved.
+                                 1984-1999

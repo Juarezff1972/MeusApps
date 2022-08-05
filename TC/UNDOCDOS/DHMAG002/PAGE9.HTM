@@ -1,0 +1,158 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 9</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page8.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page10.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">Assembler</font></h1>
+<hr>
+
+</td>
+</table>
+<br clear=left>
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="4%"></td>
+
+<p align=left><font color="black" size=3>
+
+<td width="48%" valign=top>
+<br>
+<! - ******************************************** column one starts here >
+In this issue, I will explain the technique of the two executable formats that we can write our assembler programs for; the .COM file and the .EXE file.<br>
+<br>
+First, let us look at the .COM file format.  In this format we have to put all our code, data, and stack in one segment, the code segment.  Also, this segment can not be larger than 64k.  If we are going to write small and simple to moderate programs, this type of technique is preferred.<br>
+<br>
+When DOS loads a .COM file, it places the PSP at offset 00h.  This PSP is 100h (256) bytes in length.  Therefore, DOS places your program as a mirror image of the file at offset 100h.  With this, all data is referenced from the beginning of the PSP.  To see more on the PSP, see <a href="page4.htm">Page 4</a> of this issue.<br>
+<br>
+Since we have to have all of our code, data, and stack in the same segment, we can place any of these in any order we want.  However, the way I like to do it is place the code first, the data second, and the stack last.<br>
+<br>
+The following source code is a general setup assembler file ready for assembly.<br>
+<pre>.model tiny
+.code
+
+; code goes here
+
+            ret
+
+; data goes here
+
+.end</pre>
+<br>
+Notice that once this source is assembled, it will be a one byte .COM file and when ran, will only return to DOS.  However, this is the simple makeup of a .COM file.  As long as we don't move the stack anywhere, or we make sure that SP = 0FFFEh at the end of our code, we can use RET to exit to DOS.  However, if we do use the stack and do not leave it "clean" after use, we will have to use a different way to exit to DOS.  INT 20h or MOV AH,4Ch/INT 21h will work fine.<br>
+<br>
+Since DOS allocates all available memory for our program, we can not allocate any for ourself unless we resize the memory that DOS gave us at startup.  NBASM includes a directive that will resize the memory block to the size of our code, data, and stack together and then point the stack to the end of this block.  (Remember, the stack is used from top-down):<br>
+<pre>.model tiny
+.code
+            .START
+
+; code goes here
+
+            ret
+
+; data goes here
+
+.end</pre>
+<br>
+This will create a small .COM file that will resize the memory block used by our program. However, if your assembler does not have a directive like this you will have to code this in by hand.  The following code will resize our memory block to 64k:<br>
+<pre>.model tiny
+.code
+
+            push ax
+            push bx
+            push cx
+            mov  ah,48h      ; resize memory block
+            mov  bx,4096     ; 4096 paragraphs
+            int  21h         ; ES already points to block
+            pop  cx
+            pop  bx
+            pop  ax
+
+; code goes here
+
+            ret
+
+; data goes here
+
+.end</pre>
+<br>
+</td>
+
+<td width="48%" valign=top>
+<br>
+<! - ******************************************** column two starts here >
+
+If you wanted to, you could find the length of your code, data, and stack, and rather than leaving 64k of memory used, resize to the size found.  Then point SP to the last word in this memory block.  This is what the NBASM does with the .START directive in a .COM file.  Remember that you can not use the RET instruction to exit to DOS when you do this.<br>
+<br>
+Now on to the .EXE make up of an assembler file.  When DOS loads an .EXE file, is allocates all available memory just like the .COM file.  However, DOS now places the CODE in to a segment just after the PSP, and points CS:IP to this position.  Then places the DATA in to a segment and points ES and DS to this position.  Then points SS:SP to different place.<br>
+<br>
+Now your code uses DS:0000 as the pointer to the first data position rather than DS:0100h like in the .COM file.  Also, with the .EXE file format, you can have a full 64k of memory for each CODE, DATA, and STACK segment.  (In protected mode, you can even have more, but we won't even get in to that here).<br>
+<br>
+For an .EXE file, I like to setup the STACK, then DATA, and then the CODE.  Again, we could use the .START directive to setup our stack pointers and resize the memory block, but for learning, we will do it by hand.<br>
+<br>
+The general setup of an .EXE assembler source file:<br>
+<pre>.model small
+.stack 4096
+.data
+
+; data goes here
+
+.code
+
+           mov  ax,@data     ; @DATA points to DS
+           mov  ds,ax        ; point ds to data
+           mov  bx,4096*2    ; resize to 2 segments
+           mov  ah,4Ah       ; (code & data)
+           int  21h          ;
+           mov  ah,48h       ; allocate 4k 
+           mov  bx,256       ; 
+           int  21h          ;
+           mov  ss,ax        ; point ss to it
+           mov  sp,4096      ; point sp to top
+           push ds           ; point es = ds
+           pop  es           ;
+
+
+; code goes here
+
+
+           mov  ah,4Ch
+           int  21h
+.end
+</pre>
+<br>
+The assembler now creates an .OBJ file suitable for the linker to create an .EXE file.
+<font color="blue">&#165;</font><br>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page8.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page10.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 9
+
+</BODY>
+</HTML>

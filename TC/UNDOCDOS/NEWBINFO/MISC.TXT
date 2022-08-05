@@ -1,0 +1,103 @@
+Misc info. Includes:
+   Bit Operators (and, or, xor)
+   Screen memory locations and sizes
+   Register values on entry to program
+
+Benjamin David Lunt
+by Forever Young Software
+(C)opyright 1984-1998
+Revised: 19 Dec 1998
+
+
+Bit Operators (and, or, xor)
+-------------------------------------------------------------------
+ The AND operator.
+  If a 1 is ANDed with a 0 then becomes 0.
+  If a 0 is ANDed with a 1 then nothing changes.
+  If a 1 is ANDed with a 1 then nothing changes.
+  If a 0 is ANDed with a 0 then nothing changes.
+
+       10100110
+  and  00111011
+       --------
+       00100010
+
+ The OR operator.
+  If a 1 is ORed with a 0 then nothing changes.
+  If a 0 is ORed with a 1 then becomes a 1.
+  If a 0 is ORed with a 0 then nothing changes.
+  If a 1 is ORed with a 1 then nothing changes.
+
+       10100110
+   or  00111011
+       --------
+       10111111
+
+ The XOR operator.
+  If a 1 is XORed with a 0 then nothing changes.
+  If a 0 is XORed with a 1 then nothing changes.
+  If a 0 is XORed with a 0 then becomes a 0.
+  If a 1 is XORed with a 1 then becomes a 0.
+
+       10100110
+  xor  00111011
+       --------
+       10011101
+
+
+Screen memory locations and sizes
+-------------------------------------------------------------------
+ Screen    Starting address (Hex)  Memory Used     Systems
+  0h,1h     0B800h                    2000 (bytes)   C, E, MC, V, SV*
+  2h,3h     0B800h                    4000           C, E, MC, V, SV
+  4h,5h     0B800h                   16000           C, E, MC, V, SV
+  6h        0B800h                   16000           C, E, MC, V, SV
+  7h        0B000h                    4000           MD, E, V, SV
+  0Dh       0A000h                   32000           E, V, SV
+  0Eh       0A000h                   64000           E, V, SV
+  0Fh       0A000h                   56000           E, V, SV
+  10h       0A000h                  112000           E, V, SV
+  11h       0A000h                   38400           MC, V, SV
+  12h       0A000h                  153600           V, SV
+  13h       0A000h                   64000           MC, V, SV
+
+ *(C=CGA, E=EGA, MC=MCGA, MD=MDA, V=VGA, SV=SVGA)
+
+
+Register values on entry to program
+-------------------------------------------------------------------
+These are the register values for EXE files on entry:  (not always)
+  AX     contains number of characters in command tail, or 0 (EXE only)
+  BX:CX  32 bit value indicating the load module memory size (EXE only)
+  DX     zero (CS in COM)
+  SS:SP  set to SS.  If not defined, SS=CS and SP=0FFFFh or top of mem block
+  DS     set to segment address of EXE hdr (COM  DS = CS)
+  ES     set to segment address of EXE hdr (COM  ES = CS)
+  CS:IP  far address of program entry point
+
+These are the register values for COM files on entry:
+  AX,BX         0000h
+  CX            00FFh
+  DX,SS,DS,ES   CS
+  SP,DI         FFFEh
+  SI,IP         0100h
+  CS            current code segment
+  BP            09xxh  (lower is unknown) (???)
+  drctn flag    0 (or forward)
+  zero flag     0
+  carry flag    0
+
+
+Quick Reference:
+-to the File Attribute bits
+-to the Bit Format of each Hex digit
+-------------------------------------------------------------------
+File attribute bits:            Hex nums & their bit reps
+  76543210   Meaning              0 - 0000    8 - 1000
+  .......1    Read-only           1 - 0001    9 - 1001
+  ......1.    Hidden              2 - 0010    A - 1010
+  .....1..    System              3 - 0011    B - 1011
+  ....1...    Volume label        4 - 0100    C - 1100
+  ...1....    Subdirectory        5 - 0101    D - 1101
+  ..1.....    Archive             6 - 0110    E - 1110
+  XX......    unused              7 - 0111    F - 1111

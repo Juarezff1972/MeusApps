@@ -1,0 +1,79 @@
+<HTML>
+<HEAD>
+<TITLE>Joystick programming.  Forever Young Software</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H2>Joystick Programming</H2>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+The following is a little bit of information that will help you program the game port (Joystick).  It shows how to access both joysticks.<br>
+<br>
+The Joystick is accessed through Port 201h<br>
+<br>
+Bit 0 - joystick 1, x coord (0 - timing is active)<br>
+Bit 1 - joystick 1, y coord (0 - timing is active)<br>
+Bit 2 - joystick 2, x coord (0 - timing is active)<br>
+Bit 3 - joystick 2, y coord (0 - timing is active)<br>
+Bit 4 - joystick 1, button 1 (0 - pressed)<br>
+Bit 5 - joystick 1, button 2 (0 - pressed)<br>
+Bit 6 - joystick 2, button 1 (0 - pressed)<br>
+Bit 7 - joystick 2, button 2 (0 - pressed)<br>
+<br>
+Bits 3-0 are resistive inputs with the length of the pulse determined by 0-100k ohm resistive load.<br>
+<br>
+Use the formula:<br>
+  time = 24.2µ + (0.011µ * resistance)<br>
+or<br>
+  resistance = (time -24.2) / 0.011<br>
+<br>
+A read should be immediately preceded by a write (any data) to start timing for the resistive values.<br>
+<br>
+This info was taken out of <b>HELPPC 2.10</b> by David Hurgens.  See my
+<A HREF="links.htm"><font size=2>Links</font></A> page to download it from a Simtel mirror.<br>
+<br>
+<b>Now that you know how to do it the hard way</b>, lets let the BIOS do the hard part and just do a BIOS interrupt call using the registers.<br>
+<br>
+Using service 84h of Interrupt 15h we can get the status of two (2) joysticks and their button status from the game port.<br>
+By calling this service with DX=0, the BIOS will return the four (4) buttons' status in bits 7-4 of AL.<br>
+Bit 4 is Switch 1 of Joystick 1 (1 if pressed)<br>
+Bit 5 is Switch 2 of Joystick 1 (1 if pressed)<br>
+Bit 6 is Switch 1 of Joystick 2 (1 if pressed)<br>
+Bit 7 is Switch 2 of Joystick 2 (1 if pressed)<br>
+<br>
+By calling this service with DX=1, the BIOS will return the two (2) positional coordinates of each joystick in the registers AX, BX, CX, and DX.<br>
+AX = x-coord. of Joystick 1<br>
+BX = y-coord. of Joystick 1<br>
+CX = x-coord. of Joystick 2<br>
+DX = y-coord. of Joystick 2<br>
+<br>
+These coords. are not like the mouse drivers coords. as you might think so.  These are exponential operations rather than linear operation.  The best think to do is at program startup, ask the user to put the joystick in the center position and press one of the buttons to acknowledge, then have the user put the joystick in the TOP-LEFT most position and then the BOTTOM-RIGHT most position to find the range of the joystick.<br>
+<br>
+If you want to find the position of the joystick, take the value it is now and check it against the value that was returned when the joystick was put in the center position at startup.<br>
+<br>
+This service is not supported by all BIOS, so make sure that your BIOS supports this service before you rely on it.<br>
+<br>
+You can check by calling this service with DX=1 and checking the carry flag.  If the carry flag is not 0 then there is an error and your BIOS does not support this function.<br>
+Also see <a href="gameport.htm"><font size=2>Detecting the Gameport</font></a> on this site for another way of detecting the game port.<br>
+<br>
+<b>Something to think about:</b><br>
+If you connect a device to the gameport that uses resistance just like the joystick, then you can communicate through a home-made device through this port.<br>
+Also note that if you want to communicate with a device that only has two switches that can  be either on or off, you can also use this port by using the correct pins on the cable.  (make the BIOS think that the switches resemble the switches on the joysticks)<br>
+<br>
+<br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

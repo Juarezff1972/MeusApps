@@ -1,0 +1,184 @@
+This is the first step of the game tutorial by Forever Young Software.
+I can be reached at blunt@zekes.com
+(Previous) and future steps can be seen from http://www.zekes.com/~blunt
+
+Let us begin.
+We will create a small game using C and assembler.  We will be using
+screen 13h (320x200) with 256 colors.  We will create a PAC-MAN like game.
+
+To do this we will create a small GAME ENGINE that will read a text 'level'
+data file for each level of play.  This text file will contain a grid
+of walls and walkways as well as where the ghosts and goodies are at start
+of the level.  This grid file can be modified fairly easy by most ascii
+text editors.  Once this grid file is loaded into memory, the game engine
+will make some calculations, set up the stats, and then display the
+screen ready for play.
+
+Lets get started on the grid file.
+As with PAC-MAN, the grid contains walls, walkways, PAC-MAN himself, ghosts,
+and other items.  We will define a 'code' to each of these items.  We could
+define each item an ascii char of 0 through 255 but this would be a little
+difficult to enter into the grid file so we will use 'a'-'z'.  This gives
+us 26 different items with the capabilites of further using 'A'-'Z' for 26
+more items with a little bit of added code to the game engine.
+
+For now, I have included one game grid.  *(See SCRN00.DAT)*
+I use 'a'-'z' for each item.
+  a - a clear walkway
+  b - vertical wall
+  c - horz wall
+  d - lower left corner
+  e - upper left corner
+  f - upper right corner
+  g - lower right corner
+  h - horzontal to right joint
+  i - right joint to horzontal
+  j - vertical to horzontal joint
+  k - horzontal joint to vertical
+  l - cross
+  m - block
+  n - right stop
+  o - left stop
+  p - up stop
+  q - down stop
+  r - 'pill'
+  s - undefined as of now
+  t - undefined as of now
+  u - undefined as of now
+  v - undefined as of now
+  w - undefined as of now
+  x - undefined as of now
+  y - ghost
+  z - burfman
+
+Using the above codes, lets create a 32 x 20 grid.  This way, each item
+will take up a 10x10 box of pixels.  I created on called SCRN00.DAT.
+
+Now that we have this grid, the first level (minus the 'moving' items)
+is finished.  Once the game engine is complete, we can enter as many
+levels as we want, with the ease of entering these item codes into
+a text file.
+
+*Note: for future steps, we will create the engine to look for files
+named SCRNn.DAT starting with n = 0 and going to 99.  That is why I named
+the grid this file name.  If you create a grid file different than mine,
+make sure to name it SCRN00.DAT.
+
+
+Now that we have a grid to display, we need to create the code to display
+the grid.  This is part of the game engine.
+
+But first let us initialize the screen.  We could use the graphic routines
+included in the GRAPHICS.LIB library using GRAPH.H, but they add a lot
+of code two our executable.  Also, if we use our own assembler routines,
+we can make the graphics display very fast.  In this step you won't
+notice a difference, but in future steps when we need alot of items to
+move, our assembler routines will be needed for clean graphics.
+
+We set the screen to screen 13h (320 x 200) with 256 colors.
+(Please note that I use Quick C 2.5 with the inline assembler)
+
+ _asm {
+   mov  ax,0013h
+   int  10h
+ }
+
+
+We can now open the file (scrn00.dat) and load in the 20 lines of data.
+Then we can put this data into our grid buffer.
+
+	FILE *fp;
+					 int  i,j;
+	unsigned char dat_file[] = "SCRN00.DAT";
+  unsigned char scrn_grid[21][33];
+
+	// open, read in the grid, and close the file
+	if((fp = fopen(dat_file,"rb"))==NULL) {
+		printf("\nError opening file");
+		return(1);
+	}
+	for (i=1;i<=20;i++) {
+		for (j=1;j<=32;j++)
+			scrn_grid[i][j] = fgetc(fp) - 97;
+    fgetc(fp);  // skip CR LF
+    fgetc(fp);  //
+	}
+	fclose(fp);
+
+Notice that we read two extra chars at the end of each line.  This is to skip
+the CR and LF chars that most editors add to the end of each line.
+
+Now let display the grid.
+From the game engine we display all items:
+
+  for(i=1;i<=20;i++)
+		for(j=1;j<=32;j++)
+			display_item(scrn_grid[i][j],j-1,i-1);
+
+In the SCREEN.C source file, you will see that I have a fast assembler
+routine that displays a 10x10 block of pixels at a given pos.
+
+    void display_item(int item_num, int x, int y)
+    {
+      unsigned int  postn, temp;
+    
+      y *= 10;
+      x *= 10;
+      postn = y * 320 + x;
+      temp = item_num * 100;
+    
+      _asm {
+        push ds
+        push es
+        push si
+        push di
+        mov  ax,0A000h
+        mov  es,ax
+        mov  si,offset itembitmap
+        add  si,temp
+        mov  di,postn
+        mov  ax,seg itembitmap
+        mov  ds,ax
+        mov  cx,10
+    loop1:
+        push cx
+        mov  cx,05
+        rep  movsw
+        add  di,310
+        pop  cx
+        loop loop1
+        pop  di
+        pop  si
+        pop  es
+        pop  ds
+      }
+    }
+
+We use movsw rather than movsb.  If we know that we will access data on
+word bounderies, we can access a word of data one access at a time.  If
+the word doesn't fall on a word boundery, the CPU accesses the data twice.
+Getting the word before and the word after.  ie:
+
+If our word is on a word boundry, the CPU accesses it once:
+offset        0000h            0001h         0002h            0003h
+bits  FEDCBA9876543210|FEDCBA9876543210|FEDCBA9876543210|FEDCBA9876543210
+      0000000011111111 0000000011111111 0000000011111111 0000000011111111
+
+If we want to access the word at offset 0000h, the CPU will access it once
+returning 0F0Fh.
+
+If we want to access the word at offset 0001h, the CPU has to access the
+word at offset 0000h, getting the word 0F0Fh and saving the lower byte.
+Then it accesses the word at 0002h and saving the hi byte.  Then it
+combines the two and returns the word.
+
+Notice it took alot longer to get the word at an odd offset than at an even
+offset.
+
+Now we have the board displayed.  Not much, but if you change SCRN00.DAT, you
+don't have to re-write any code.  Make a backup of SCRN00.DAT and then try it.
+Move some of the walls.  I told ya.  Now make sure you restore SCRN00.DAT to
+it's original state.
+
+Now what?  Well we need to add movement for Burfman.  So we need to add some
+code to make him move when we enter a direction on the keyboard.

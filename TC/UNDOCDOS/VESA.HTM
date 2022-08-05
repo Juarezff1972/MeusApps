@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<TITLE>Checking for VESA compatible system.   Source code included.</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<H2>Checking for VESA compatible system</H2>
+<br>
+<p align=left><font color=black size=2 face="Comic Sans MS">
+call INT 10h service 4Fh (subservice 00h?)<br>
+<br>
+INT 10h - VESA SuperVGA BIOS - GET SuperVGA INFORMATION<br>
+On Entry:<br>
+- AX = 4F00h<br>
+- ES:DI -> 256-byte buffer for SuperVGA information<br>
+On Return:<br>
+- AL = 4Fh function supported<br>
+- AH = status<br>
+- - 00h successful<br>
+- - 01h failed<br>
+- - 02h (VBE 2) function not supported by current hardware config<br>
+- - 03h (VBE 2) function invalid in current mode<br>
+<br>
+<br>
+This code was assembled with <a href="newbasic.htm">NBASM 00.23.xx.</a><br>
+<br>
+<pre><font size=2>
+.model tiny
+.code
+	org	100h
+	mov	ax,cs		; free unused part of Mem Block
+	mov	es,ax		;   for .COM file format
+	mov	bx,4096		;
+	mov	ah,4Ah		;
+	int	21h		;
+
+	mov	ax,4F00h	; Service 4Fh of INT 10h
+	mov	di,offset Buff	;  returns info (need place for it)
+	int	10h		;
+	cmp	al,4Fh		; if al = 4Fh then success
+	je	short IsSup	;
+	mov	dx,offset NotSupS ; else fail.
+	mov	ah,09		;
+	int	21h		;
+	jmp	short Done	;
+IsSup:	push	ax		; save RC
+	mov	dx,offset SupS	;
+	mov	ah,09		;
+	int	21h		;
+	pop	ax		; restore RC
+	mov	dx,offset SuccS	; assume Successful
+	xor	ah,ah		; completely successful??
+	jz	short PrntIt	;
+	mov	dx,offset FailS	; Failed
+PrntIt:	push	ax		; save RC
+	mov	ah,09		;
+	int	21h		;
+	pop	ax		; restore RC
+	xor	ah,ah		; if success then DONE
+	jz	short Done	;
+	mov	dx,offset FailS1 ; Assume hardware
+	cmp	ah,02		;
+	je	short PrntIt1	;
+	mov	dx,offset FailS2 ; video mode
+PrntIt1:	mov	ah,09	;
+	int	21h		;
+Done:	int	20h		; exit to DOS
+
+NotSupS	db  13,10,'This system does not support VESA comp. video',36
+SupS	db  13,10,'This system supports VESA copm. video'	
+	db  13,10,'  status: ',36
+SuccS	db  'OK',36
+FailS	db  'Failed',36
+FailS1	db  '  Function not supported by current hardware config.',36
+FailS2	db  '  Function invalid in current mode',36
+Buff:
+
+.end
+</font></pre>
+<br>
+<br>
+<font face="" size=3>
+<pre>
+<b>The contents of the buffer:</b>
+Offset   Size     Description
+ 00h    DWORD       Signature ('VESA'). For VBE 2.0 this field must be set to
+                      "VBE2" before the call to fill in the version 2.0 fields
+ 04h    WORD        VESA version number
+ 06h    DWORD       Pointer to OEM name
+ 0Ah    DWORD       Capabilities.
+                      Bit  0  Set if the DAC can switch width, clear if it is
+                               fixed 6 bits per primary color
+                           1  (VBE2) non-VGA controller
+                           2  (VBE2) Programmed DAC with blank bit
+ 0Eh    DWORD       Pointer to list of supported VESA and OEM video modes
+                      Terminated with 0FFFFh.
+ 12h    WORD        Video memory in 64k blocks
+ 14h    WORD      OEM software version                 *VBE v2.0*
+ 16h    DWORD     Pointer to vendor name               *VBE v2.0*
+ 1Ah    DWORD     Pointer to product name              *VBE v2.0*
+ 1Eh    DWORD     Pointer to product revision string   *VBE v2.0*
+100h  256 bytes   OEM scratchpad
+The buffer is defined as 256 bytes for version 1.0 & 1.2, 262 bytes for 
+version 1.1 and 512 bytes for version 2.0. Note: Some VESA drivers have been 
+known to write beyond the end of the official buffer.
+(Clipped from Ralph Browns Interrupt List)
+</pre>
+</font>
+<br>
+Thanks to <a HREF="mailto:jimmy_chin@hotmail.com">Jimmy Chin</a> for this info.
+<br><br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

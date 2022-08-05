@@ -1,0 +1,246 @@
+This is a tutorial on programming in DEBUG.  It describes how to make a 
+small simple directory listing.  This text assumes that you know how to 
+program with assembly and therefore does not try to teach assembly.
+
+Print this file and the open a new text document and name it DR.ASM.  When 
+prompted, add the lines of code given and when complete save the file and 
+use the following line at the command prompt to assemble it to DR.COM:  
+
+DEBUG < DR.ASM
+
+You should have a file called DR.COM with a length of 595 byte when DEBUG 
+returns to DOS.  I have included the full source script file for DR.ASM.  It 
+is name DR.SCR.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+We first start by discussing what a COM file is.  A COM file is an 
+executable file the DOS loads and executes.  DOS first creates an 100h byte 
+length PSP (Program Segment Prefix) and then loads the COM file just after 
+this PSP and starts executing at the first byte in the file or at offset 
+100h in the segment.  DOS sets CS DS ES and SS to point to this segment.
+
+We can write the assembler code directly in DEBUG or we can write a script 
+file and enter it in DEBUG using DOS' redirection.  We write a script file
+in this tutorial.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+To get started with a script file must start with the following line as the 
+first line in our script file:
+
+n dr.com
+
+This line tells DEBUG to name the COM file DR.COM.  If you don't name the 
+file, DEBUG can not create it.  Next we must tell DEBUG to start assembling.  
+Being that most COM files will start execution just after the PSP we tell 
+DEBUG to start at offset 100h with the following line (enter this line in 
+DR.ASM):
+
+a 100
+
+Once have told DEBUG to start assembling, we can enter code as well as 
+comments with the usual semicolon.  The full source listing has four line of 
+comment at this point.  You don't have to list these lines.
+
+Next we must tell the assembler to skip the next few lines of code because 
+they are data lines, not actual executable code.  To tell DEBUG to skip our 
+data we must first know how many bytes of data will be needed.  Once we know 
+this amount we add 100h to it and enter the following line:
+
+jmp 01ED
+
+Notice that I did not put an 'h' on the end of it.  DEBUG assumes that all 
+numbers are hexadecimal.  Next we can enter our data.  We can enter data 
+just like must other assemblers with the 'DB' and 'DW' codes.  We could 
+enter the exact values with the 'e' code but for easier viewing and editing 
+we will let DEBUG change them for us.  Enter the following 13 lines of code:
+
+db 0D,0A,'DR.COM v1.00'
+db 0D,0A,'A simple directory lister to show how to program in DEBUG'
+db 0D,0A,'(c)opyright 1997   Forever Young Software'
+db 0D,0A,0A,'$'
+db 0D,0A,'Current Directory:   '
+db 0
+db ':\'
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+db 0D,0A,'$'
+db '*.*',0
+db 'An error occured$'
+
+Next we can enter our first executable code.  We first want to print our 
+'greetings' header:
+
+mov  ah,09                  ; print our header text
+mov  dx,0103                ;
+int  21                     ;
+
+Next we want to get the current drive letter:
+
+mov  ah,19                  ; get current drive letter
+int  21                     ;
+
+And add 41h to it so that we can print it as 'A', 'B', 'C', etc.:
+
+add  al,41                  ; add 'A' to it (for printing ascii letter)
+
+Then we can put it at the first of the path string:
+
+mov  [0192],al              ; put it at front of path
+
+Notice that I already know at what offset to put it.  We can not use 
+variables so I had to start at offset 100h and then calculate the offset to 
+this point.  Next we can get the current directory.  We must have a 64 byte 
+buffer for this.  That is what the 64 NULL bytes are in the data 'area' 
+above:
+
+mov  ah,47                  ; get current directory
+xor  dl,dl                  ; current drive
+mov  si,0195                ; put in our buffer above
+int  21                     ;
+
+If there is an error, we will jump to the 'error handler':
+
+jc   024B                   ; if error
+
+Next we will print the current path including the drive letter:
+
+mov  ah,09                  ; print the current full path
+mov  dx,017B                ;
+int  21                     ;
+
+
+DOS uses the DTA (Data Transfer Area) in the PSP.  I like to create my own 
+so that I am sure that it is the correct length.  We no longer need the 
+current directory path string so we can use 43 of the 64 bytes of this 
+buffer for our new DTA:
+
+mov  dx,0195                ; prepare to create a new dta temporarily
+mov  ah,1A                  ; "set dta addr" service of int 21h
+int  21 
+
+Because DOS' print service needs a '$' as the eol char, we will fill the 
+filename area with this char:
+
+                            ;
+mov  di,01B3                ; put '$' in filename area for our printing
+mov  cx,14                  ;
+mov  al,24                  ;
+rep                         ;
+stosb                       ;
+
+We can now find the first file name:
+
+mov  ah,4E                  ; find first dir entry
+mov  dx,01D8                ;
+mov  cx,0020                ; archive only (no dirs, etc.)
+int  21                     ;
+
+If the carry is set then there either was an error or there was no file to 
+be found:
+
+jc   024A                   ; if carry - done (no more found)
+
+If there was a filename found, then let us print it (including the CRLF):
+
+mov  ah,09                  ; else print the filename
+mov  dx,01B3                ;
+int  21                     ;
+mov  ah,09                  ; and a CRLF
+mov  dx,01D5                ;
+int  21                     ;
+
+We need to put '$' back in to the filename area of the DTA or there might be 
+trailing chars from the last filename is this filename length is less than 
+last:
+
+mov  di,01B3                ; put '$' in filename area for our printing
+mov  cx,14                  ;
+mov  al,24                  ;
+rep                         ;
+stosb                       ;
+
+Let us now find the next filename:
+
+mov  ah,4F                  ; find next directory entry
+int  21                     ;
+
+If the carry is clear, there was another file.  Loop to the print it code 
+and find another:
+
+jnc  022C                   ; if no carry, cont. with find next
+
+Else, if the carry is set then there either was an error or there was no 
+more files to be found, so exit:
+
+ret                         ; if carry - done (no more found)
+
+This is where we have our 'error handler' jumped to by some above code:
+
+mov  ah,09                  ; was an error so print error message
+mov  dx,01DC                ;
+int  21                     ;
+ret                         ;
+
+Once we are done entering the code we must put a blank line in telling DEBUG 
+that that was it:
+
+<- make sure there is a blank line between the RET above and the RCX below ->
+
+Now we must tell DEBUG how many bytes of code are to be written to the file 
+and put it in the CX register:
+
+rcx
+0253
+
+Now tell DEBUG to write it to the file:
+
+w
+
+Now tell DEBUG that we are done:
+
+q
+
+
+
+That is it as far as the DR.COM file is.  You should use DEBUG to assemble 
+it as stated above (or again below) and you should have a 595 byte file.
+
+Save your file and exit the editor.  To assemble the file using DEBUG, use 
+the following line:
+
+DEBUG < DR.ASM
+
+This will create the DR.COM file.  If you had any typing errors, the DEBUG 
+will list them as it get to each one in the file.  If you would like to view 
+these errors in another file use the following line to put the output text 
+to DR.LST
+
+DEBUG < DR.ASM > DR.LST
+
+This will not display any text to the screen as DEBUG assembles the file.  
+All of the listing will be in DR.LST
+
+Remember that this is a simple program to show how to program in DEBUG.  It 
+is not intended to be used for any other purpose.
+
+Also, this is not all that DEBUG can do.  You can do quite a few other 
+things as well as 'debug' another program that was compiled or assembled by 
+another source.  For instance, load DEBUG with your newly created DR.COM 
+file and use the unassemble command to see the source that you just entered:
+
+At the DOS prompt enter:
+
+DEBUG DR.COM
+
+Now at the '-' prompt type:
+
+u 0100 0252
+
+You should see all the code you just entered.
+
+(c)opyright 1997
+Forever Young Software
+Benjamin David Lunt
+blunt@zekes.com
+http://www.zekes.com/~blunt/index.html

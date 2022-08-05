@@ -1,0 +1,188 @@
+<HTML>
+<HEAD>
+<TITLE>ROM BIOS</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>ROM BIOS</H1>
+<H2>The values and the uses of the ROM BIOS data area</H2>
+</p>
+
+<font color=black size=2 face="Comic Sans MS">
+The following describes the ROM BIOS data area.
+<p>
+  The ROM BOIS uses the two adjacent 256-byte areas beginning at
+segments 40h and 50h.  (0040:0000h and 0050:0000h)  The ROM BOIS
+uses the first 256 bytes of segment 40h (0040:0000h-0040:00FFh) as
+a data area for its keyboard, video, disk, printer, and communications
+routines.  The first 256 bytes of segment 50h (0050:0000h-0050:00FFh)
+are primarily used by BASIC, although some of these bytes are used the
+same as segment 40h.</p><br>
+
+The lines with an '*' in the first pos of the line are updated (10/08/97)<br>
+<FORM><TEXTAREA NAME="Src1" ROWS=25 COLS=100 WRAP=off>
+The first 256 bytes of segment 0040h:
+  Offset/bytes/Description
+*  0000h /  2   /  COM1 I/O base address (set to 0 if none found)
+*  0002h /  2   /  COM2 I/O base address (set to 0 if none found)
+*  0004h /  2   /  COM3 I/O base address (set to 0 if none found)
+*  0006h /  2   /  COM4 I/O base address (set to 0 if none found)
+*  0008h /  2   /  LPT1 I/O base address (set to 0 if none found)
+*  000Ah /  2   /  LPT2 I/O base address (set to 0 if none found)
+*  000Ch /  2   /  LPT3 I/O base address (set to 0 if none found)
+*  000Eh /  2   /  LPT4 I/O base address (set to 0 if none found)
+   0010h /  2   /  equipment list reported by interrupt 11h (see figure 1)
+*  0012h /  1   /  PCjr - Infrared Keyboard Link Error
+   0013h /  2   /  usable memory size in kilobytes (interrupt 12h)
+*  0015h /  2   /  unknown (reserved)
+   0017h /  2   /  keyboard status bits  (see figure 2)
+*  0019h /  1   /  Alternate Keypad entry
+   001Ah /  2   /  points to current head of keyboard buffer at 0040:001Eh
+   001Ch /  2   /  points to current tail of keyboard buffer at 0040:001Eh
+   001Eh / 32   /  keyboard buffer - used as sixteen 2-byte entries
+   003Eh /  1   /  indicates whether a floppy drive should be re calibrated
+   003Fh /  1   /  floppy drive motor status (bites 0-3)
+                     bit 0 = drive 0, if set - drive motor running
+                     bit 1 = drive 1, if set - drive motor running, etc.
+   0040h /  1   /  floppy drive motor status.  The value in this byte is
+                     decremented with every tick of the system clock.
+                     When the value returns 0, the BOIS turns off the motor
+   0041h /  1   /  floppy drive motor status.  status code returned by the
+                     ROM BIOS from the most recent disk operation
+   0042h /  7   /  floppy drive controller status
+   0049h /  1   /  current video mode
+   004Ah /  2   /  max number of chars in a row of text
+   004Ch /  2   /  number of bytes needed to display the screen (text=80x25)
+   004Eh /  2   /  offset of current display page
+   0050h / 16   /  8 words, each giving the cursor location of each page
+   0060h /  2   /  size of current cursor
+   0062h /  1   /  current display page
+   0063h /  2   /  port address of the hardware display controller chip
+   0065h /  1   /  current setting of the display mode-register of the MDA and CGA
+   0066h /  1   /  current setting of the CGA's CRT color register
+   0067h /  5   /  cassette tape control
+   006Ch /  4   /  master clock count (long integer) 0 = midnight and increments until a 24 hour equiv.
+   0070h /  1   /  not 0 = passed midnight
+   0071h /  1   /  if bit 7 is set, ctrl-break was pressed
+   0072h /  2   /  set to 1234h after initial power up telling a warm boot to skip mem check
+   0074h /  4   /  floppy and hard disk control
+   0078h /  4   /  contains a time-out value for the respective parallel ports
+   007Ch /  4   /  contains a time-out value for the respective RS-232 serial ports
+   0080h /  2   /  points at the start of the keyboard buffer area
+   0082h /  2   /  points at the end of the keyboard buffer area
+   0084h /  1   /  this value is one less than the number of character rows displayed on the screen
+   0085h /  2   /  height, in scan lines, of characters on the screen
+   0087h /  4   /  amount of video RAM available, initial setting of the
+                     EGA configuration switches, as well as other misc. Video status information.
+   008Bh / 11   /  control and status information regarding the floppy and hard disk drives
+   0096h /  2   /  data area used to support the 101-key keyboard
+   0098h /  9   /  real time clock control
+*  00A1h /  1   /  LANA DMA channel flags
+*  00A2h /  2   /  Status of LANA 0,1
+*  00A4h /  4   /  Saved hard disk interrupt vector
+   00A8h /  4   /  (EGA and VGA) contain segmented address of a table of video parameters
+                     and overrides
+*  00ACh /  8   /  (reserved)
+*  00B4h /  1   /  Keyboard NMI control flags (convertible)
+*  00B5h /  4   /  Keyboard Break pending flags (convertible)
+*  00B9h /  1   /  Port 60h single byte Queue (convertible)
+*  00BAh /  1   /  Scan code for last key (convertible)
+*  00BBh /  1   /  NMI Buffer head pointer (convertible)
+*  00BCh /  1   /  NMI Buffer tail pointer (convertible)
+*  00BDh / 16   /  NMI scan code Buffer (convertible)
+   00CDh /  1   /  unknown
+*  00CEh /  2   /  Day Counter (convertible)
+   00D0h / 16   /  unknown
+   00F0h / 16   /  intra-application communications area (ICA)
+                     ie: known area where one app can communicate with another app. (not
+                         used much because of its small size)
+
+The first 256 bytes of segment 0050h:
+  Offset  bytes  Description
+   0000h /  1   /  status of a print-screen operation
+                     00h - OK
+                     01h - a print-screen operation currently in progress
+                     FFh - error occurred during a print-screen operation
+*  0001h /  3   /  Used by BASIC
+   0004h /  1   /  if only 1 floppy installed, this byte indicates which drive letter it is using (a or b)
+                     00h - acting as drive a:
+                     01h - acting as drive b:
+*  0005h / 10   /  POST work area
+*  000Fh /  1   /  BASIC shell flag (2 if currently in shell)
+   0010h /  2   /  holds ROM Basics default DS value (DO NOT CHANGE)
+   0012h /  4   /  segment offset address of Basic's clock-tick interrupt handler
+   0016h /  4   /  address for ROM Basic's Break-key-handling routine
+   001Ah /  4   /  address for ROM Basic's floppy disk error-handling routine
+   001Eh /226   /  unknown
+
+
+ -------------------------- Figures ---------------------------
+
+****************************************************************
+       bit
+FEDCBA98 76543210  Described
+XX...... ........   Number of printers installed
+..X..... ........   (reserved)
+...X.... ........   set if game adapter installed
+....XXX. ........   Number of RS-232 serial ports
+.......X ........   (reserved)
+........ XX......   +1 = number of floppy drives (see bit 0) 00 - 1 drive, 01 - 2 drives, etc.
+........ ..XX....   Initial video mode
+                      01 - 40 column color
+                      10 - 80 column color
+                      11 - monochrome
+                      00 - none of the above
+........ ....XX..   For PC w/64k motherboard
+                      Amount of system board RAM
+                      00 - 16k,01 - 32k, 10 - 48k, 11 - 64k
+                    For PC/AT: not used
+                    For PS/2:
+                      Bit 3 not used
+                      Bit 2 - pointing device installed
+........ ......X.   set if math co processor installed
+........ .......X   set if any floppy drives installed
+                      if set, see bits 6 and 7
+****************************************************************
+FIGURE 1:   equipment list word at 0040:0010h
+
+****************************************************************
+       bit
+FEDCBA98 76543210  Described
+X....... ........   insert state: (1 = active, 0 = inactive)
+.X...... ........   caps lock:
+..X..... ........   num lock:
+...X.... ........   scroll lock:
+....X... ........   set if alt pressed
+.....X.. ........   set if ctrl pressed
+......X. ........   set if left shift pressed
+.......X ........   set if right shift pressed
+........ X.......   set if insert pressed
+........ .X......   set if caps lock pressed
+........ ..X.....   set if num lock pressed
+........ ...X....   set if scroll lock pressed
+........ ....X...   hold state active (ctrl-num lock or pause pressed)
+........ .....X..   system request pressed
+........ ......X.   left alt pressed
+........ .......X   right alt pressed
+****************************************************************
+FIGURE 2:   Keyboard status bits at 0400:0017h, lo order bits are set
+              only while a corresponding key is pressed
+</textarea></form>
+<br>
+<br>
+<br>
+All Rights Reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</td>
+</table>
+</BODY>
+</HTML>

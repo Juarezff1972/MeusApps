@@ -1,0 +1,168 @@
+<HTML>
+<HEAD>
+<TITLE>DOS Help Magazine Number 02, December 1998, Page 3</TITLE>
+
+<META HTTP-EQUIV="Keywords" CONTENT="Undocumented DOS Programming, DOS Help, DOS Source Code, Freeware">
+
+</HEAD>
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page2.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page4.htm">Turn the page ---&gt; </a><br>
+</font>
+<hr>
+
+<h1><font color=purple face="Comic Sans MS">The CD Tray</font></h1>
+<hr>
+</td>
+</table>
+<br clear=left>
+
+
+<!- *** a blank table to get text of the left margin in NETSCAPE ->
+<table align=left border=0 width="100%" cellspacing=25>
+<td width="04%"></td>
+<td width="48%" valign="top">
+<br>
+<! - column one starts here ************************ >
+
+<font color="black" face="Comic Sans MS" size=2>
+
+Have you ever wanted to open or close the CD tray in your batch files?  In this months column we will create a small assembler routine to do just that.<br>
+<br>
+Being that this is the second issue, I will remind you that unless otherwise stated, all assembler listings in this magazine are written to be assembled with <a href="http://www.zekes.com/~blunt/newbasic.html">NBASM</a>.
+<br>
+See Listing 1 below for the full listing of the assembler routine.<br>
+<br>
+To use CDDOOR we entry a function (open or close) and a drive letter on the command line.
+<pre><font size=3>CDDOOR +D</font></pre>
+The above line will open the tray of drive D.
+<pre><font size=3>CDDOOR -E</font></pre>
+The above line will close the tray of drive E.<br>
+<br>
+You must specify a + to open or a - to close and a drive letter in upper case from D to Z only.<br>
+<br>
+</font>
+</td>
+
+<! - column two starts here ******************** >
+<td width="48%" valign="top">
+<font color="black" face="Comic Sans MS" size=2>
+<br>
+First we will create the command line parser.  Lines 11 - 28.<br>
+<br>
+Next we will point the offset of the command table to the I/O controller (BX) and fill it with the required data.  Lines 30 - 41.<br>
+<br>
+Next we specify the drive.  3 = D:, 4 = E:, etc..<br>
+<br>
+Then we call the I/O function.  The door opens or closes.<br>
+<br>
+Now check for an error and exit with this error in ERRORLEVEL.
+<font color="blue">&#165;</font><br>
+
+<br>
+</font>
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+
+<hr>
+
+<table align=left border=0 width="100%">
+<td width="10%"></td>
+<td width="90%">
+
+<b>Listing 1</b><pre>
+; this utility opens/closes the CD door.  It doesn't print anything
+; to the screen so that it can be 'cleanly' used in a batch file.
+;
+; util to open/close the CD door.
+; CDDOOR +D  (or -D)
+;  where + denotes open and - denotes close
+;  where D is the drive letter (D - Z) (upper case)
+
+.model tiny
+.code
+           mov  al,[0082h]              ; get first char on command line
+           cmp  al,'+'                  ; + opens the door
+           jne  short NotOpenIt
+           mov  byte Job,00h            ; open the door
+           jmp  short GetDrive
+NotOpenIt: cmp  al,'-'                  ; - closes the door
+           jne  short NotBuzyo          ; invalid job
+           mov  byte Job,05h            ; close the door
+           jmp  short GetDrive
+
+GetDrive:  mov  al,[0083h]              ; get second char on command line
+           cmp  al,'D'                  ; if it is 'D' or less then
+           jb   short JustDoIt          ;  just assume 'D'
+           cmp  al,'Z'                  ; if it is 'Z' or more then
+           ja   short JustDoIt          ;  just assume 'D'
+           sub  al,'A'                  ; D = 3, E = 4, ...
+           xor  ah,ah                   ;
+           mov  device,ax               ; put in device
+
+JustDoIt:  mov  bx,offset ioctlo        ; Do the I/O
+           mov  byte [bx+13],00h        ; ioc.mdb = 0
+           mov  byte [bx+20],00h        ; ioc.ssn = 0
+           mov  word [bx+22],00h        ; volid=NULL
+           mov  word [bx+24],00h        ;
+           mov  byte [bx],13            ; rhlen
+           mov  byte [bx+2],12          ; comc
+           mov  word [bx+3],00h         ; status
+           mov  word [bx+14],offset Job ; trandad
+           mov  [bx+16],ds              ; data seg
+           mov  word [bx+18],01h        ; tranct
+           mov  cx,device               ;
+           mov  ax,1510h                ;
+           int  2Fh                     ;
+           mov  bx,offset ioctlo        ;
+           mov  dx,[bx+3]               ; status
+           xor  ax,ax                   ; assume no error
+           test dx,8000h                ;
+           jz   short NoRetErr          ;
+           mov  al,02h                  ; other error
+NoRetErr:  test dx,20h                  ;
+           jz   short NotBuzyo          ;
+           mov  al,01h                  ; busy error
+
+NotBuzyo:  mov  ah,4Ch                  ; Exit program, close files
+           int  21h                     ; and return to DOS
+
+device     dw  03h                      ; 3 = D:, 4 = E:, etc.
+Job        db  0                        ; cc   (00 = Open it, 05 = close it)
+ioctlo     db  0,0,0                    ; rhlen,subu,comc
+           dw  00h                      ; status
+           dup 8,0                      ; reserved
+           db  00h                      ; mdb
+           dw  00h,00h                  ; *trandad
+           dw  00h,00h                  ; tranct,ssn
+           dw  00h,00h                  ; *volid
+.end
+</pre>
+
+</td>
+</table>
+
+<br clear=all>   <!- drop back to the bottom of the page ->
+
+<hr>
+<p align=center><font size=2 face="Comic Sans MS">
+<a href="page2.htm">&lt;--- Turn the page </a>
+&nbsp &nbsp
+<a href="contents.htm"> (contents page) </a>
+&nbsp &nbsp
+<a href="page4.htm">Turn the page ---&gt; </a><br>
+<p align=right><font color="black" size=2>Page 3
+</font>
+</BODY>
+</HTML>

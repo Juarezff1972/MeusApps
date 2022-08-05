@@ -1,0 +1,88 @@
+<HTML>
+<HEAD>
+<TITLE>A check Windoze routine</TITLE>
+</HEAD>
+
+<BODY link="blue" vlink="purple" background="bmain.gif">
+<!-- *** a blank table to get text of the left margin in NETSCAPE -->
+<table align=left border=0 width="100%">
+<td width="4%"></td>
+<td width="96%">
+
+<p>
+<H1>Check Windoze</H1>
+
+<b>Checks to see if in a Windoze-DOS session or running in True DOS.  Returns version info in DOS' ERRORLEVEL for use in batch files.</b>
+<br>
+</p>
+
+<p align=left><font color=black size=2 face="Comic Sans MS">
+*Description<br>
+        This file is distributed to show how to check if Windows is
+        currently running.  This technique is undocumented in most
+        DOS programmers books or manuals.<br>
+<br>
+*Programming description<br>
+<br>
+  Using the DOS Multiplex interrupt, we can see if we are in a Windows-
+    DOS session, or in true DOS.<br>
+<br>
+  On return of interrupt 2Fh:  (Note: ax = 1600h, 16h is for the windows MI)<br>
+<pre><font size=2>
+  If RC = 0 then - no Windows in system (running in TRUE DOS)
+          1 then - found an old version of windows running
+        128 then - found an old ver of XMS. Note that XMS does not
+                   report on this interrupt anymore. If you want to
+                   check for EMS you have to call sub function 160Ah or 1610h
+        255 then - found Windows 386 other than version 2.x
+            else - found a newer version of windows (RC is version)
+
+*Using in a .bat file
+          You can use this in a batch file.
+        Example:
+                   (Note:  If ErrorLevel is anything other than the
+                            five values see below, this batch file will
+                            work incorrectly.  This batch file is used
+                            for demonstration only)
+
+                @echo off
+                ChkWin&lt;
+                @if ErrorLevel == 255 goto Win2x
+                @if ErrorLevel == 128 goto end
+                @if ErrorLevel ==   4 goto Win95
+                @if ErrorLevel ==   1 goto OldVer
+                @if ErrorLevel ==   0 goto NoWin
+                :Win95
+                @echo Found Windows 95
+                goto end
+                :NoWin
+                @echo In TRUE DOS
+                goto end
+                :OldVer
+                @echo Found Win 2.x or before
+                goto end
+                Win2x
+                @echo Found a 32-bit Windows
+                goto end
+                :end
+
+.MODEL tiny
+.CODE
+
+	mov	ax,1600h	; Check if windows in mem
+	int	2Fh		; Multiplex interrupt
+	mov	ah,4Ch		; exit to DOS
+	int	21h		;  al = ERROR LEVEL
+.end				; End of assembly code
+</font></pre>
+<br><br><br>
+All rights reserved.<br>
+<A HREF="legal.htm"><font size=1>Legal Notice</font></A><br>
+<i>Copyright &copy; 1984-1999  Forever Young Software<BR></i>
+<A HREF="index.htm"><IMG SRC="gohome.gif" ALT="Return to My Home Page" ALIGN=middle WIDTH=44 HEIGHT=39 border=0></A>
+<a HREF="index.htm">Return to My Home Page</A>
+</P>
+</td>
+</table>
+</BODY>
+</HTML>

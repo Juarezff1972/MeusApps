@@ -1,0 +1,7 @@
+LIBRARY              JOY
+DESCRIPTION          'DLL Ler Botao do ClubeNB por Juarez Fioravanti Filho'
+EXETYPE              WINDOWS
+CODE                 PRELOAD MOVEABLE DISCARDABLE
+DATA                 PRELOAD MOVEABLE SINGLE
+HEAPSIZE             1024
+EXPORTS              readbutton
