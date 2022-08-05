@@ -1,0 +1,14 @@
+assign(TempBatchFile,'c:\smenubtc.bat');
+         erase(TempBatchFile);
+         rewrite(TempBatchFile);
+         writeln(TempBatchFile,'@echo off');
+         writeln(TempBatchFile,'cd\');
+         writeln(TempBatchFile,'cls');
+         writeln(TempBatchFile,'cd '+Caminho3);
+         writeln(TempBatchFile,Programa+' '+Parametro);
+         writeln(TempBatchFile,'echo Aperte qualquer tecla para continuar...');
+         writeln(TempBatchFile,'pause > NUL');
+         writeln(TempBatchFile,'c:');
+         writeln(TempBatchFile,'cd\');
+         writeln(TempBatchFile,'smenu');
+         close(TempBatchFile);

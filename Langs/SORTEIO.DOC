@@ -1,0 +1,22 @@
+unit sorteio;
+var _dest,_orig: word;
+	t : array[1..4096] of byte;
+	fundo                      : byte; { Plano de fundo }
+	fundomenu,frentemenu       : byte; { Menu principal }
+	menutitulo                 : byte; { Titulo do menu }
+	fundomenusel,frentemenusel : byte; { Menu principal - selecionado }
+	fundobarra,frentebarra     : byte; { Barra superior e inferior }
+	SombraAtrib                : word; { Cor da sombra }
+
+	regs                  : registers;
+	segm                  : pointer;     tela                  : array[1..3] of word;
+
+Procedure MovePagina;
+Procedure Retangulo(x1,y1,x2,y2:byte);
+Procedure Sombra(x1,y1,x2,y2:byte;sombraatrib:word);
+Procedure Cursor(o:boolean;cursoroff:word);
+Procedure Cores(cor_fundo,cor_texto:byte);
+Function  Caracter(x,y : byte) : char;
+Procedure EscreveBarra(x,y,tam : byte; texto : string; fundo,frente : byte);
+Procedure Relogio(x,y:integer);
+Procedure Sobre;

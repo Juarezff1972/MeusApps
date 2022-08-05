@@ -1,0 +1,40 @@
+/* proto-types for GRAPH.C */
+
+
+extern int  XRes, YRes;
+extern Word MaxXRes, MaxYRes;
+extern Word MaxX, MaxY;
+extern float Asp;
+extern Boolean PerspectivePlot;
+extern float   Mx, My, Mz, ds;
+extern int   Angl, Tilt;
+extern Boolean Draw_Axis_And_Palette;
+extern void Set_Mode(int Mode);
+extern void Pre_Calc();
+extern void Plot(Word x, Word y, Byte color);
+extern void Set_Palette(Palette_Register Hue);
+extern void Init_Palette(Palette_Register Color);
+extern void Init_Palette_2(Palette_Register Color);
+extern void Cycle_Palette(Palette_Register Hue);
+extern void Swap(int *first, int *second);
+extern void Circle(Word x, Word y, Word radius, Byte color);
+extern void Draw(int xx1, int yy1, int xx2, int yy2, Byte color);
+extern void Init_Graphics();
+extern void Set_Graphics_Mode(Word xRes, Word yRes);
+extern void Wait_For_Key();
+extern void Exit_Graphics();
+extern void Title();
+extern void Init_Plotting(int Ang, int Tlt);
+extern void Init_Perspective(Boolean Perspective, float x, float y, float z, float m);
+extern void Map_Coordinates(float X, float Y, float Z, int *Xp, int *Yp);
+extern void Cartesian_Plot_3D(float X, float Y, float Z, Byte Color);
+extern void Cylindrical_Plot_3D(float Rho, float Theta, float Z, Byte Color);
+extern void Spherical_Plot_3D(float R, float Theta, float Phi, Byte Color);
+extern void Draw_Line_3D(TDA Pnt1, TDA Pnt2, Byte Color);
+extern void Put_Pixel(int x, int y, Byte Color, Byte Intensity);
+extern Byte Get_Pixel(Word x, Word y);
+extern Byte Get_Pixel_2(Word x, Word y);
+extern void Put_Axis_And_Palette(Boolean PlaceOnScreen);
+extern void Display_Axis();
+extern void Display_Palette();
+extern void Axis_And_Palette();

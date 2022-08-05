@@ -1,0 +1,3 @@
+if Botao>0 then OldBot:=Botao;
+         inline($50/$e4/$60/$a3/>Botao/$58);
+         if Botao=OldBot then Botao:=0;

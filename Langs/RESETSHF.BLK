@@ -1,0 +1,9 @@
+inline($50/                    { push ax          }
+             $06/                    { push es          }
+             $b8/$40/$00/            { mov ax,0040      }
+             $8e/$c0/                { mov es,ax        }
+             $26/$a1/$17/$00/        { mov ax,es:[0017] }
+             $24/$f9/                { and al,f9        }
+             $26/$a3/$17/$00/        { mov es:[17],ax   }
+             $07/                    { pop es           }
+             $58);                   { pop ax           }

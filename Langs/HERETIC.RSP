@@ -1,0 +1,188 @@
+; TITLE  :  HERETIC RESPONSE FILE FOR DM2CONV V2.0
+; ABOUT  :  converts DOOM/DOOM II maps into HERETIC maps.
+; AUTHORS:  Vincenzo Alcamo (alcamo@arci01.bo.cnr.it)
+;           Jack Hartman (jack.hartman@cutting.hou.tx.us)
+;
+; USAGE  :  DM2CONV file_in file_out @HERETIC.RSP
+;
+; NOTES  :  You can use this as a base for your own response file:
+;           in this case, please forward a copy to alcamo@arci01.bo.cnr.it,
+;           I may distribute it with the next version of DM2CONV.
+
+/HERETIC        ;enable heretic conversion
+/NOCHECK        ;disable object's numbers check
+/M              ;enable music remapping
+
+;+---------------------------------------------------------------+
+;| REMOVE THE FOLLOWING TWO LINES IF YOU USE DM2CONV FOR HERETIC |
+;| AND YOU ARE CONVERTING DOOM WADS. DOOM II WADS REQUIRE THEM!  |
+;+---------------------------------------------------------------+
+/TEXTURE        ;enable wall texture remapping
+/FLOOR          ;enable floor texture remapping
+
+
+;these objects remain the same:
+;1,2,3,4        player ? start
+;8              backpack = bag of holding
+;11             deathmatch start position
+;14             teleport exit
+;2001           shotgun = ethereal crossbow
+;2003           rocket launcher = Phoenix rod
+;2004           plasma gun = Hellstaff
+;2005           chainsaw = gauntlets of the necromancers
+;2035           barrel = spore
+
+
+;===================================================
+;====== SECTION ONE: ASSIGNING PSEUDO NUMBERS ======
+;===================================================
+
+;keys
+5,40=1000           ;Blue keycard,blue skullkey
+6,39=1001           ;Yellow keycard,yellow skullkey
+13,38=1002          ;Red keycard,red skullkey
+
+;weapons and ammo
+17=1010             ;Cell pack
+2007=1011           ;Ammo clip
+2008=1012           ;4 shotgun shells
+2010=1013           ;1 rocket
+2046=1014           ;Box of rockets
+2047=1015           ;Cell charge
+2048=1016           ;Box of ammo
+2049=1017           ;Box of shells
+2002=1018           ;Chaingun
+2006=1019           ;BFG9000
+82=1020             ;SuperShotgun
+
+;monsters
+7=1030              ;Spider demon
+9=1031              ;Sergeant
+16=1032             ;Cyberdemon
+58=1033             ;Spectre
+3001=1034           ;Imp
+3002=1035           ;Demon
+3003=1036           ;Baron of hell
+3004=1037           ;Trooper
+3005=1038           ;Cacodemon
+3006=1039           ;Lost soul
+
+;doom II's monsters
+64=1040             ;Archvile
+65=1041             ;Chaingun dude
+66=1042             ;Revenant
+67=1043             ;Mancubus
+68=1044             ;Arachnotron
+69=1045             ;Hell Knight
+71=1046             ;Pain Elemental
+72=1047             ;Commander Keen
+84=1048             ;SS Nazi
+87=1049             ;Demon Spawn Spot
+88=1050             ;Big Brain
+89=1051             ;Demon Spawner
+
+;items
+2011=1060           ;Stimpak
+2014=1061           ;Health bonus
+2015=1062           ;Armor bonus
+2012=1063           ;Medikit
+2013=1064           ;Soulsphere
+83=1065             ;Megasphere
+2018=1066           ;Green armor 100%
+2019=1067           ;Blue armor 200%
+2022=1068           ;Invulnerability
+2024=1069           ;Invisibility
+2026=1070           ;Computer map
+2045=1071           ;Light goggles
+2023=1072           ;Berserk strength
+2025=1073           ;Radiation suit
+
+;decorations
+10,12,15,18,19,20,21,22,23,24,79,80,81=1080
+25,26,27,28,29,42=1081
+49,50,51,52,53,59,60,61,62,63,73,74,75,76,77,78=1082
+30,31,32,33,36,37,41=1083
+48=1084
+35,85,86,2028=1085
+44,55=1086
+45,56=1087
+46,57=1088
+43,47,54,70=1089
+
+
+;====================================================
+;====== SECTION TWO: CONVERTING PSEUDO NUMBERS ======
+;====================================================
+
+;keys
+1000=79             ;Blue keycard,blue skullkey = blue key
+1001=80             ;Yellow keycard,yellow skullkey = yellow key
+1002=73             ;Red keycard,red skullkey = green key
+
+;weapons and ammo (IN HERETIC YOU'LL NEED MORE AMMO THAN IN DOOM)
+1010=20,13,21,16    ;Cell pack = l.runes,macespheres,g.runes,pile of macesphere
+1011=10,54,12,55    ;Ammo clip = wand crystal,claw orb,geode,energy orb
+1012=18,19@40%      ;4 shotgun shells = ethereal arrows,quiver
+1013=22,23@25%      ;1 rocket = flame orb,inferno orb
+1014=23             ;Box of rockets = inferno orb
+1015=21,16          ;Cell charge = greater runes,pile of mace spheres
+1016=12,55          ;Box of ammo = crystal geode,energy orb
+1017=19             ;Box of shells = quiver of ethereal arrows
+1018=53             ;Chaingun = dragon claw
+1019=2002           ;BFG9000 = fire mace
+1020=2001           ;Super shotgun = Ethereal crossbow
+
+;monsters
+1030=9              ;Spider demon = maulotaur
+1031=45,64          ;Sergeant = golem leader,undead warrior
+1032=7              ;Cyberdemon = Dsparil
+1033=90,70          ;Spectre = sabreclaw,weredragon
+1034=69,45,46       ;Imp = golem ghost,golem leader,golem leader ghost
+1035=90             ;Demon = sabreclaw
+1036=6@25%,15       ;Baron of hell = iron lich,disciple
+1037=66,68          ;Trooper = flying gargoyle,golem
+1038=92             ;Cacodemon = ophidian
+1039=5              ;Lost soul = flying gargoyle leader
+
+;doom II's monsters
+1040=6              ;Archvile = iron lich
+1041=92             ;Chaingun dude = ophidian
+1042=70,92          ;Revenant = weredragon,ophidian
+1043=70,92          ;Mancubus = weredragon,ophidian
+1044=70,92          ;Arachnotron = weredragon,ophidian
+1045=65             ;Hell Knight = undead warrior ghost
+1046=15             ;Pain Elemental = disciple
+1047=64             ;Commander Keen = flying gargoyle  // THIS IS CRITICAL
+1048=46             ;SS Nazi = golem leader
+1049=6              ;Demon Spawn Spot = iron lich      // THIS IS CRITICAL
+1050=7              ;Big Brain = D'sparil              // THIS IS CRITICAL
+1051=6              ;Demon Spawner = iron lich         // THIS IS CRITICAL
+
+;items
+1060,1061,1062=30@1,86@2,83@1,2001@1,36@1
+1060,1061,1062=12@30%,19@15%,81
+;Stimpak,health bonus,armor bonus = miscellaneus objects
+;  morph ovum,tome of power,wings,crossbow,chaos device,geode,quiver,vial
+;  In some levels the shotgun is given only by dead sergeants.
+1063=82             ;Medikit = quartz flask
+1064,1065=32        ;Soulsphere,Megasphere = mystic urn
+1066=85             ;Green armor 100% = silver shield
+1067=31             ;Blue armor 200% = enchanted shield
+1068=84             ;Invulnerability = ring of invulnerability
+1069=75             ;Invisibility = shadowsphere
+1070=35             ;Computer map = map scroll
+1071=33             ;Light goggles = torch
+1072,1073=32        ;Berserk strength,Radiation suit = mystic urn
+
+;decorations
+1080=48,49
+1081=37,38
+1082=17,24,25,26,39,40
+1083=29
+1084=47
+1085=27
+1086=94
+1087=96
+1088=95
+1089=87
+

@@ -1,0 +1,31 @@
+Procedure MudarCaminho1;
+var path  : string;
+    lista : searchrec;
+begin
+  getdir(gDriveNum,path);
+  nomes[i]:=path;
+  if length(path)>3 then path:=path+'\';
+  FindFirst(path+'*.*',anyfile,lista);
+  if lista.name='' then
+  begin
+     nomes[i]:=path;
+     exit;
+  end;
+  while(((lista.attr<>directory)or(lista.attr=VolumeID))and(doserror=0)) do
+     FindNext(lista);
+  i:=i+1;
+  while (DosError = 0) and (lista.attr = directory) do
+  begin
+    if (lista.name <> '.') and (lista.name <> '..') then
+    begin
+       chdir(lista.name);
+       getdir(gDriveNum,path);
+       nomes[i]:=path;
+       MudarCaminho1;
+       chdir('..');
+    end;
+    FindNext(lista);
+    while((lista.attr<>directory)and(doserror=0)) do
+       FindNext(lista);
+  end;
+end;

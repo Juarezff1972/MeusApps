@@ -1,0 +1,9 @@
+      chdir(gCaminho[numero,pagina]);
+      swapvectors;
+      exec(getenv('COMSPEC'),'/C'+gNome[numero,pagina]+gParametro[numero,pagina]);
+      swapvectors;
+      chdir('C:\');
+      if ioresult<>0 then writeln('Erro ao executar ',gNome[numero,pagina]);
+      writeln;
+      writeln('Aperte <RETURN> para continuar...');
+      readln;

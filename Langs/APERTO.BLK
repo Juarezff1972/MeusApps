@@ -1,0 +1,6 @@
+procedure Aperto;
+begin
+   inline($b4/$02/           { mov ah,0002  }
+          $cd/$16/           { int 16       }
+          $a2/>tecla);       { mov tecla,al }
+end;

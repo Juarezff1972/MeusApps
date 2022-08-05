@@ -1,0 +1,10 @@
+procedure caracteres;
+begin
+   regs.ah:=8;
+   intr($10,regs);
+   regs.cx:=1;
+   regs.bx:=sombraatrib;
+   regs.ah:=9;
+   intr($10,regs);
+end;
+{---------------------------------------------------------------------------}

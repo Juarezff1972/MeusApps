@@ -1,0 +1,59 @@
+procedure CapsOn;
+begin
+   inline($8a/$40/$00       { mov dx,0040   }
+         /$8e/$da           { mov ds,dx     }
+         /$a7/$17/$00       { mov al,0017   }
+         /$0c/$40           { or  al,40     }
+         /$a2/$17/$00);     { mov [0017],al }
+end;
+procedure CapsOff;
+begin
+   inline($8a/$40/$00       { mov dx,0040   }
+         /$8e/$da           { mov ds,dx     }
+         /$a7/$17/$00       { mov al,0017   }
+         /$24/$bf           { and al,bf     }
+         /$a2/$17/$00);     { mov [0017],al }
+end;
+procedure NumOn;
+begin
+   inline($8a/$40/$00       { mov dx,0040   }
+         /$8e/$da           { mov ds,dx     }
+         /$a7/$17/$00       { mov al,0017   }
+         /$0c/$20           { or  al,20     }
+         /$a2/$17/$00);     { mov [0017],al }
+end;
+procedure NumOff;
+begin
+   inline($8a/$40/$00       { mov dx,0040   }
+         /$8e/$da           { mov ds,dx     }
+         /$a7/$17/$00       { mov al,0017   }
+         /$24/$df           { and al,df     }
+         /$a2/$17/$00);     { mov [0017],al }
+end;
+procedure PrtScrOn;
+begin
+   inline($ba/$50/$00       { mov dx,0050           }
+         /$8e/$da           { mov ds,dx             }
+         /$c6/$06/0/0/0);   { mov byte ptr [0000],0 }
+end;
+procedure PrtScrOff;
+begin
+   inline($ba/$50/$00       { mov dx,0050           }
+         /$8e/$da           { mov ds,dx             }
+         /$c6/$06/0/0/1);   { mov byte ptr [0000],1 }
+end;
+procedure Borda;
+begin
+   inline($31/$c0            { xor ax,ax     }
+         /$8e/$d8            { mov ds,ax     }
+         /$a0/$10/$04        { mov al,[0410] }
+         /$24/$cf            { and al,cf     }
+         /$0c/$20            { or  al,20     }
+         /$a2/$10/$04        { mov [0410],al }
+         /$b0/$03            { mov al,03     }
+         /$b4/$00            { mov ah,00     }
+         /$cd/$10            { int 10        }
+         /$b0/$06            { mov al,06     }
+         /$ba/$d9/$03        { mov dx,03d9   }
+         /$ee);              { out dx,al     }
+end;

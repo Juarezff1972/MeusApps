@@ -1,0 +1,12 @@
+ Aperto;
+     i:=tecla;
+     chave:='';
+     if i>=128 then i:=i-128; { Insert ligado }
+     if i>=64 then  i:=i-64;  { Caps Lock     }
+     if i>=32 then  i:=i-32;  { Num Lock      }
+     if i>=16 then  i:=i-16;  { Scroll Lock   }
+     if i>=8 then   i:=i-8;   { Alt           }
+     if i=6 then sair:=true;
+     if i>=4 then   i:=i-4;   { Ctrl          }
+     if i>=2 then   i:=i-2;   { Shift esq.    }
+     if i>=1 then   i:=i-1;   { Shift dir.    }

@@ -1,0 +1,26 @@
+; TITLE  :  DOOM2 CONVERSION RESPONSE FILE for DM2CONV v1.7
+; ABOUT  :  converts DOOM maps into DOOM II maps.
+; AUTHOR :  Vincenzo Alcamo (alcamo@arci01.bo.cnr.it)
+;
+; USAGE  :  DM2CONV file_in file_out @DOOM2.RSP
+
+
+; change each shotgun into a super shotgun (wow!)
+shotgun=supershotgun     ;doesn't affect shotguns dropped by dying sergeants
+
+; at least 1 of: megasphere, archvile, berserk, supershotgun
+demo,imp,serg,baro,caco,spec,lost=megasphere@1,archvile@1,berserk@1,ssh@1
+
+; create new monsters from old ones
+imp=chaingundude@20%
+cacodemon=painelemental@10%
+baron=arachnotron@5%,revenant@5%,hellknight@30%
+; troopers are too weak: better transform them into useful things
+trooper=chaingundude@10%,medikit@10%,stimpack@15%,healthpotion@20%
+
+; convert DOOM texture into similar DOOM II texture
+; delete the following line if you use DM2CONV.WAD
+/TEXTURE
+
+; remap MUSICS
+/M

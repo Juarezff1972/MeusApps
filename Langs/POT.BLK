@@ -1,0 +1,1 @@
+ if y>0 then pot:=exp(y*ln(x)) else pot:=1;

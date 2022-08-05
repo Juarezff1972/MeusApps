@@ -1,0 +1,530 @@
+                       =======================
+                            DM2CONV v2.0
+                         by Vincenzo Alcamo
+                       =======================
+
+
+** DESCRIPTION
+--------------
+This program converts DOOM/DOOM2 levels to run with DOOM2 or HERETIC:
+now you can play all those maps with you favourite game!
+DM2CONV features:
+   - DOOM II support
+   - HERETIC support
+   - level conversion and remapping
+   - music conversion and remapping
+   - wall/floor texture remapping
+   - resource renaming
+   - object substitution with difficulty level
+   - fully configurable
+   - DM2MKWAD util to use DOOM textures/floors inside DOOM II/HERETIC
+
+IMPORTANT: DM2CONV is changed alot since v1.7: please re-read the DOC
+
+
+
+** WHY I MUST CONVERT A PWAD?
+-----------------------------
+Levels designed for DOOM are incompatible with DOOM II or HERETIC
+because some resources (ie: graphic bitmap) and objects only exist
+inside the DOOM main wad file: DOOM.WAD.
+Nevertheless, if you have played DOOM II or HERETIC you should have seen
+new monsters and things (the SuperShotgun, the Ethereal Crossbow...).
+
+DM2CONV handles the conversion process in a very easy way.
+Let suppose you want to run SNIPER.WAD (a well-made level by Eric C.
+Reuter) with DOOM II; just execute the following command:
+    DM2CONV SNIPER.WAD SNIPER2.WAD @DOOM2.RSP
+For HERETIC you have to execute:
+    DM2CONV SNIPER.WAD SNIPERH.WAD @HERETIC.RSP
+This is all you must know to use this program. Simple and effective.
+(For better performances I recommend you to read the DM2MKWAD paragraph)
+
+
+
+** HOW THE CONVERSION WORKS
+---------------------------
+The differences between DOOM and DOOM II (or HERETIC) are the following:
+   - many resources have different names
+   - most wall/floor textures are different
+   - new things or missing things (for HERETIC)
+DM2CONV renames the resource to their appropriate names, remaps the
+textures to similar ones, changes the objects.
+
+The syntax is:
+
+DM2CONV <input> [output] [/mapnum] [/M[=num]] [/DEBUG] [/IGNORE] [/HERETIC]
+        [/TEXTURE[{=file|:name1=name2}]] [/FLOOR[{=file|:name1=name2}]]
+        [/NO{CONV|CHECK|TEXTURE|FLOOR}]... [/SEED[=num]] [replacements]...
+        [/R{=file|:name1=name2}] [/LIST] [/EXAMPLES] [/NOTES] [@response]...
+
+input
+   This parameter is required: it specifies the name of the wad to
+   convert. All the other parameters are optional.
+   The .WAD extension is optional.
+   The input file must be a PWAD or a IWAD file.
+
+output
+   This is the name of the output wad. The .WAD extension is optional.
+   If a file of the same name already exists, it is deleted.
+   If this parameter is omitted, the input file is overwritten.
+   Caution: make a backup copy of the files you convert since there is
+   no way back!
+
+/mapnum
+   mapnum is a number between 1 and 32 (DOOM II) or between 1 and 27
+   (HERETIC). This parameter enables the level remapping.
+   If /mapnum is omitted levels starts from MAP01 (only for DOOM II).
+   examples:
+     /5
+       DOOM II: level names start from MAP05
+       HERETIC: level names start from E1M5
+     /12
+       DOOM II: level names start from MAP12
+       HERETIC: level names start from E2M3
+   Please note that the first level found is remapped to the level
+   specified by mapnum, the second will be mapnum+1, etc.
+
+/M[=num]
+   num is a number between 1 and 32 (DOOM II) or between 1 and 27
+   (HERETIC). This parameter enables the music remapping.
+   If /M is omitted there is no music remapping.
+   The =num subparameter specify the level for the first music.
+   If =num is omitted, the musics are remapped accordingly to the
+   level they belong: if E1M1 is remapped to E2M3, then D_E1M1
+   is renamed to MUS_E2M3 (HERETIC example).
+   If =num is specified, the musics are remapped starting from
+   the music for level num: with /M=9 the first music becomes
+   MUS_E1M9, the second becomes MUS_E2M1 and so on (HERETIC).
+   Please note that the first music found is remapped to the level
+   specified by num, the second will be num+1, etc.
+   Along the other music resources, only the intermission music
+   is renamed to the appropriate name for the selected game.
+
+/DEBUG or /D
+   This switch enables the debug mode.
+   All object substitutions are listed verbosely.
+
+/IGNORE or /I
+   This switch specifies that DM2CONV must ignore that the source file
+   has no levels.
+   This is useful to make object substitutions over an already converted
+   file (especially for DOOM II).
+
+/HERETIC
+   This switch enables the HERETIC conversion: DOOM wads and also DOOM II
+   wads can be converted to the HERETIC format.
+   If it is omitted, the default DOOM2 conversion is performed.
+   Please note that textures/floors/objects must be converted separately.
+   SPECIAL NOTE: DOOM II has linedef types not supported by HERETIC.
+                 These linedef types will be converted, thus the result
+                 may be a bad (unplayable) wad.
+   The DOOM II conversion is here only because many users have requested
+   me to implement this feature, but it is not 100% guaranteed.
+   I am not sure that such a conversion is always possible: please report
+   any problem you may encounter when converting from DOOM II.
+   SPECIAL NOTE: some levels will show the FOS bug (FLASH OF SKY):
+                 when you stand over a linedef you will see the sky.
+                 This is probably due to some limitation of the HERETIC
+                 graphic engine, perhaps it could be removed with the
+                 use of a node builder.
+
+/TEXTURE
+/TEXTURE=file
+/TEXTURE:name1=name2
+   The TEXTURE switch enables the wall texture remapping.
+   This is required only if you don't use the patch wad DM2CONV.WAD
+   created by DM2MKWAD (see DM2MKWAD later in this document).
+   The texture remapping simply renames texture not found in DOOM II or
+   HERETIC with similar ones that exist in the target game.
+   When converting DOOM levels, I recommend you to use DM2CONV.WAD, thus
+   avoiding the TEXTURE switch.
+   The =file parameter specify a text file containing a list of texture
+   names and their new names: texture are renamed using this list.
+   You may use comments inside your list files: simply start them with
+   one of the following characters ';#%[
+   The third syntax specify a single texture and its new name.
+   Multiple /TEXTURE switches may be used at the same time.
+   /TEXTURE may be abbreviated with /T.
+   SPECIAL NOTE: the internal texture list is used only if you specify
+                 the /TEXTURE switch alone.
+
+/NOTEXTURE
+   This switch disables the use of the internal texture remap table.
+   Textures specified by /TEXTURE=file and /TEXTURE:name1=name2 are
+   converted normally.
+   This switch is implemented only to cancel the effect of a /TEXTURE
+   switch inside a response file without the need to edit such file.
+   See DMTEXTUR.RSP for an application example.
+
+/FLOOR
+/FLOOR=file
+/FLOOR:name1=name2
+   The FLOOR switch enables the floor texture remapping.
+   This is required for HERETIC if you don't use DM2CONV.
+   It does not work for DOOM II.
+   See /TEXTURE for detail on the three different syntaxes.
+   Multiple /FLOOR switches may be used at the same time.
+   /FLOOR may be abbreviated with /F.
+
+/NOFLOOR
+   This switch disables the use of the internal floor remap table.
+   Floors specified by /FLOOR=file and /FLOOR:name1=name2 are
+   converted normally.
+   This switch is implemented only to cancel the effect of a /FLOOR
+   switch inside a response file without the need to edit such file.
+   See DMTEXTUR.RSP for an application example.
+
+/R=file
+/R:name1=name2
+   This switch enables the custom resource renaming.
+   The =file subparameter specify a text file containing a list of
+   resource names and their new names.
+   You may use comments inside your list files: simply start them with
+   one of the following characters ';#%[
+   The second syntax specify a single resource and its new name.
+   Multiple /R switches may be used at the same time.
+   example:
+     /R:DEMO1=D1 /R:DEMO2=D2 /R:DEMO3=D3
+     These switches eliminate the demo resources: DOOM demos are not
+     compatible with DOOM II/HERETIC.
+
+/NOCONV
+   This switch disables the resource remapping: levels, musics, skies.
+   This is useful if you use the /R switch over an already converted
+   wad. This switch does not disable the object substitution nor the
+   texture remapping.
+
+/SEED[=num]
+   SEED specifies the random number generator's seed.
+   By default the seed is 0.
+   If /SEED=num is specified, the seed is num.
+   If only /SEED is specified, the seed is random.
+   This parameter is only used by the object substitution algorithm.
+   A random seed (/SEED) will make different conversions each time.
+
+/NOCHECK or /N
+   This switch enable the use of any number for the object substitution.
+   By default, only the numbers shown by the /LIST switch are accepted.
+   This is useful to change unusual objects into others: for example,
+   medikits (2012) into deathmatch starts (11).
+   The other use of this switch is to ignore the error message when
+   you try to remap more than 27 levels (or musics).
+
+replacements
+   This parameter specify an object substitution rule.
+   replacements is a string of the format:
+     obj1[:flags]=obj2[@num[%]][:flags]
+   More than one replacement may be specified.
+   See OBJECT SUBSTITUTION for details.
+
+@response
+   response is the name of a text file containing additional parameters
+   to DM2CONV. The .RSP extension is optional.
+   The response file is necessary if all the parameters cannot stay on
+   the command line (which is normally limited to 128 characters).
+   More than one response files are allowed.
+   Response files can now be nested: the max nesting level is 8.
+   You may use comments inside your response files: simply start them
+   with one of the following characters ';#%[
+
+/HELP or /H or /?
+   This switch will display the help text.
+   The help screen will appear if no source was specified.
+
+/LIST or /L
+   This switch will display the list of known objects.
+
+/EXAMPLE or /EXAMPLES or /E
+   This switch will display some substitution examples.
+
+/NOTES or /NOTE
+   This switch will display special notes regarding the program.
+
+
+
+** OBJECT SUBSTITUTIONS
+-----------------------
+All things in DOOM are objects: lamps, monsters, weapons, power-ups,
+obstacles, other players, etc..
+DOOM II supports all DOOM objects plus others: the super shotgun, the
+megasphere, many new monsters, etc..
+HERETIC hasn't any of the DOOM objects.
+With DM2CONV you can transform specified DOOM objects into DOOM II or
+HERETIC objects. The object substitution is such a process and is
+enabled by specifying at least one replacement.
+
+A replacement is a string describing what objects to transform and how
+to transform them. The simplest replacement string is of the format:
+   object1=object2
+This replacement will transform each object of the type object1 to one
+of the type object2.
+An object is specified by its number, its shortname, its name or an
+initial part of its name: type DM2CONV /LIST to obtain the list of all
+recognized objects; if you want to change objects that are not in this
+list, you can specify the /NOCHECK parameter.
+The most used substitution for DOOM II is:
+   SHOTGUN=SUPERSHOTGUN
+
+You can change multiple objects:
+   obj1,obj2=obj3
+all objects of type obj1 and obj2 are transformed into obj3 objects.
+   obj1=obj2,obj3
+all obj1 objects becomes obj2 and obj3 (they are chosen randomly in
+equal proportions: this is why the /SEED parameter exists).
+You can specify any number of source objects and any number of
+destination objects.
+
+You can also specify quantities (only for the destination objects):
+   IMP=DEMON@5
+In the above example, only 5 IMPs become DEMONs; the others remain IMPs.
+   IMP=DEMON@5,SPECTRE@10
+Five IMPs become DEMONs and ten become SPECTREs.
+If the number of source objects is less than the destination, the
+quantities are adjusted proportionally.
+In the above example if there are only 9 IMPS, 3 become DEMONs (33%)
+and 6 become SPECTREs (66%).
+Another example:
+   IMP=DEMON@5,SPECTRE
+5 IMPs become DEMONs, the remaining become SPECTRE: if there are less
+than 5 IMPs, all of them become DEMONs.
+That is, if you don't specify a quantity the remaining objects are used.
+
+The quantity can be a percentual:
+   IMP=DEMONS@50%
+In this way, 50% of IMPs become DEMONs.
+You can mix all of the above rules:
+   IMP,DEMON=BARON@2,LOSTSOUL@50%,TROOPER
+The % sign can be replaced with any of the following signs $ # &
+This is because the % character has a special meaning for DOS: you must
+avoid using the % sign on the command line of DM2CONV; response files
+are not affected by this limitation.
+
+In DOOM/DOOM II/HERETIC the difficulty level chosen when you start a new
+game will affect the objects in a considerable manner:
+   - new objects may appear
+   - other objects disappear
+The reason is that each object has flags that specify in which level of
+difficulty it should appear.
+There are five flags:
+   1 - object appears on difficulty levels 1 and 2
+   2 - object appears on difficulty level 3
+   3 - object appears on difficulty levels 4 and 5
+   D - object is deaf (useful only for monsters)
+   M - object appears ONLY in multiplayer mode
+Starting from version 1.5, DM2CONV supports these flags in the
+substitution rules; the complete syntax is:
+   sobj1[:flags]...=dobj1[@quantity[%]][:flags]...
+
+Each object can have one or more of the above flags.
+If difficulty flags are specified in the source, only the objects
+that have those flags are changed.
+   IMP:1=STIMPACK
+means that all IMP that will appear (at least) in difficulty level 1
+will be transformed into STIMPACK.
+This affects all IMP that have the '1' flag, not the ones that
+have only the '1' flag.
+
+If difficulty flags are specified in the destination, the object
+remapped will have the specified flags.
+   IMP=STIMPACK:123
+means that all IMP will be transformed into STIMPACK and will appear
+on any level (except multiplayer mode).
+
+The 'D' flag has no means if used in a source object.
+The 'M' flag works in different ways if used in source or destination
+   source:      only multiplayer-mode objects are changed
+   destination: the object appear only on multiplayer mode
+
+
+
+** DM2MKWAD
+-----------
+DM2MKWAD can create a wad file that contains all the missing textures
+from DOOM II or HERETIC. You will need both registered versions of DOOM
+and DOOM II/HERETIC to proceed.
+The output file is named DM2CONV.WAD and should be included in the list
+of patch wad files for DOOM II/HERETIC. example:
+   DOOM2 -FILE DM2CONV.WAD your.wad
+   (or HERETIC -FILE DM2CONV.WAD your.wad)
+Using DM2CONV.WAD, you can eliminate the /TEXTURE and /FLOOR switches when
+converting DOOM files: the original DOOM textures/floors will be used.
+DM2MKWAD will not overwrite or delete any file other than DM2CONV.WAD.
+Before converting your first wad, please exit to DOS and type the
+following command:
+   DM2MKWAD
+then feed it with the appropriate information.
+If you use the DOOM2/HERETIC response file and DM2CONV.WAD, remove the
+line in which appears /TEXTURE and /FLOOR.
+NOTES: You must create one DM2CONV.WAD for DOOM II and one DM2CONV.WAD
+       for HERETIC: they are not interchangeable.
+
+SPECIAL CONSIDERATION ABOUT DM2CONV FOR HERETIC:
+ - Since HERETIC has a color palette different than DOOM's one, the
+   colors of the patches/floors of DOOM need to be converted.
+   Most of the time there is no exact match, so another similar colour
+   must be used. This is why the textures look different.
+ - I have noticed that HERETIC will hang the computer if the external
+   files have too many resources. (HERETIC has lot of bugs)
+   This happen if you use (for example) DM2CONV.WAD and all the three
+   episodes of DOOM.
+   I recommend you to use only one level at a time with DM2CONV.WAD
+ - For the above reason, I have not implemented the DOOM II textures
+   inside DM2CONV.WAD.
+   DM2MKWAD.PAS contains the instructions to merge DOOM,DOOM II,HERETIC
+   textures and floors, but they are currently commented out.
+   If you use DM2CONV.WAD for HERETIC, I recommend you to convert
+   DOOM II wads using the following command:
+      DM2CONV input.wad output.wad @DMTEXTUR.RSP
+ - The effect that shows when a switch or button is pressed, is
+   implemented inside the executable, so DOOM buttons will not
+   change when you press them, although they will works as usual.
+
+
+
+** DMT
+------
+Included in this version of DM2CONV is DMT: my first program developed
+for DOOM.
+Please note that DMT is not related with DM2CONV: I distribute it here
+because I think DMT could be of some help to someone.
+DMT fully supports DOOM, but not DOOM2 or HERETIC although many options
+will work well.
+I may write a full DOOM/DOOM2/HERETIC compatible version if there is
+enough interest in this type of program.
+DMT has no documentation yet: if anyone can (and will) write one,
+he/she should contact me (I'm Italian: my English is poor);
+however just type DMT to get a list of known commands: type
+DMT HELP command to get help about any commands.
+DMT is both a batch tool and a command-line program.
+
+
+
+** SPECIAL CONSIDERATIONS
+-------------------------
+The sky resources are now remapped when converting to DOOM II.
+This is performed by renaming each SKY? (? can be 1, 2 or 3) resource to
+RSKY?. This operation is automatically done when new wads are converted:
+for wads already converted use the /IGNORE switch. If a level has a wall
+with a texture named SKY? (example: GALAXIA.WAD by Pavel Hodek) it will
+be displayed fine after the conversion.
+The sky remapping works only in DOOM->DOOM2 because DOOM II has the
+same color palette of DOOM.
+
+Even if the DOOM/DOOM II skies are converted for HERETIC, they will
+appear strange because of the different color palette of HERETIC.
+
+You can build a wad containing all the DOOM's musics with the following
+command:
+   DMT -open DOOM.WAD -new MUSICS -copy MUSICS DOOM D_E?M?.M
+then you can convert this file to DOOM II:
+   DM2CONV MUSICS /M=1 /IGNORE
+or to HERETIC:
+   DM2CONV MUSICS /M=1 /IGNORE /HERETIC
+
+For DOOM II musics you should execute:
+   DMT -open DOOM2.WAD -new MUSICS2 -copy MUSICS2 DOOM2 D_*
+   DM2CONV MUSICS2 /M=1 /IGNORE /HERETIC2
+
+
+** KNOWN PROBLEMS
+-----------------
+Multi-level pwads can create problems with DOOM II because the level
+sequence cannot be replicated: DOOM has 3 episodes, each with 8 levels
+and 1 secret level, while DOOM II has 30 levels, 1 secret level and 1
+super-secret level.
+This means that accessing the secret level in a wad will load the
+31th level of DOOM II instead of the ExM9 level of DOOM.
+For the same reason, DOOM II level converted for HERETIC must consist
+of less than nine maps. HERETIC has the same level scheme of DOOM.
+
+Monster substituition has a weak spot. When you change monsters with
+bigger ones, if these new monsters are too near a wall they cannot move
+because they collide with the scenario. It is the same as you type
+IDSPISPOPD (or IDCLIP for DOOM II, KITTY for HERETIC), then move into a
+wall and retype the code.
+
+DM2CONV.WAD for HERETIC can cause troubles: see DM2MKWAD.
+
+The DOOM2->HERETIC conversion is still in beta: please report bugs
+(and possible solutions) to alcamo@arci01.bo.cnr.it.
+
+
+
+** DISTRIBUTION LICENSE
+-----------------------
+All files in the original distribution package are PUBLIC DOMAIN.
+You can freely distribute these files (also separately) in any form.
+The files included inside DM2CNV20.ZIP are:
+   DM2CONV.EXE   the converter!
+   DM2CONV.PAS   source for DM2CONV
+   DM2CONV.DOC   documentation
+   DM2MKWAD.EXE  the wad builder
+   DM2MKWAD.PAS  source for DM2MKWAD
+   SPECMEM.PAS   turbo pascal's unit for DM2MKWAD
+   DOOM2.RSP     sample response file for DOOM II conversion
+   HERETIC.RSP   the response file for DOOM->HERETIC conversion
+   DMTEXTUR.RSP  DOOM II levels to HERETIC using DM2CONV.WAD
+   OBJECTS.TXT   object comparison table for DOOM/DOOM2/HERETIC
+   DMT.EXE       manipulation tool
+   FILE_ID.DIZ   package description
+
+For comments, bug reports, suggestions, etc.. please contact the author:
+
+  snail-mail:
+    Vincenzo Alcamo
+    via Verdi 185
+    40059 Medicina (BO)
+    ITALY
+
+  e-mail:
+    alcamo@arci01.bo.cnr.it
+
+You can ask me by e-mail the latest version of DM2CONV:
+please state your current version and I will send you a new version
+when it will be available.
+You will receive an uuencoded zip file, unless you specify otherwise.
+
+
+
+** ADDITIONAL CREDITS
+---------------------
+Matt Fell                         author of the DOOM specs - vital info
+Raphael Quinet,Brendon J Wyber    authors of DEU - first DOOM editor
+Jeff Rabenhorst                   author of EDMAP - awesome DOOM editor
+Greg Lewis                        author of DEHACKED
+
+
+
+** PROGRAM HISTORY
+------------------
+04/01/95  v2.0  Registered HERETIC support (shareware is no longer supported)
+                DOOM textures and floors inside HERETIC.
+                DOOM II to HERETIC conversion.
+                Many little improvements: IWAD support, no RSP extension
+                   needed in response files, nested response files,
+                   /NOTEXTURE and /NOFLOOR switch.
+
+03/04/95  v1.7b Special bug fix version:
+                - texture names were case sensitive
+                  (reported by Thomas Beckmann)
+                - strange substitutions with multi-level pwads
+                  (reported by Rick Weber,Jack Hartman,Georg Deppe)
+
+01/21/95  v1.6b Resource renaming.
+                Improved documentation.
+
+01/14/95  v1.5b Sky resource remapping.
+                Heretic support.
+                External texture tables.
+                Difficulty level supported.
+                Some code rewritten.
+
+12/14/94  v1.2  Music remapping. Other minor changes.
+                Sources released in the public domain.
+                DMT tool distributed to check reactions.
+
+11/12/94  v1.0  The first release.
+                DM2CONV.PAS should be in the distribution package:
+                it wasn't for my fault.
+
