@@ -1,0 +1,2227 @@
+program calculo;
+uses graph,crt,Dos,bgifont,bgidriv;
+var
+  gMenu       : array[1..6] of integer;    gGraphdriver  : integer;
+  gEsc        : array[1..6] of string[15]; gRx,gRy,gRang : integer;
+  gRot        : array[1..3] of integer;    gTx,gTy       : integer;
+  gRotEsc     : array[1..3] of string[23]; gEx,gEy       : real;
+  gTrans      : array[1..2] of integer;    gEsX,gEsY     : integer;
+  gTransEsc   : array[1..2] of string[23]; gPts,i        : integer;
+  gEscala     : array[1..2] of integer;    gGraphMode    : integer;
+  gEscalaEsc  : array[1..2] of string[23]; gZoom         : integer;
+  gEspelho    : array[1..2] of integer;    gGrade        : boolean;
+  gEspelhoEsc : array[1..2] of string[23]; gNome         : string[12];
+  gInicio     : array[1..2] of integer;    gProssegue    : boolean;
+  gInicioEsc  : array[1..2] of string[23];
+  gFim        : array[1..3] of integer;
+  gFimEsc     : array[1..3] of string[23];
+  gRpX,gRpY   : array[1..50] of real;
+{--------------------------------------------------------------------------}
+procedure Abort(Msg : string);
+begin
+  Writeln(Msg, ': ', GraphErrorMsg(GraphResult));
+  Halt(1);
+end;
+{--------------------------------------------------------------------------}
+procedure apresentacao;
+var
+    y,x:integer;
+begin
+  if RegisterBGIdriver(@CGADriverProc) < 0 then
+    Abort('CGA');
+  if RegisterBGIdriver(@EGAVGADriverProc) < 0 then
+    Abort('EGA/VGA');
+  if RegisterBGIdriver(@HercDriverProc) < 0 then
+    Abort('Herc');
+  if RegisterBGIdriver(@ATTDriverProc) < 0 then
+    Abort('AT&T');
+  if RegisterBGIdriver(@PC3270DriverProc) < 0 then
+    Abort('PC 3270');
+  if RegisterBGIfont(@GothicFontProc) < 0 then
+    Abort('Gothic');
+  if RegisterBGIfont(@SansSerifFontProc) < 0 then
+    Abort('SansSerif');
+  if RegisterBGIfont(@SmallFontProc) < 0 then
+    Abort('Small');
+  if RegisterBGIfont(@TriplexFontProc) < 0 then
+    Abort('Triplex');
+  gGraphdriver := detect;
+  initgraph(gGraphdriver,gGraphmode,'');
+    case gGraphdriver of
+    CGA     : gGraphmode:= CGAhi;
+    EGA     : gGraphmode:= EGAlo;
+    VGA     : gGraphmode:= VGAlo;
+    MCGA    : gGraphmode:= MCGAmed;
+    HERCMONO: gGraphmode:= HERCMONOhi;
+    ATT400  : gGraphmode:= ATT400med;
+    PC3270  : gGraphmode:= PC3270hi;
+    IBM8514 : gGraphmode:= IBM8514lo
+  end;
+  setgraphmode(gGraphMode);
+  settextstyle(triplexfont,horizdir,5);
+  setlinestyle(Solidln,15,Normwidth);
+  rectangle(0,0,639,199);
+  outtextxy(140,20,'TRANSFORMACOES');
+  outtextxy(270,70,'DE');
+  outtextxy(140,120,'FIGURAS PLANAS');
+  delay(2000);
+  cleardevice;
+  rectangle(0,0,639,199);
+  settextstyle(triplexFont,horizdir,3);
+  outtextxy(10,10,'Produzido por :  ');
+  outtextxy(165,40,'Mauricio Streisky');
+  outtextxy(165,70,'Adil Calomeno Junior');
+  outtextxy(165,100,'Juarez Fioravanti Filho');
+  delay(2000);
+  settextstyle(defaultfont,horizdir,1);
+end;
+{--------------------------------------------------------------------------}
+Procedure CalculoEscala;
+var
+    sFx,sFy : real;
+begin
+  for i:=1 to gPts do
+  begin
+    if gEx <=0 then gEx:=1;
+    if gEy <=0 then gEy:=1;
+    sFx:=gRpX[i] * gEx;
+    sFy:=gRpY[i] * gEy;
+    gRpY[i]:=sFy;
+    gRpX[i]:=sFx;
+  end;
+end;
+{--------------------------------------------------------------------------}
+Procedure CalculoEspelho;
+var sFx,sFy : real;
+begin
+  for i:=1 to gPts do
+  begin
+    sFx:=gRpX[i] * gEsX;
+    sFy:=gRpY[i] * gEsY;
+    gRpY[i]:=sFy;
+    gRpX[i]:=sFx;
+  end;
+end;
+{--------------------------------------------------------------------------}
+Procedure CalculoTranslacao;
+var
+    sTx,sTy : real;
+begin
+  for i:=1 to gPts do
+  begin
+    sTx:=gRpX[i]+gTx;
+    sTy:=gRpY[i]+gTy;
+    gRpX[i]:=sTx;
+    gRpY[i]:=sTy;
+  end;
+end;
+{--------------------------------------------------------------------------}
+procedure CalculoRotacao;
+var
+    sX,sY : real;
+begin
+  for i:=1 to gPts do
+  begin
+    sX:=cos(gRang*pi/180)*(gRpX[i]+gRx)-sin(gRang*pi/180)*(gRpY[i]+gRy)-gRx;
+    sY:=sin(gRang*pi/180)*(gRpX[i]+gRx)+cos(gRang*pi/180)*(gRpY[i]+gRy)-gRy;
+       gRpX[i]:=sX;
+    gRpY[i]:=sY;
+  end;
+end;
+{-------------------------------MENUS--------------------------------------}
+Procedure Eixos;
+var
+    x,y,z : real;
+    sZoom : real;
+begin
+   setcolor(15);
+   line(GetMaxX div 2,10,GetMaxX div 2,GetMaxY-10);
+   line(0,GetMaxY div 2,GetMaxX,GetMaxY div 2);
+   if gZoom>=10 then begin
+   z:=1;
+     if (gZoom>=40)  and (gZoom<60)   then z:=2;
+     if (gZoom>=60)  and (gZoom<80)   then z:=3;
+     if (gZoom>=80)  and (gZoom<100)  then z:=4;
+     if (gZoom>=100) and (gZoom<120)  then z:=5;
+     if (gZoom>=120) and (gZoom<140)  then z:=6;
+     if (gZoom>=140) and (gZoom<160)  then z:=7;
+     if (gZoom>=160) and (gZoom<180)  then z:=8;
+     if (gZoom>=180) and (gZoom<200)  then z:=9;
+     if (gZoom>=200) and (gZoom<220)  then z:=10;
+     if (gZoom>=220) and (gZoom<240)  then z:=11;
+     if (gZoom>=240) and (gZoom<260)  then z:=12;
+     if (gZoom>=260) and (gZoom<280)  then z:=13;
+     if (gZoom>=280) and (gZoom<300)  then z:=14;
+     if (gZoom>=300) and (gZoom<320)  then z:=15;
+     if (gZoom>=320) and (gZoom<340)  then z:=16;
+     if (gZoom>=340) and (gZoom<360)  then z:=17;
+     if (gZoom>=360) and (gZoom<380)  then z:=18;
+     if (gZoom>=380) and (gZoom<400)  then z:=19;
+     if (gZoom>=400) and (gZoom<420)  then z:=20;
+     if (gZoom>=420) and (gZoom<440)  then z:=21;
+     if (gZoom>=440) and (gZoom<460)  then z:=22;
+     if (gZoom>=460) and (gZoom<480)  then z:=23;
+     if (gZoom>=480) and (gZoom<500)  then z:=24;
+     if (gZoom>=500) and (gZoom<520)  then z:=25;
+     if (gZoom>=520) and (gZoom<540)  then z:=26;
+     x:=(getmaxx div 2)+1;
+     sZoom:=gZoom/10;
+     repeat
+       line(trunc(x-1),(GetMaxY div 2)-1,trunc(x-1),(GetMaxY div 2)+1);
+       line(trunc(639-(x)),(GetMaxY div 2)-1,trunc(639-(x)),(GetMaxY div 2)+1);
+       x:=x+(10*sZoom/z);
+     until x >= 639;
+     y:=(getmaxy div 2)+1;
+     repeat
+       line((GetMaxX div 2)-2,trunc(Y-1),(GetMaxX div 2)+2,trunc(y-1));
+       line((GetMaxX div 2)-2,trunc(199-(Y)),(GetMaxX div 2)+2,trunc(199-(y)));
+       y:=y+(4*sZoom/z);
+     until y >= 189;
+   end;
+end;
+{--------------------------------------------------------------------------}
+Procedure Coordenadas(x1,y1 : real; var x2,y2 : real);
+begin
+  x2:=(10*(x1*(639 div (GetMaxX div 2)))+(GetMaxX div 2));
+  y2:=(4*(-y1*(199 div (GetMaxY div 2)))+(GetMaxY div 2));
+end;
+{--------------------------------------------------------------------------}
+Procedure Desenha;
+var
+    x,y,sZoom        : real;
+    area,area2       : pointer;
+    tamanho,tamanho2 : word;
+begin
+  tamanho:=imagesize(0,0,639,10);
+  tamanho2:=imagesize(0,188,639,199);
+  area:=nil;
+  area2:=nil;
+  getmem(area,tamanho);
+  getmem(area2,tamanho2);
+  getimage(0,0,639,10,area^);
+  getimage(0,188,639,199,area2^);
+  sZoom:=gZoom/10;
+  Coordenadas(sZoom*gRpX[1],sZoom*gRpY[1],x,y);
+  moveto(trunc(x),trunc(y));
+  for i:=2 to gPts do
+  begin
+    Coordenadas(sZoom*gRpX[i],sZoom*gRpY[i],x,y);
+    lineto(trunc(x),trunc(y));
+  end;
+  coordenadas(sZoom*gRpX[1],sZoom*gRpY[1],x,y);
+  lineto(trunc(x),trunc(y));
+  setviewport(0,0,639,10,true);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(0,0,area^,normalput);
+  putimage(0,188,area2^,normalput);
+  freemem(area,tamanho);
+  freemem(area2,tamanho2);
+end;
+{--------------------------------------------------------------------------}
+procedure RotEixoX;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(500,20,610,35);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(500,20,610,35,area^);
+  setviewport(500,20,610,35,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,' X = ');
+  setcolor(0);
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(500,20,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(310,15,550,60,true);
+    setcolor(15);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if (c=#45) and (copy(k,1,1)='-') then begin
+    k:=copy(k,2,length(k)-1);
+    c:=#46;
+  end;
+  if (c=#45) and (copy(k,1,1)<>'-') then k:='-'+k;
+  if c=#8 then delete(k,length(k),1);
+  if ((c>#47) and (c<#58)) then k:=k+c;
+  val(k,gRx,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  setcolor(15);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(500,20,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(310,15,550,60,true);
+end;
+{--------------------------------------------------------------------------}
+procedure RotEixoY;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(500,30,610,45);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(500,30,610,45,area^);
+  setviewport(500,30,610,45,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,' Y = ');
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(500,30,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(310,15,550,60,true);
+    setcolor(15);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if (c=#45) and (copy(k,1,1)='-') then begin
+    k:=copy(k,2,length(k)-1);
+    c:=#46;
+  end;
+  if (c=#45) and (copy(k,1,1)<>'-') then k:='-'+k;
+  if c=#8 then delete(k,length(k),1);
+  if (c>#47) and (c<#58) then k:=k+c;
+  val(k,gRy,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(500,30,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(310,15,550,60,true);
+end;
+{--------------------------------------------------------------------------}
+procedure AnguloRot;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(500,50,610,65);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(500,50,610,65,area^);
+  setviewport(500,50,610,65,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,'Ang = ');
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(500,50,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(310,15,550,60,true);
+    setcolor(15);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(50,4,k);
+  if (c=#45) and (copy(k,1,1)='-') then begin
+    k:=copy(k,2,length(k)-1);
+    c:=#46;
+  end;
+  if (c=#45) and (copy(k,1,1)<>'-') then k:='-'+k;
+  if c=#8 then delete(k,length(k),1);
+  if (c>#47) and (c<#58) then k:=k+c;
+  val(k,gRang,m);
+  setcolor(15);
+  outtextxy(50,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(500,30,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(310,15,550,60,true);
+end;
+{--------------------------------------------------------------------------}
+procedure Rotacao;
+var
+    tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+    sRx,sRy : string[5];
+    sRang   : string[5];
+begin
+  tamanho:=imagesize(310,15,550,60);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(310,15,550,60,area^);
+  setviewport(310,15,550,60,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,240,45);
+  setcolor(15);
+  rectangle(3,1,237,44);
+  str(gRx,sRx);
+  str(gRy,sRy);
+  str(gRang,sRang);
+  outtextxy(10,4, ' Relativo ao eixo X  '+sRx);
+  outtextxy(10,18,' Relativo ao eixo Y  '+sRy);
+  outtextxy(10,33,' Angulo de rotacao   '+sRang);
+  x:=10;
+  z:=1;
+  y:=4;
+  gRotEsc[1]:=' Relativo ao eixo X ';
+  gRotEsc[2]:=' Relativo ao eixo Y ';
+  gRotEsc[3]:=' Angulo de rotacao  ';
+  for i:=1 to 3 do gRot[i]:=textwidth(gRotEsc[i]);
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gRot[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gRotEsc[z]);
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(310,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(15);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(x-1,y-1,x+gRot[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gRotEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    RotEixoX;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,45);
+    rectangle(3,1,237,44);
+    str(gRx,sRx);
+    str(gRy,sRy);
+    str(gRang,sRang);
+    outtextxy(10,4, ' Relativo ao eixo X  '+sRx);
+    outtextxy(10,18,' Relativo ao eixo Y  '+sRy);
+    outtextxy(10,33,' Angulo de rotacao   '+sRang);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gRot[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gRotEsc[z]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    RotEixoY;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,45);
+    rectangle(3,1,237,44);
+    str(gRx,sRx);
+    str(gRy,sRy);
+    str(gRang,sRang);
+    outtextxy(10,4, ' Relativo ao eixo X  '+sRx);
+    outtextxy(10,18,' Relativo ao eixo Y  '+sRy);
+    outtextxy(10,33,' Angulo de rotacao   '+sRang);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gRot[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gRotEsc[z]);
+  end;
+  if (c=#13) and (z=3) then
+  begin
+    AnguloRot;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,45);
+    rectangle(3,1,237,44);
+    str(gRx,sRx);
+    str(gRy,sRy);
+    str(gRang,sRang);
+    outtextxy(10,4, ' Relativo ao eixo X  '+sRx);
+    outtextxy(10,18,' Relativo ao eixo Y  '+sRy);
+    outtextxy(10,33,' Angulo de rotacao   '+sRang);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gRot[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gRotEsc[z]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=3;
+    if z > 3 then z:=1;
+    case z of
+     1 : y:=4;
+     2 : y:=18;
+     3 : y:=33;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gRot[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gRotEsc[z]);
+  end;
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gRot[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gRotEsc[z]);
+  until ord(c)=32;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(310,15,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(0);
+  desenha;
+  setcolor(15);
+  if gGrade=true then eixos;
+  setcolor(15);
+  CalculoRotacao;
+  desenha;
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+procedure TransEixoX;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(500,20,610,35);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(500,20,610,35,area^);
+  setviewport(500,20,610,35,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,'Tx = ');
+  setcolor(0);
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(500,20,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(310,15,550,45,true);
+    setcolor(15);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if (c=#45) and (copy(k,1,1)='-') then begin
+    k:=copy(k,2,length(k)-1);
+    c:=#46;
+  end;
+  if (c=#45) and (copy(k,1,1)<>'-') then k:='-'+k;
+  if c=#8 then delete(k,length(k),1);
+  if ((c>#47) and (c<#58)) then k:=k+c;
+  val(k,gTx,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(500,20,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(310,15,550,45,true);
+end;
+{--------------------------------------------------------------------------}
+procedure TransEixoY;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(500,30,610,45);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(500,30,610,45,area^);
+  setviewport(500,30,610,45,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,'Ty = ');
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(500,30,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(310,15,550,45,true);
+    setcolor(15);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if (c=#45) and (copy(k,1,1)='-') then begin
+    k:=copy(k,2,length(k)-1);
+    c:=#46;
+  end;
+  if (c=#45) and (copy(k,1,1)<>'-') then k:='-'+k;
+  if c=#8 then delete(k,length(k),1);
+  if (c>#47) and (c<#58) then k:=k+c;
+  val(k,gTy,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(500,30,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(310,15,550,45,true);
+end;
+{--------------------------------------------------------------------------}
+procedure Translacao;
+var
+    tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+    sTx,sTy : string[5];
+begin
+  tamanho:=imagesize(310,15,550,45);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(310,15,550,45,area^);
+  setviewport(310,15,550,45,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,240,30);
+  setcolor(15);
+  rectangle(3,1,237,29);
+  str(gTx,sTx);
+  str(gTy,sTy);
+  outtextxy(10,4, ' Relativa ao eixo X  '+sTx);
+  outtextxy(10,18,' Relativa ao eixo Y  '+sTy);
+  x:=10;
+  z:=1;
+  y:=4;
+  gTransEsc[1]:=' Relativa ao eixo X ';
+  gTransEsc[2]:=' Relativa ao eixo Y ';
+  for i:=1 to 2 do gTrans[i]:=textwidth(gTransEsc[i]);
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gTrans[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gTransEsc[z]);
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(310,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(x-1,y-1,x+gTrans[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gTransEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    TransEixoX;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    rectangle(3,1,237,29);
+    str(gTx,sTx);
+    str(gTy,sTy);
+    outtextxy(10,4, ' Relativa ao eixo X  '+sTx);
+    outtextxy(10,18,' Relativa ao eixo Y  '+sTy);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gTrans[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gTransEsc[z]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    TransEixoY;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    rectangle(3,1,237,29);
+    str(gTx,sTx);
+    str(gTy,sTy);
+    outtextxy(10,4, ' Relativa ao eixo X  '+sTx);
+    outtextxy(10,18,' Relativa ao eixo Y  '+sTy);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gTrans[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gTransEsc[z]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=2;
+    if z > 2 then z:=1;
+    case z of
+     1 : y:=4;
+     2 : y:=18;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gTrans[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gTransEsc[z]);
+  end;
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gTrans[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gTransEsc[z]);
+  until ord(c)=32;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(310,15,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(0);
+  desenha;
+  setcolor(15);
+  if gGrade=true then eixos;
+  setcolor(15);
+  CalculoTranslacao;
+  desenha;
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+procedure EscalaEixoX;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(275,20,385,35);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(275,20,385,35,area^);
+  setviewport(275,20,385,35,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,'Ex = ');
+  setcolor(0);
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(275,20,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(50,15,290,45,true);
+    setcolor(0);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if c=#8 then delete(k,length(k),1);
+  if ((c>#47) and (c<#58)) or (c=#46) then k:=k+c;
+  val(k,gEx,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(275,20,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(50,15,290,45,true);
+end;
+{--------------------------------------------------------------------------}
+procedure EscalaEixoY;
+var
+    area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : string[5];
+    m       : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(275,35,385,50);
+   area:=nil;
+  getmem(area,tamanho);
+  getimage(275,35,385,50,area^);
+  setviewport(275,35,385,50,true);
+  k:='';
+  m:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,110,15);
+  repeat
+  setcolor(15);
+  rectangle(4,1,106,14);
+  outtextxy(10,4,'Ey = ');
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(275,35,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(50,15,290,45,true);
+    setcolor(0);
+    exit;
+  end;
+  setcolor(0);
+  outtextxy(45,4,k);
+  if c=#8 then delete(k,length(k),1);
+  if ((c>#47) and (c<#58)) or (c=#46) then k:=k+c;
+  val(k,gEy,m);
+  setcolor(15);
+  outtextxy(45,4,k);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(275,35,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(50,15,290,45,true);
+end;
+{--------------------------------------------------------------------------}
+procedure Escalamento;
+var
+    tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+    sEx,sEy : string[5];
+begin
+  tamanho:=imagesize(50,15,290,45);
+   area:=nil;
+  getmem(area,tamanho);
+  getimage(50,15,290,45,area^);
+  setviewport(50,15,290,45,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,240,30);
+  setcolor(15);
+  rectangle(3,1,237,29);
+  str(gEx:1:1,sEx);
+  str(gEy:1:1,sEy);
+  outtextxy(10,4, ' Coeficiente do eixo X  '+sEx);
+  outtextxy(10,18,' Coeficiente do eixo Y  '+sEy);
+  x:=10;
+  z:=1;
+  y:=4;
+  gEscalaEsc[1]:=' Coeficiente do eixo X ';
+  gEscalaEsc[2]:=' Coeficiente do eixo Y ';
+  for i:=1 to 2 do gEscala[i]:=textwidth(gEscalaEsc[i]);
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gEscala[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gEscalaEsc[z]);
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(50,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(x-1,y-1,x+gEscala[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gEscalaEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    EscalaEixoX;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    setcolor(15);
+    rectangle(3,1,237,29);
+    str(gEx:1:1,sEx);
+    str(gEy:1:1,sEy);
+    outtextxy(10,4, ' Coeficiente do eixo X  '+sEx);
+    outtextxy(10,18,' Coeficiente do eixo Y  '+sEy);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gEscala[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEscalaEsc[z]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    EscalaEixoY;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    setcolor(15);
+    rectangle(3,1,237,29);
+    str(gEx:1:1,sEx);
+    str(gEy:1:1,sEy);
+    outtextxy(10,4, ' Coeficiente do eixo X  '+sEx);
+    outtextxy(10,18,' Coeficiente do eixo Y  '+sEy);
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gEscala[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEscalaEsc[z]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=2;
+    if z > 2 then z:=1;
+    case z of
+     1 : y:=4;
+     2 : y:=18;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x-1,y-1,x+gEscala[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEscalaEsc[z]);
+  end;
+  setfillstyle(solidfill,15);
+  bar(x-1,y-1,x+gEscala[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gEscalaEsc[z]);
+  until ord(c)=32;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(50,15,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(0);
+  desenha;
+  setcolor(0);
+  if gGrade=true then eixos;
+  setcolor(0);
+  CalculoEscala;
+  setcolor(15);
+  desenha;
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+procedure EspelhoEixoX;
+var area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : array[1..2] of string[5];
+    m,z,n   : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(340,20,438,35);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(340,20,438,35,area^);
+  setviewport(340,20,438,35,true);
+  k[1]:='  1 ';
+  k[2]:=' -1 ';
+  m:=1;
+  n:=1;
+  z:=1;
+  gEsX:=z;
+  setfillstyle(solidfill,0);
+  bar(0,0,98,15);
+  setcolor(15);
+  outtextxy(10,4,k[1]+' '+k[2]);
+  rectangle(4,1,94,14);
+  repeat
+  setfillstyle(solidfill,15);
+  bar(7+m,4,51+m,10);
+  setcolor(0);
+  outtextxy(10+m,4,k[n]);
+  setcolor(15);
+  rectangle(4,1,94,14);
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(340,20,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(150,15,390,45,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(7+m,4,51+m,10);
+  setcolor(15);
+  outtextxy(10+m,4,k[n]);
+  if c=#0 then c:=readkey;
+  if (c=#77) or (c=#75) then z:=-z;
+  if z=1   then begin m:=0;  n:=1; end;
+  if z=-1  then begin m:=40; n:=2; end;
+  gEsX:=z;
+  setfillstyle(solidfill,0);
+  bar(7+m,4,51+m,10);
+  setcolor(15);
+  outtextxy(10+m,4,k[n]);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(340,20,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(150,15,390,45,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure EspelhoEixoY;
+var area    : pointer;
+    tamanho : word;
+    c       : char;
+    k       : array[1..2] of string[5];
+    m,z,n   : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(340,30,438,45);
+   area:=nil;
+  getmem(area,tamanho);
+  getimage(340,30,438,45,area^);
+  setviewport(340,30,438,45,true);
+  k[1]:='  1 ';
+  k[2]:=' -1 ';
+  m:=1;
+  n:=1;
+  z:=1;
+  gEsY:=z;
+  setfillstyle(solidfill,0);
+  bar(0,0,98,15);
+  setcolor(15);
+  outtextxy(10,4,k[1]+' '+k[2]);
+  rectangle(4,1,94,14);
+  repeat
+  setfillstyle(solidfill,15);
+  bar(7+m,4,51+m,10);
+  setcolor(0);
+  outtextxy(10+m,4,k[n]);
+  setcolor(15);
+  rectangle(4,1,94,14);
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(340,30,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(150,15,390,45,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(7+m,4,51+m,10);
+  setcolor(15);
+  outtextxy(10+m,4,k[n]);
+  if c=#0 then c:=readkey;
+  if (c=#77) or (c=#75) then z:=-z;
+  if z=1   then begin m:=0;  n:=1; end;
+  if z=-1  then begin m:=40; n:=2; end;
+  gEsY:=z;
+  setfillstyle(solidfill,0);
+  bar(7+m,4,51+m,10);
+  setcolor(15);
+  outtextxy(10+m,4,k[n]);
+  until (ord(c)=13) or (ord(c)=32);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(340,30,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(150,15,390,45,true);
+end;
+{--------------------------------------------------------------------------}
+procedure Espelhamento;
+var tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+    sEsx,sEsy : string[5];
+begin
+  tamanho:=imagesize(150,15,390,45);
+   area:=nil;
+  getmem(area,tamanho);
+  getimage(150,15,390,45,area^);
+  setviewport(150,15,390,45,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,240,30);
+  setcolor(15);
+  rectangle(3,1,237,29);
+  str(gEsx,sEsx);
+  str(gEsy,sEsy);
+  outtextxy(10,4, ' Coeficiente do eixo X  '+sEsx);
+  outtextxy(10,18,' Coeficiente do eixo Y  '+sEsy);
+  x:=10;
+  z:=1;
+  y:=4;
+  gEspelhoEsc[1]:=' Coeficiente do eixo X ';
+  gEspelhoEsc[2]:=' Coeficiente do eixo Y ';
+  for i:=1 to 2 do gEspelho[i]:=textwidth(gEspelhoEsc[i]);
+  setfillstyle(solidfill,15);
+  bar(x,y,x+gEspelho[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gEspelhoEsc[z]);
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(150,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(x,y,x+gEspelho[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gEspelhoEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    EspelhoEixoX;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    setcolor(15);
+    rectangle(3,1,237,29);
+    str(gEsx,sEsx);
+    str(gEsy,sEsy);
+    outtextxy(10,4, ' Coeficiente do eixo X  '+sEsx);
+    outtextxy(10,18,' Coeficiente do eixo Y  '+sEsy);
+    setfillstyle(solidfill,15);
+    bar(x,y,x+gEspelho[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEspelhoEsc[z]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    EspelhoEixoY;
+    setfillstyle(solidfill,0);
+    bar(0,0,240,30);
+    setcolor(15);
+    rectangle(3,1,237,29);
+    str(gEsx,sEsx);
+    str(gEsy,sEsy);
+    outtextxy(10,4, ' Coeficiente do eixo X  '+sEsx);
+    outtextxy(10,18,' Coeficiente do eixo Y  '+sEsy);
+    setfillstyle(solidfill,15);
+    bar(x,y,x+gEspelho[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEspelhoEsc[z]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=2;
+    if z > 2 then z:=1;
+    case z of
+     1 : y:=4;
+     2 : y:=18;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x,y,x+gEspelho[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gEspelhoEsc[z]);
+  end;
+  setfillstyle(solidfill,15);
+  bar(x,y,x+gEspelho[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gEspelhoEsc[z]);
+  until ord(c)=32;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(150,15,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(0);
+  desenha;
+  setcolor(15);
+  if gGrade=true then eixos;
+  CalculoEspelho;
+  desenha;
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure RecebePontos;
+var
+    tamanho : word;
+    area    : pointer;
+    i,m     : integer;
+    n       : byte;
+    c       : char;
+    x,y,z   : integer;
+    sRpX    : string[5];
+    sRpY,l  : string[5];
+    k       : string[12];
+    sPont   : string[30];
+    cont    : boolean;
+begin
+  for i:=1 to 50 do
+  begin
+    gRpX[i]:=0;
+    gRpY[i]:=0;
+  end;
+  cont:=false;
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(361,35,621,55);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(361,35,621,55,area^);
+  setviewport(361,35,621,55,true);
+  i:=1;
+  for i:=1 to gPts do
+  begin
+    cont:=false;
+    setfillstyle(solidfill,0);
+    bar(0,0,261,35);
+    setcolor(15);
+    rectangle(3,1,258,19);
+    k:='';
+    m:=1;
+    str(gRpX[i],sRpX);
+    str(gRpY[i],sRpY);
+    str(i,l);
+    setcolor(15);
+    outtextxy(15,6, ' Entre com o ponto '+l+' = ');
+    sPont:=' Entre com o ponto '+l+' = ';
+    repeat
+      c:=readkey;
+      if c=#27 then begin
+       setviewport(0,0,639,199,true);
+       putimage(361,35,area^,normalput);
+       freemem(area,tamanho);
+       setviewport(51,30,291,50,true);
+       setcolor(0);
+       exit;
+      end;
+      setcolor(0);
+      outtextxy(15,6,sPont+k);
+      if (cont=false) and (c=#13) then
+      begin
+        c:=#44;
+        cont:=true;
+      end;
+      if c=#44 then cont:=true;
+      if  (c=#44) or (c=#45) or ((c>#47) and (c<#58)) then k:=k+c;
+      if c=#8 then delete(k,length(k),1);
+      setcolor(15);
+      outtextxy(15,6,sPont+k);
+    until (c=#13) and (cont=true);
+    n:=pos(',',k);
+    sRpY:=copy(k,n+1,length(k)-n);
+    sRpX:=copy(k,1,length(k)-(length(k)-n)-1);
+    val(sRpX,gRpX[i],m);
+    val(sRpY,gRpY[i],m);
+    setcolor(15);
+    outtextxy(15,6,sPont+k);
+  end;
+  setcolor(0);
+  setviewport(0,0,639,199,true);
+  putimage(361,35,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(161,20,401,40,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure Pontos;
+var
+    tamanho : word;
+    area    : pointer;
+    i,m     : integer;
+    c       : char;
+    x,y,z   : integer;
+    sPts,k  : string[5];
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(161,20,401,40);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(161,20,401,40,area^);
+  setviewport(161,20,401,40,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,240,20);
+  setcolor(15);
+  rectangle(3,1,237,19);
+  k:='';
+  m:=1;
+  str(gPts,sPts);
+  setcolor(15);
+  outtextxy(15,6, ' Numero de pontos:  ');
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+       setviewport(0,0,639,199,true);
+       putimage(161,20,area^,normalput);
+       freemem(area,tamanho);
+       setviewport(1,15,200,50,true);
+       setcolor(0);
+       exit;
+      end;
+  setcolor(0);
+  outtextxy(15,6, ' Numero de pontos:  '+k);
+  if c=#8 then delete(k,length(k),1);
+  if (c>#47) and (c<#58) then k:=k+c;
+  val(k,gPts,m);
+  setcolor(15);
+  outtextxy(15,6, ' Numero de pontos:  '+k);
+  until (ord(c)=13) or (ord(c)=32);
+  if gPts>50 then gPts:=50;
+  if gPts<=0 then gPts:=1;
+  if ord(c)=13 then RecebePontos;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(161,20,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(1,15,200,50,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure AlteraPontos;
+var
+    tamjanX,tamjanY : integer;
+    x,y,i           : integer;
+    sRpX,sRpY       : string[5];
+    tamanho,tamanho2: word;
+    area,area2      : pointer;
+    c               : char;
+    MaxX,MaxY,q     : integer;
+    k,l             : string[12];
+    cont            : boolean;
+    m,t             : integer;
+    sPont           : string[30];
+    n               : byte;
+    sZoom           : string[5];
+begin
+  setviewport(0,0,639,199,true);
+  setfillstyle(solidfill,5);
+  bar(0,189,639,199);
+  setcolor(0);
+  rectangle(3,190,636,198);
+  outtextxy(4,191,'  <ESC> para  sair    <ENTER> para alterar pontos    <ESPACO> para prosseguir');
+  setcolor(15);
+  gProssegue:=false;
+  repeat
+  if gPts<=10 then begin
+    tamjanX:=100;
+    t:=0;
+    if(gPts div 2)=(gPts/2) then begin
+      tamjanY:=10*(gPts+2);
+      if gPts=4 then tamjanY:=tamjanY-5;
+      if gPts=2 then tamjanY:=tamjanY-10;
+      if gPts=10 then tamjanY:=tamjanY+3;
+      end
+    else begin
+      tamjanY:=10*(gPts+1);
+      if gPts=5 then tamjanY:=tamjanY+3;
+      if gPts=7 then tamjanY:=tamjanY+10;
+      if gPts=9 then tamjanY:=tamjanY+13;
+    end;
+  end;
+  if (gPts>10) and (gPts<=20) then
+  begin
+    t:=0;
+    tamjanX:=200;
+    tamjanY:=123;
+  end;
+  if (gPts>20) and (gPts<=30) then
+  begin
+    t:=0;
+    tamjanX:=300;
+    tamjanY:=123;
+  end;
+  if (gPts>30) and (gPts<=40) then
+  begin
+    t:=0;
+    tamjanX:=400;
+    tamjanY:=123;
+  end;
+  if (gPts>40) and (gPts<=50)then
+  begin
+    tamjanX:=400;
+    tamjanY:=123;
+    t:=100;
+  end;
+  tamanho:=imagesize(160-t,40,160+tamjanX,40+tamjanY);
+  getmem(area,tamanho);
+  getimage(160-t,40,160+tamjanX,40+tamjanY,area^);
+  setviewport(160-t,40,160+tamjanX,40+tamjanY,true);
+  setfillstyle(solidfill,0);
+  bar(0,0,tamjanX+t,tamjanY);
+  setcolor(15);
+  rectangle(3,1,tamjanX-3+t,tamjanY-1);
+  x:=10;
+  y:=4;
+  q:=0;
+  if (gPts div 10) = (gPts / 10) then q:=1;
+  for i:=1 to gPts do
+  begin
+     str(gRpX[i]:1:1,sRpX);
+     str(gRpY[i]:1:1,sRpY);
+     if gRpX[i]>=0 then sRpX:=' '+sRpX;
+     if gRpY[i]>=0 then sRpY:=' '+sRpY;
+     outtextxy(x,y,sRpX+','+sRpY);
+     MaxX:=x;
+     MaxY:=y;
+     y:=y+12;
+     if y>(112+(q*8)) then begin
+       y:=4;
+       x:=x+100;
+     end;
+  end;
+  x:=10;
+  y:=4;
+  setfillstyle(solidfill,15);
+  bar(7,3,90,12);
+  setcolor(0);
+  str(gRpX[1]:1:1,sRpX);
+  str(gRpY[1]:1:1,sRpY);
+  if gRpX[1]>=0 then sRpX:=' '+sRpX;
+  if gRpY[1]>=0 then sRpY:=' '+sRpY;
+  outtextxy(10,4,sRpX+','+sRpY);
+  i:=1;
+  repeat
+  c:=readkey;
+  if c=#32 then gProssegue:=true;
+  setfillstyle(solidfill,0);
+  bar(x-3,y-1,x+82,y+8);
+  setcolor(15);
+  str(gRpX[i]:1:1,sRpX);
+  str(gRpY[i]:1:1,sRpY);
+  if gRpX[i]>=0 then sRpX:=' '+sRpX;
+  if gRpY[i]>=0 then sRpY:=' '+sRpY;
+  outtextxy(x,y,sRpX+','+sRpY);
+  case ord(c) of
+    72 : begin
+           y:=y-12;
+           if (y<4) and (x>100) then
+           begin
+             y:=112;
+             if x>100 then x:=x-100;
+           end;
+           i:=i-1;
+           if (i=0) or (y<4) then
+           begin
+             i:=gPts;
+             x:=MaxX;
+             y:=MaxY;
+           end;
+         end;
+    80 : begin
+           y:=y+12;
+           i:=i+1;
+           if i=gPts+1 then
+           begin
+             i:=1;
+             x:=10;
+             y:=4;
+           end;
+           if y>(112+(q*8)) then begin
+             y:=4;
+             x:=x+100;
+           end;
+          end;
+    end;
+  setfillstyle(solidfill,15);
+  bar(x-3,y-1,x+82,y+8);
+  setcolor(0);
+  str(gRpX[i]:1:1,sRpX);
+  str(gRpY[i]:1:1,sRpY);
+  if gRpX[i]>=0 then sRpX:=' '+sRpX;
+  if gRpY[i]>=0 then sRpY:=' '+sRpY;
+  outtextxy(x,y,sRpX+','+sRpY);
+  until ((c=#13) or (c=#27) or (c=#32));
+  if c=#32 then gProssegue:=true;
+  if (c=#27) or (c=#32) then begin
+    setviewport(0,0,639,199,true);
+    putimage(160-t,40,area^,normalput);
+    freemem(area,tamanho);
+    setfillstyle(solidfill,15);
+    bar(0,189,639,199);
+    setcolor(0);
+    rectangle(3,190,636,198);
+    str(gZoom,sZoom);
+    outtextxy(4,191,'   F1 : Zoom (-)    F2 : Zoom (+)     F3 : Grade     F4 : Ler        Zoom: '+sZoom);
+    setviewport(1,15,200,50,true);
+    setcolor(0);
+    exit;
+  end;
+  cont:=false;
+  setviewport(0,0,639,199,true);
+  tamanho2:=imagesize(251,tamjanY+25,600,tamjanY+45);
+  getmem(area2,tamanho2);
+  getimage(251,tamjanY+25,600,tamjanY+45,area2^);
+  setviewport(251,tamjanY+25,600,tamjanY+45,true);
+    cont:=false;
+    setfillstyle(solidfill,0);
+    bar(0,0,291,35);
+    setcolor(15);
+    rectangle(3,1,288,19);
+    k:='';
+    m:=1;
+    str(gRpX[i],sRpX);
+    str(gRpY[i],sRpY);
+    str(i,l);
+    setcolor(15);
+    outtextxy(15,6, ' Entre com o ponto '+l+' = ');
+    sPont:=' Entre com o ponto '+l+' = ';
+    repeat
+      c:=readkey;
+      if c=#32 then gProssegue:=true;
+      if c=#27 then begin
+        setviewport(0,0,639,199,true);
+        putimage(251,tamjanY+25,area2^,normalput);
+        freemem(area2,tamanho2);
+        setviewport(0,0,639,199,true);
+        putimage(160-t,40,area^,normalput);
+        freemem(area,tamanho);
+        setfillstyle(solidfill,5);
+        bar(0,189,639,199);
+        setcolor(0);
+        rectangle(3,190,636,198);
+        str(gZoom,sZoom);
+        outtextxy(4,191,'   F1 : Zoom (-)    F2 : Zoom (+)     F3 : Grade     F4 : Ler        Zoom: '+sZoom);
+        setcolor(0);
+        setviewport(1,15,200,50,true);
+        setcolor(0);
+      exit;
+      end;
+      setcolor(0);
+      outtextxy(15,6,sPont+k);
+      if (cont=false) and ((c=#13) or (c=#32)) then
+      begin
+        c:=#44;
+        cont:=true;
+      end;
+      if c=#44 then cont:=true;
+      if  (c=#44) or (c=#46) or (c=#45) or ((c>#47) and (c<#58)) then k:=k+c;
+      if c=#8 then delete(k,length(k),1);
+      setcolor(15);
+      outtextxy(15,6,sPont+k);
+    until ((c=#13) or (c=#32)) and (cont=true);
+  if c=#32 then gProssegue:=true;
+  n:=pos(',',k);
+  sRpY:=copy(k,n+1,length(k)-n);
+  sRpX:=copy(k,1,length(k)-(length(k)-n)-1);
+  val(sRpX,gRpX[i],m);
+  val(sRpY,gRpY[i],m);
+  setcolor(15);
+  outtextxy(15,6,sPont+k);
+  setcolor(0);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(251,tamjanY+25,area2^,normalput);
+  freemem(area2,tamanho2);
+  putimage(160-t,40,area^,normalput);
+  freemem(area,tamanho);
+  until gProssegue;
+  setfillstyle(solidfill,5);
+  bar(0,189,639,199);
+  setcolor(0);
+  rectangle(3,190,636,198);
+  str(gZoom,sZoom);
+  outtextxy(4,191,'   F1 : Zoom (-)    F2 : Zoom (+)     F3 : Grade     F4 : Ler        Zoom: '+sZoom);
+  setcolor(15);
+  setviewport(1,15,200,50,true);
+end;
+{--------------------------------------------------------------------------}
+procedure Inicio;
+var
+    tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+begin
+  gRx:=0;    gEx:=1;
+  gRy:=0;    gEy:=1;
+  gTx:=1;    gEsX:=1;
+  gTy:=1;    gEsY:=1;
+  gRang:=45;
+  tamanho:=imagesize(1,15,200,50);
+  getmem(area,tamanho);
+  getimage(1,15,200,50,area^);
+  setviewport(1,15,200,50,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,199,35);
+  setcolor(15);
+  rectangle(3,1,197,34);
+  setcolor(15);
+  outtextxy(10,6, ' Entrada de Pontos  ');
+  outtextxy(10,20,' Alterar Pontos     ');
+  x:=10;
+  z:=1;
+  y:=6;
+  gInicioEsc[1]:=' Entrada de Pontos  ';
+  gInicioEsc[2]:=' Alterar Pontos     ';
+  for Z:=1 to 2 do gInicio[z]:=textwidth(gInicioEsc[z]);
+  setfillstyle(solidfill,15);
+  bar(x-3,y-1,x+gInicio[1],y+8);
+  setcolor(0);
+  outtextxy(x,y,gInicioEsc[1]);
+  z:=1;
+  repeat
+  c:=readkey;
+  if c=#27 then begin
+    setviewport(0,0,639,199,true);
+    putimage(1,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(0);
+    exit;
+  end;
+  setfillstyle(solidfill,0);
+  bar(x-3,y-1,x+gInicio[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gInicioEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    Pontos;
+    c:=#27;
+    setfillstyle(solidfill,0);
+    bar(0,0,199,35);
+    setcolor(15);
+    rectangle(3,1,197,34);
+    setfillstyle(solidfill,15);
+    bar(7,5,10+gInicio[1],14);
+    setcolor(0);
+    outtextxy(10,6, gInicioEsc[1]);
+    setcolor(15);
+    outtextxy(10,20,gInicioEsc[2]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    AlteraPontos;
+    c:=#27;
+    setfillstyle(solidfill,0);
+    bar(0,0,199,35);
+    setcolor(15);
+    rectangle(3,1,197,34);
+    outtextxy(10,6, gInicioEsc[1]);
+    setfillstyle(solidfill,15);
+    bar(7,19,10+gInicio[2],28);
+    setcolor(0);
+    outtextxy(10,20,gInicioEsc[2]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=2;
+    if z > 2 then z:=1;
+    case z of
+     1 : y:=6;
+     2 : y:=20;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x-3,y-1,x+gInicio[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gInicioEsc[z]);
+  end;
+  until (ord(c)=32) or (gProssegue=true);
+  gProssegue:=false;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(1,15,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(0);
+  setviewport(1,11,638,188,true);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  setcolor(15);
+  if gGrade=true then  eixos;
+  setcolor(15);
+  CalculoEscala;
+  desenha;
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure Sair;
+begin
+  RestoreCrtMode;
+  Halt(1);
+end;
+{--------------------------------------------------------------------------}
+Procedure Salvar;
+var
+    f       : text;
+    area    : pointer;
+    tamanho : word;
+    sCh     : char;
+    sQl     : integer;
+    sTam    : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(430,70,600,90);
+  area:=nil;
+  getmem(area,tamanho);
+  getimage(430,70,600,90,area^);
+  setviewport(430,70,600,90,true);
+  setfillstyle(solidfill,0);
+  bar(0,0,170,20);
+  setcolor(15);
+  rectangle(2,1,168,19);
+  gNome:='';
+  outtextxy(2,2,'            ');
+  outtextxy(3,7,' Arquivo:  ');
+  sQl:=1;
+  repeat
+  sCh:=readkey;
+  if sCh > #31 then gNome:=gNome+sCh;
+  if sCh = #8  then
+  begin
+    sQl:=sQl-1;
+    setcolor(0);
+    outtextxy(3,7,' Arquivo:  '+gNome);
+    setcolor(15);
+    sTam:=length(gNome);
+    delete(gNome,sTam,1)
+  end;
+  sQl:=sQl+1;
+  outtextxy(3,7,' Arquivo:  '+gNome);
+  until (sCh=#13);
+  if gNome=''then
+    begin
+      clearviewport;
+      setviewport(0,0,639,199,true);
+      putimage(548,15,area^,normalput);
+      freemem(area,tamanho);
+      setviewport(548,15,638,60,true);
+      exit;
+    end;
+  assign(f,'pic\'+gNome+'.pic');
+  rewrite(f);
+  writeln(f,gRx);  writeln(f,gRy);
+  writeln(f,gEx);  writeln(f,gEy);
+  writeln(f,gTx);  writeln(f,gTy);
+  writeln(f,gEsX); writeln(f,gEsY);
+  writeln(f,gPts); writeln(f,gRang);
+  for i:=1 to gPts do
+  begin
+    writeln(f,gRpX[i]);
+    writeln(f,gRpY[i]);
+  end;
+  close(f);
+  outtextxy(3,2,' Arquivo:  ');
+  setviewport(0,0,639,199,true);
+  putimage(430,70,area^,normalput);
+  freemem(area,tamanho);
+  setcolor(15);
+  setviewport(548,15,638,60,true);
+end;
+{--------------------------------------------------------------------------}
+Procedure Ler;
+var
+    f       : text;
+    area    : pointer;
+    tamanho : word;
+    nomes   : array[1..209] of string[12];
+    dosinfo : searchrec;
+    i,max   : integer;
+    x,y,k   : integer;
+    escX    : array[1..209] of integer;
+    escY    : array[1..209] of integer;
+    c       : char;
+    pag     : boolean;
+    kMax    : integer;
+begin
+  setviewport(0,0,639,199,true);
+  tamanho:=imagesize(120,50,510,150);
+  getmem(area,tamanho);
+  getimage(120,50,510,150,area^);
+  setviewport(120,50,510,150,true);
+  x:=20;
+  y:=4;
+  i:=1;
+  setfillstyle(solidfill,0);
+  bar(0,0,390,100);
+  setcolor(15);
+  rectangle(2,1,388,99);
+  for i:=1 to 209 do
+  begin
+    escX[i]:=x;
+    x:=x+125;
+    if x=395 then x:=20;
+    nomes[i]:='';
+  end;
+  i:=1;
+  repeat
+    escY[i]  :=y;
+    escY[i+1]:=y;
+    escY[i+2]:=y;
+    i:=i+3;
+    y:=y+14;
+    if y=102 then y:=4;
+  until i=205;
+  i:=1;
+  k:=0;
+  x:=20;
+  y:=4;
+  findfirst('pic\*.pic',anyfile,DosInfo);
+  while doserror=0 do
+  begin
+    nomes[i]:=DosInfo.name;
+    findnext(DosInfo);
+    x:=x+125;
+    i:=i+1;
+    y:=y+14;
+    if x=395 then x:=20;
+    if y=102 then y:=4;
+  end;
+  if nomes[1] ='' then begin
+    outtextxy(10,4,'Nao ha arquivos *.pic no diretorio');
+    outtextxy(10,14,'Pressione <ESC> para sair');
+    repeat
+      c:=readkey;
+    until c=#27;
+    setviewport(0,0,639,199,true);
+    putimage(120,50,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    setcolor(0);
+    exit;
+  end;
+  max:=i;
+  kMax:=max div 22;
+  repeat
+    pag:=false;
+    setfillstyle(solidfill,0);
+    bar(0,0,390,100);
+    setcolor(15);
+    rectangle(2,1,388,99);
+    for i:=1 to 21 do outtextxy(escX[i+k],escY[i+k]+1,nomes[i+k]);
+    i:=1;
+    x:=20;
+    y:=4;
+    setfillstyle(solidfill,15);
+    bar(escX[i+k],escY[i+k],escX[i+k]+textwidth(nomes[i+k]),escY[i+k]+8);
+    setcolor(0);
+    outtextxy(escX[i+k],escY[i+k]+1,nomes[i+k]);
+    repeat
+    c:=readkey;
+    if ord(c)=13 then pag:=true;
+    if ord(c)=27 then begin
+      setviewport(0,0,639,199,true);
+      putimage(120,50,area^,normalput);
+      freemem(area,tamanho);
+      setviewport(0,0,639,199,true);
+      setcolor(0);
+      exit;
+    end;
+    setfillstyle(solidfill,0);
+    bar(escX[i+k],escY[i+k],escX[i+k]+textwidth(nomes[i+k]),escY[i+k]+8);
+    setcolor(15);
+    outtextxy(escX[i+k],escY[i+k]+1,nomes[i+k]);
+    if c=#00 then begin
+      c:=readkey;
+      case ord(c) of
+        75 : begin
+               i:=i-1;
+               if i=0 then begin
+                 if (max<=21) or ((max>21) and (k>0)) then i:=max-1;
+                 if (max>=21) and (k=0) then i:=21 else
+                 repeat
+                    if (i>21) or (nomes[i+k]='') then i:=i-1;
+                 until nomes[i+k]<>'';
+               end;
+             end;
+        77 : begin
+               i:=i+1;
+               if (i=22) or (nomes[i+k]='') then i:=1;
+               end;
+        80 : begin
+               k:=k+21;
+               if k=kMax+1 then k:=0;
+               c:=#13;
+               if k>0 then begin
+                 k:=0;
+                 i:=1;
+               end;
+             end;
+        72 : begin
+               k:=k-21;
+               if k=-1 then k:=kMax;
+               c:=#13;
+               if k<0 then k:=0;
+             end;
+      end;
+    setfillstyle(solidfill,15);
+    bar(escX[i+k],escY[i+k],escX[i+k]+textwidth(nomes[i+k]),escY[i+k]+8);
+    setcolor(0);
+    outtextxy(escX[i+k],escY[i+k]+1,nomes[i+k]);
+    setcolor(15);
+    end;
+   until (c =#13);
+  until pag;
+  doserror:=0;
+  gNome:=nomes[i+k];
+  assign(f,'pic\'+gNome);
+  reset(f);
+  readln(f,gRx);  readln(f,gRy);
+  readln(f,gEx);  readln(f,gEy);
+  readln(f,gTx);  readln(f,gTy);
+  readln(f,gEsX); readln(f,gEsY);
+  readln(f,gPts); readln(f,gRang);
+  for i:=1 to gPts do
+  begin
+    readln(f,gRpX[i]);
+    readln(f,gRpY[i]);
+  end;
+  close(f);
+  setviewport(0,0,639,199,true);
+  putimage(120,50,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(1,11,638,188,true);
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  if gGrade=true then eixos;
+  setcolor(15);
+  desenha;
+end;
+{--------------------------------------------------------------------------}
+Procedure Fim;
+var
+    tamanho : word;
+    area    : pointer;
+    i       : integer;
+    c       : char;
+    x,y,z   : integer;
+begin
+  tamanho:=imagesize(548,15,638,60);
+  getmem(area,tamanho);
+  getimage(548,15,638,60,area^);
+  setviewport(548,15,638,60,true);
+  clearviewport;
+  setfillstyle(solidfill,0);
+  bar(0,0,90,45);
+  setcolor(15);
+  rectangle(3,1,87,44);
+  outtextxy(10,4, ' Sair    ');
+  outtextxy(10,18,' Voltar  ');
+  outtextxy(10,33,' Salvar  ');
+  x:=10;
+  z:=1;
+  y:=4;
+  gFimEsc[1]:=' Sair   ';
+  gFimEsc[2]:=' Voltar ';
+  gFimEsc[3]:=' Salvar ';
+  for i:=1 to 3 do gFim[i]:=textwidth(gFimEsc[i]);
+  setfillstyle(solidfill,15);
+  bar(x-2,y-1,x+7+gFim[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gFimEsc[z]);
+  repeat
+  c:=readkey;
+  setfillstyle(solidfill,0);
+  bar(x-2,y-1,x+7+gFim[z],y+8);
+  setcolor(15);
+  outtextxy(x,y,gFimEsc[z]);
+  if (c=#13) and (z=1) then
+  begin
+    Sair;
+    setfillstyle(solidfill,0);
+    bar(0,0,90,45);
+    setcolor(15);
+    rectangle(3,1,87,44);
+    outtextxy(10,4, ' Sair    ');
+    outtextxy(10,18,' Voltar  ');
+    outtextxy(10,33,' Salvar  ');
+    setfillstyle(solidfill,15);
+    bar(x-2,y-1,x+7+gFim[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gFimEsc[z]);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    clearviewport;
+    setviewport(0,0,639,199,true);
+    putimage(548,15,area^,normalput);
+    freemem(area,tamanho);
+    setviewport(0,0,639,199,true);
+    exit;
+  end;
+  if (c=#13) and (z=3) then
+  begin
+    Salvar;
+    setfillstyle(solidfill,0);
+    bar(0,0,90,45);
+    setcolor(15);
+    rectangle(3,1,87,44);
+    outtextxy(10,4, ' Sair    ');
+    outtextxy(10,18,' Voltar  ');
+    outtextxy(10,33,' Salvar  ');
+    setfillstyle(solidfill,15);
+    bar(x-2,y-1,x+7+gFim[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gFimEsc[z]);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     72 : z:=z-1;
+     80 : z:=z+1;
+    end;
+    if z < 1 then z:=3;
+    if z > 3 then z:=1;
+    case z of
+     1 : y:=4;
+     2 : y:=18;
+     3 : y:=33;
+    end;
+    setfillstyle(solidfill,15);
+    bar(x-2,y-1,x+7+gFim[z],y+8);
+    setcolor(0);
+    outtextxy(x,y,gFimEsc[z]);
+  end;
+  setfillstyle(solidfill,15);
+  bar(x-2,y-1,x+7+gFim[z],y+8);
+  setcolor(0);
+  outtextxy(x,y,gFimEsc[z]);
+  until ord(c)=32;
+  clearviewport;
+  setviewport(0,0,639,199,true);
+  putimage(548,15,area^,normalput);
+  freemem(area,tamanho);
+  setviewport(0,0,639,199,true);
+end;
+{--------------------------------------------------------------------------}
+procedure menu;
+ var
+     i,s      : integer;
+     c        : char;
+     x,y,z    : integer;
+     sZoom    : string[5];
+begin
+  ClearDevice;
+  s:=1;
+  x:=30;
+  z:=1;
+  y:=2;
+  rectangle(0,0,639,199);
+  setfillstyle(solidfill,9);
+  bar(0,0,639,10);
+  setcolor(0);
+  outtextxy(30,2,' Inicio ');
+  outtextxy(120,2,' Escala ');
+  outtextxy(215,2,' Espelhamento ');
+  outtextxy(350,2,' Rotacao ');
+  outtextxy(450,2,' Translacao ');
+  outtextxy(570,2,' Fim ');
+  gEsc[1]:=' Inicio ';
+  gEsc[2]:=' Escala ';
+  gEsc[3]:=' Espelhamento ';
+  gEsc[4]:=' Rotacao ';
+  gEsc[5]:=' Translacao ';
+  gEsc[6]:=' Fim ';
+  for i:=1 to 6 do
+     gMenu[i]:=textwidth(gEsc[i]);
+  setcolor(0);
+  setfillstyle(solidfill,0);
+  bar(x,0,x+gMenu[z],10);
+  setcolor(15);
+  outtextxy(x,y,gEsc[z]);
+  setfillstyle(solidfill,5);
+  bar(0,189,639,199);
+  setcolor(0);
+  rectangle(3,190,636,198);
+  str(gZoom,sZoom);
+  outtextxy(4,191,'   F1 : Zoom (-)    F2 : Zoom (+)     F3 : Grade     F4 : Ler        Zoom: '+sZoom);
+  setcolor(15);
+  if gGrade=true then Eixos;
+  desenha;
+  setcolor(0);
+  repeat
+  c:=readkey;
+  setfillstyle(solidfill,9);
+  bar(x,0,x+gMenu[z],10);
+  setcolor(0);
+  outtextxy(x,y,gEsc[z]);
+  if (c=#13) then begin
+  setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    setcolor(0);
+  end;
+  if (c=#13) and (z=1) then
+  begin
+    Inicio;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if (c=#13) and (z=2) then
+  begin
+    Escalamento;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if (c=#13) and (z=3) then
+  begin
+    Espelhamento;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if (c=#13) and (z=4) then
+  begin
+    rotacao;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if (c=#13) and (z=5) then
+  begin
+    Translacao;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if (c=#13) and (z=6) then
+  begin
+    Fim;
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    outtextxy(x,y,gEsc[z]);
+    rectangle(0,0,639,199);
+  end;
+  if c=#0 then begin
+    c:=readkey;
+    case ord(c) of
+     59 : begin
+            setviewport(1,11,638,188,true);
+            gZoom:=gZoom-1;
+            if gZoom<=1 then gZoom:=1;
+            clearviewport;
+            setviewport(0,0,639,199,true);
+            setcolor(15);
+            if gGrade=true then eixos;
+            desenha
+          end;
+     60 : begin
+            setviewport(1,11,638,188,true);
+            gZoom:=gZoom+1;
+            clearviewport;
+            setviewport(0,0,639,199,true);
+            setcolor(15);
+            if gGrade=true then eixos;
+            desenha
+          end;
+     61 : begin
+            setviewport(1,11,638,188,true);
+            clearviewport;
+            setviewport(0,0,639,199,true);
+            setcolor(15);
+            s:=-s;
+            if s=-1  then gGrade:=false;
+            if s=1 then gGrade:=true;
+            desenha;
+            if gGrade=true then
+            begin
+              setcolor(15);
+              eixos;
+            end;
+          end;
+     62 : ler;
+     75 : z:=z-1;
+     77 : z:=z+1;
+    end;
+    if z < 1 then z:=6;
+    if z > 6 then z:=1;
+    case z of
+     1 : x:=30;
+     2 : x:=120;
+     3 : x:=215;
+     4 : x:=350;
+     5 : x:=450;
+     6 : x:=570;
+    end;
+    setfillstyle(solidfill,5);
+    bar(549,191,620,197);
+    setcolor(0);
+    str(gZoom,sZoom);
+    outtextxy(556,191,'Zoom: '+sZoom);
+    setcolor(0);
+    setfillstyle(solidfill,0);
+    bar(x,0,x+gMenu[z],10);
+    setcolor(15);
+    rectangle(0,0,639,199);
+    outtextxy(x,y,gEsc[z]);
+  end;
+  setcolor(0);
+  setfillstyle(solidfill,0);
+  bar(x,0,x+gMenu[z],10);
+  setcolor(15);
+  outtextxy(x,y,gEsc[z]);
+  until ord(c)=-27;
+end;
+{--------------------------------------------------------------------------}
+begin
+gRx:=0;    gEx:=1;
+gRy:=0;    gEy:=1;
+gTx:=1;    gEsX:=1;
+gTy:=1;    gEsY:=1;
+gPts:=3;   gZoom:=10;
+gRang:=45; gGrade:=true;
+for i:=1 to 50 do
+begin
+  gRpX[i]:=0;
+  gRpY[i]:=0;
+end;
+gRpX[1]:=0;  gRpY[1]:=0;
+gRpX[2]:=1;  gRpY[2]:=4;
+gRpX[3]:=4;  gRpY[3]:=2;
+Apresentacao;
+Menu;
+end.

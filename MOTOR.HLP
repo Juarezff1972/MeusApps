@@ -1,0 +1,46 @@
+   Este programa foi desenvolvido com o prop¢sito de ser poss°vel a
+simulaáÑo matem†tica de um motor elÇtrico, a partir de alguns dados.
+
+   Eis aqui a explicaáÑo de alguns termos usados no programa:
+
+ - Rotaáîes por minuto: ê o n£mero de rotaáîes que o rotor faz em um minuto.
+ - Foráa de traáÑo: ê a quantidade de cavalos-foráa (HP ou Horse-Power) que
+                    o motor pode desenvolver com as caracter°sticas dadas.
+ - Potància: ê a quantidade de "Watts" que o motor consome.
+ - Rotaáîes por segundo: ê o n£mero de rotaáîes que o rotor faz em um
+                         segundo.
+ - FreqÅància do estator: ê a freqÅància da corrente elÇtrica que passa pelo
+                          estator.
+ - N£mero de p¢los: ê a quantidade de p¢los positivos mais negativos no
+                    estator. Deve ser sempre par, pois todo p¢lo positivo Ç
+                    sempre acompanhado de um negativo.
+ - Escorregamento de fase: ê a diferenáa entre as RPM desenvolvidas pelo
+                           motor e as RPM m†ximas calculadas, que represen-
+                           ta a porcentagem de energia perdida em forma de
+                           calor.
+ - FreqÅància do rotor: ê o n£mero de vezes que cada condutor do rotor
+                          ser† cortado por um p¢lo do motor.
+ - Foráa c.e.m.: Foráa contra-eletromotriz Ç a foráa magnÇtica contr†ria Ö
+                 rotaáÑo do motor. Equivale Ö foráa de atrito, caso o rotor
+                 estivesse em contato com os p¢los.
+ - Amperagem: Quantidade de AmpËres da corrente fornecida ao motor.
+ - Voltagem no terminal: Quantidade de Volts da energia fornecida ao motor.
+ - Resitància do estator: Resistància elÇtrica dos condutores do estator.
+ - Raio da espira: Raio do estator em cent°metros.
+ - Velocidade de sincronismo: Velocidade na qual a freqÅencia do estator Ç
+                              igual Ö freqÅencia do rotor, quando nÑo existe
+                              entÑo momento de toráÑo, e motor nÑo realiza
+                              nenhum trabalho.
+ - Comprimento do condutor: Tamanho do condutor se fosse esticado.
+
+
+
+   Para se realizar um c†lculo, coloque o cursor no item C†lculo, e aperte
+<ENTER>.
+   O cursor se movimenta utilizando-se as teclas de setas, e <ENTER>.
+
+
+
+
+MOTOR - Copyright(C)1991 by Juarez Fioravanti Filho.
+
