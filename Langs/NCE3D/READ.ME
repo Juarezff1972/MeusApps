@@ -1,0 +1,160 @@
+--------------------------------------------------------------------------
+
+N C E 3 D  -  Versao 2.7                                    Agosto de 1993
+
+
+Produzido pelo Grupo de Computacao Grafica
+Nucleo de Computacao Eletronica
+Universidade Federal do Rio de Janeiro
+Autores: Mauricio N. C. Bomfim / Jose Antonio Borges
+
+--------------------------------------------------------------------------
+
+DESCOMPACTE COM
+     pkunzip -d nce3d
+
+--------------------------------------------------------------------------
+
+     Voce esta recebendo a versao 2.7 do software NCE3D. Este software
+e' uma biblioteca de rotinas em Turbo Pascal, desenvolvida pelo
+Nucleo de Computacao Eletronica da UFRJ para visualizacao tridimensional
+e criacao de animacoes em microcomputadores.
+
+     Foi desenvolvido com o intuito de facilitar a programacao de
+graficos 3D, sem que o usuario precise se preocupar a fundo com a parte
+teorica da computacao grafica tridimensional.
+
+     Nao e' exigida nenhuma configuracao de hardware sofisticada para
+utilizar a NCE3D, entretanto o equipamento mais adequado para gerar
+visualizacoes com realismo e tempo de processamento razoaveis e' um PC 386
+com 2 Mb de memoria RAM, placa de video SuperVGA e monitor colorido.
+Algumas operacoes graficas podem ser muito aceleradas com o uso de
+um RamDisk de 640 Kbytes.
+
+     Entre as facilidades implementadas na NCE3D, destacam-se as seguintes:
+
+- Suporte a diversas placas e modos graficos
+- Projecao perspectiva e recorte
+- Transformacoes tridimensionais com hierarquia de movimentos
+- Rotinas de retas em 3D
+- Especificacao da posicao do observador
+- Preenchimento de poligonos com iluminacao e coloracao
+  (Gouraud Shading com Z-Buffer)
+- Preenchimento de poligonos 2D em degrade
+- Uso automatico de Dither de acordo com a placa/modo grafico utilizados
+- Solidos primitivos predefinidos como cubo, esfera, cilindro, anel,
+  toro, e cone
+- Geracao automatica de curvas e superficies de Bezier, B-Spline e
+  Hermitianas
+- Rotinas de armazenamento e recuperacao de imagens em disco em formato PCX
+- Geracao de animacoes em tempo real em "Wireframe"
+- Prototipo de uma interface com ilha de edicao de video, para
+  ser customizada pelo usuario.
+- Melhoria da qualidade das imagens geradas atraves de quantizacao
+
+
+CONTEUDO DESTA DISTRIBUICAO
+
+     Neste pacote estao compactados os seguintes diretorios/arquivos:
+
+DEMOS -> Programas de demonstracao da NCE3D
+    ANJO.PAS              - um anjo estilizado
+    BALANCO.PAS           - um balanco animado
+    ESTACAO.PAS           - uma estacao espacial
+    ESTEREO.PAS           - necessita oculos 3d (azul e vermelho)
+    NCE.PAS               - arco iris com NCE/UFRJ
+    NCEUFRJ.DAT           - arq. de dados usado pelo NCE.PAS
+    PIRAMIDE.PAS          - interacao 3d em tempo real
+    TRICICLO.PAS          - um triciclo em movimento
+
+DRIVERS -> Drivers utilizados pelo programa
+    CGA.BGI, HERC.BGI, EGAVGA.BGI - drivers Borland
+    VGA256.BGI, SVGA256.BGI       - drivers VGA e SuperVGA 256 cores
+
+FONTES -> Programas que compoem a NCE3D
+    NCE3D.PAS            - arquivos da Unit NCE3D
+    INIC3D.PAS
+    LUZ3D.PAS
+    RETAS3D.PAS
+    SOLIDO3D.PAS
+    SUPERF3D.PAS
+    TRANSF3D.PAS
+    ZBUF3D.PAS
+
+    UTNCE3D.PAS          - arquivos da Unit UtNCE3D
+    UTDEGRAD.PAS
+    UTPCX.PAS
+    UTQUANT.PAS
+    UTVIDEO.PAS
+
+    ARQRGB3D.PAS         - unit de uso interno; nao deve ser chamada
+                           diretamente pelo usuario
+
+    FACIL3D              - modulo para facilitar o uso das procedures
+                           de curvas e superficies para programadores
+                           iniciantes
+
+    NCEMENU.PAS          - rotinas de menu e cursor
+
+IMAGENS -> Algumas imagens que demonstram a potencialidade do software
+    ANJO.PCX     ARCO.PCX      CABECA.PCX     CAFE.PCX       DESERTO.PCX
+    DRINK.PCX    FACE.PCX      FLOR.PCX       FUNDAO.PCX     GATO.PCX
+    HYDRO.PCX    MACA.PCX      MESA.PCX       PAISAG.PCX     PASSARO.PCX
+    SATURNO.PCX  SORVETE.PCX   SURPRESA.PCX
+
+MANUAL ->  Versao PostScript do Manual de Operacao (118 pags)
+    INDICE.PS       -    4 pags
+    CAP1.PS         -   10 pags
+    CAP2.PS         -   11 pags
+    CAP3.PS         -   18 pags
+    CAP4.PS         -    9 pags
+    CAP5.PS         -   16 pags
+    CAP6.PS         -   18 pags
+    CAP7.PS         -    9 pags
+    APENDICE.PS     -   23 pags
+
+MANUAL\EXEMPLOS -> Programas exemplo do manual
+    APEND4_1.PAS   APEND4_2.PAS    CAP2_1.PAS    CAP2_2.PAS
+    CAP3_1.PAS      CAP3_2.PAS     CAP3_3.PAS    CAP4.PAS
+    CAP5_1.PAS     CAP5_2.PAS      CAP6_1.PAS    CAP6_2.PAS
+    CAP7.PAS
+
+    CAMINHO.CTR     - dados usados pelos exemplos
+    CUR1.CTR   CUR2.CTR   CUR3.CTR   CUR4.CTR
+    CUR5.CTR   CUR6.CTR   CUR7.CTR   CUR8.CTR
+    PCONTR.DAT POLIGS.DAT
+    SUP1.CTR   SUP2.CTR   SUP3.CTR   SUP4.CTR   SUP5.CTR
+
+UTIL  -> Programas utilitarios
+    SH.EXE       - programa para mostrar animacao em WireFrame
+    EDMALHA.PAS  - editor de malhas 3D
+    EDMALHA.EXE
+    SANS.CHR     - fonte de caracteres usado pelo programa EdMalha
+    QUANTPCX.PAS - quantizador de imagens da NCE3D
+    QUANTPCX.EXE
+    GRAVA.PAS    - grava uma imagem PCX em video
+    GRAVA.EXE
+
+
+Caracteristicas de distribuicao FREEWARE
+
+     Voce pode copiar, utilizar e modificar livremente estes programas,
+desde que para uso academico ou pessoal.  Usos deste programa com fins
+lucrativos devem ser negociados com NCE/UFRJ.  Remover ou adulterar
+as mensagens iniciais dos programas (cabecalho) constitui uma violacao
+ao direito de CopyRight.
+
+     O NCE/UFRJ nao assume nenhuma responsabilidade por qualquer
+prejuizo ou dano, advindo do uso, direto ou indireto, destes programas.
+
+     Maiores informacoes e/ou sugestoes podem ser encaminhadas a:
+
+        Grupo de Computacao Grafica da DAU
+        NCE/UFRJ
+        Caixa Postal 2324 - Rio de Janeiro - RJ
+        CEP 20001-970
+        Tel. (021) 598-3117
+        Fax. (021) 270-8554
+        E-mail: mauricio@nce.ufrj.br
+
+--------------------------------------------------------------------------
