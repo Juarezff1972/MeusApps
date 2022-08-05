@@ -1,0 +1,2 @@
+turbo senha.asm
+compila

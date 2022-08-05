@@ -1,0 +1,34 @@
+uses dos;
+var regs : registers;
+	 x    : byte;
+	 aux  : string[4];
+	 t    : array[1..4096] of byte;
+	 asci : file of byte;
+	 i    : word;
+begin
+	writeln;
+	write('Entre com o numero de pontos: (7 a 20) ');
+	readln(x);
+	if x<7 then x:=7;
+	if x>20 then x:=20;
+   str(x,aux);
+	assign(asci,'FONT'+aux+'.CHR');
+	reset(asci);
+	regs.ah:=$11;
+	regs.al:=4;
+	regs.bl:=0;
+	intr($10,regs);
+	for i:=0 to 255*x+(x-1) do read(asci,t[i]);
+	close(asci);
+	regs.ax:=$1110;
+	regs.bl:=0;
+	regs.bh:=x;
+	regs.cx:=256;
+	regs.dx:=0;
+	regs.es:=seg(t);
+	regs.bp:=ofs(t)+1;
+	intr($10,regs);
+	regs.ah:=$12;
+	regs.bl:=$20;
+	intr($10,regs);
+end.

@@ -1,0 +1,77 @@
+uses dos,crt;
+type chtb = array[1..4096] of byte;
+var regs : registers;
+    x    : ^byte;
+    y,z  : byte;
+    i    : word;
+    t    : chtb;
+    v    : byte;
+    w    : array[1..16] of string[8];
+    aux  : byte;
+    u    : integer;
+begin
+   regs.ah:=$11;
+   regs.al:=4;
+   regs.bl:=0;
+   intr($10,regs);
+   regs.ah:=$11;
+   regs.al:=$30;
+   regs.bh:=6;
+   intr($10,regs);
+   for i:=0 to 255*16+15 do
+   begin
+      x:=ptr(regs.es,regs.bp+i);
+      t[i]:=x^;
+   end;
+   w[ 1]:='10000000';
+   w[ 2]:='11000000';
+   w[ 3]:='11100000';
+   w[ 4]:='11110000';
+   w[ 5]:='11111000';
+   w[ 6]:='11111100';
+   w[ 7]:='11111110';
+   w[ 8]:='11111111';
+   w[ 9]:='11111110';
+   w[10]:='11111000';
+   w[11]:='11001100';
+   w[12]:='00000110';
+   w[13]:='00000110';
+   w[14]:='00000011';
+   w[15]:='00000011';
+   w[16]:='00000001';
+   aux:=0;
+   for i:=1 to 16 do
+   begin
+      val(copy(w[i],1,1),v,u);
+      aux:=2*2*2*2*2*2*2*v;
+      val(copy(w[i],2,1),v,u);
+      aux:=2*2*2*2*2*2*v+aux;
+      val(copy(w[i],3,1),v,u);
+      aux:=2*2*2*2*2*v+aux;
+      val(copy(w[i],4,1),v,u);
+      aux:=2*2*2*2*v+aux;
+      val(copy(w[i],5,1),v,u);
+      aux:=2*2*2*v+aux;
+      val(copy(w[i],6,1),v,u);
+      aux:=2*2*v+aux;
+      val(copy(w[i],7,1),v,u);
+      aux:=2*v+aux;
+      val(copy(w[i],8,1),v,u);
+      aux:=v+aux;
+      t[255*16+(i-1)]:=aux;
+   end;
+   regs.ah:=$11;
+   regs.al:=$0;
+   regs.cx:=256;
+   regs.dx:=0;
+   regs.bh:=16;
+   regs.es:=seg(t);
+   regs.bp:=ofs(t)-1;
+   intr($10,regs);
+   writeln;
+   writeln(chr(255));
+   writeln;
+   textattr:=7;
+   writeln;
+   repeat until keypressed;
+end.
