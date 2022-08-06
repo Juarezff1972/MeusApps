@@ -1,0 +1,62 @@
+list
+frame_count  1
+object_count 7
+
+camera {						// define camera
+	location 	450 450 100
+	coa		-500 -500 0
+	up		0 0 1
+}
+
+light {							// define light source
+	type far
+	direction -1 -1 -1
+	ambient 0.15 0.15 0.15
+	diffuse 0.35 0.35 0.35
+}
+
+sbfast {						// define terrain
+	shade palex terrain.ilm
+	3d_texture terrain3.3dt
+        back 1000.0
+//	octaves 100
+	octaves 6
+	h 0.2765
+	lacunarity 2
+	displacement barfland_alt
+}
+
+polygon {						// define clouds
+	raycast
+	shade alex cloud.ilm
+	3d_texture cloud.3dt
+	file sky.spg
+	transparent
+	luminate
+	translate 500 500 110
+}
+
+polygon {						// define stars
+	raycast
+	transparent
+	luminate
+	shade alex stars.ilm
+	3d_texture stars.3dt
+	translate 500 500 250
+	file sky.spg
+}
+
+polygon {						// define sea
+	raycast
+	shade alex sea.ilm
+	file sea.spg
+	3d_texture terrain2.3dt
+	scale 100
+}
+
+geosphere {						// define moon
+	shade palex white.ilm
+	3d_texture moon.3dt
+	translate 350 200 180
+	axis 40 40 40
+}

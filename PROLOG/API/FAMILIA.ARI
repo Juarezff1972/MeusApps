@@ -1,0 +1,33 @@
+familia(pessoa(joao,silva,data(7,maio, 1950),trabalho(PUC,650)),
+        pessoa(ana, silva,data(9,julho,1953),desempregado),
+        [pessoa(pedro,silva,data(5,julho  ,1973),desempregado),
+         pessoa(paulo,silva,data(8,janeiro,1977),desempregado)]).
+
+inst_familia(familia(X,Y,Z)):-familia(X,Y,Z).
+esposo(familia(X,_,_),X).
+esposo(familia(_,X,_),X).
+filhos(familia(_,_,X),X).
+nome(pessoa(X,_,_,_),X).
+sobrenome(pessoa(_,X,_,_),X).
+data(pessoa(_,_,X,_),X).
+trabalho(pessoa(_,_,_,X),X).
+dia(data(X,_,_),X).
+mes(data(_,X,_),X).
+ano(data(_,_,X),X).
+local(trabalho(X,_),X).
+salario(trabalho(_,X),X).
+salario(desempregado,0).
+
+n_filhos(X,Y):-inst_familia(W),esposo(W,E),sobrenome(E,X),filhos(W,LF),n_elementos(LF,Y).
+
+familia_sem_filhos(X):-n_filhos(X,0).
+
+primeiro_filho(X,N):-inst_familia(F),esposo(F,E),sobrenome(E,X),filhos(F,[P|_]),nome(P,N).
+
+ultimo_filho(X,N):-inst_familia(F),esposo(F,E),sobrenome(E,X),filhos(F,LF),n_elementos(LF,Z),n_esimo(Z,N,LF).
+
+n_esimo(1,E,[E|_]).
+n_esimo(N,E,[_|C]):-n_esimo(M,E,C),M is N-1.
+
+n_elementos([],0).
+n_elementos([E|C],N):-n_elementos(C,N1),N is N1+1.

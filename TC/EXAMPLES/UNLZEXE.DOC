@@ -1,0 +1,41 @@
+*******************************************************
+
+                UNLZEXE.EXE  Ver.0.2   
+
+                written by Kou , 03/29/90
+
+      UTJ44266 SIG "Global Village" in PC-VAN (Japan)
+
+*******************************************************
+
+   UNLZEXE converts the compressed file by lzexe(ver.0.90,0.91) to the
+decompressed executable one.
+
+USAGE:
+　　　　A>UNLZEXE  packedfile.EXE  unpackedfile.EXE
+
+ packedfile.EXE   : the name of the compressed file by LZEXE.
+ unpackedfile.EXE : the name of the decompressed file.
+  (BOTH full names including the extention ".EXE" are required)
+
+Notice: The UNpacked file is executable and its load module is the same
+        as the original one, but the header and the relocation table of
+        the UNpacked executable file may be different from those of the
+        original executable file.
+
+  UNLZEXE is distributed as PUBLIC DOMAIN.
+
+  BUG reports and comments to the author are welcome.
+
+  Since the author does not have an ID of CompuServe, please contact
+with Tamio TSUKAMOTO(ID:76663,226), or Masazumi TAKADA(ID:70007,2767)
+who is the SigOP of the SIG " Global Village" in the Japanese computer
+network "PC-VAN".
+
+----------------------------------------
+Files in this package:
+----------------------------------------
+UNLZEXE  DOC     
+UNLZEXE  C       7229  90-03-29   0:49
+UNLZEXE  EXE     8232  90-03-29   0:52
+----------------------------------------

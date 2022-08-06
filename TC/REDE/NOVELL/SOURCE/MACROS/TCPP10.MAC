@@ -1,0 +1,779 @@
+;	(c) COPYRIGHT 1988-1990 by Novell, Inc.  All Rights Reserved.
+	.XLIST
+	PAGE	58, 132
+;**
+;
+; This macro library defines the operating environment for the Borland Turbo
+; 'C' Compilers
+;
+;**
+
+True	EQU	0FFFFh
+False	EQU	0
+procnam EQU	<Proc>
+havesi	=	0
+havedi	=	0
+havPSg	=	0
+havDSg	=	0
+haveES	=	0
+
+
+;**
+;
+; The following symbols define the memory mode being used.  Define LProg on
+; the command line for a large program segment, and define LData on the
+; command line for a large data segment.  Model will have bit 0 set
+; if LData was defined, and bit 1 set if LProg was defined.
+;
+;**
+Model	= 0
+IFDEF LProg
+	Model	=	Model OR 2
+ENDIF
+IFDEF LData
+	Model	=	Model OR 1
+ENDIF
+
+IFDEF LProg
+	CPSIZE	= 4
+ELSE
+	CPSIZE	= 2
+ENDIF
+
+
+IPXExterns	MACRO
+IFDEF VAP
+	VExtern IPXSPXServices, dword
+ELSE
+	VExtern IPXLocation, dword
+ENDIF
+	ENDM
+
+DOSExterns	MACRO
+IFDEF VAP
+	VExtern NetWareShellServices, dword
+ENDIF
+	ENDM
+
+
+;**
+;
+; The DSEG and PSEG macros are defined to generate the appropriate GROUP
+; and SEGMENT statements for the memory model being used.  The ENDDS and
+; ENDPS macros are then used to end the segments.
+;
+;**
+DSeg	MACRO
+havDSg	=	True
+DGROUP	GROUP	_DATA
+_DATA	SEGMENT word public 'DATA'
+	ASSUME	ds:DGROUP
+	ENDM
+
+ EndDS	MACRO
+ _DATA	ENDS
+	ENDM
+
+IF	(Model AND 2) EQ 0
+	PSeg	MACRO
+	havPSg	=	True
+	_TEXT	SEGMENT byte public 'CODE'
+		ASSUME	cs:_TEXT
+		ENDM
+
+	EndPS	MACRO
+	_TEXT	ENDS
+		ENDM
+ENDIF
+
+IF	Model AND 2
+	PSeg	MACRO
+	havPSg	=	True
+	procnam&_TEXT	SEGMENT byte 'CODE'
+		ASSUME	cs:procnam&_TEXT
+		ENDM
+
+	EndPS	MACRO
+	procnam&_TEXT	ENDS
+		ENDM
+ENDIF
+
+;**
+;
+; The ProcDef and Entry macros establish function entry points depending
+; on whether NEAR or FAR program addressing is being used.  Arguments for
+; the entry points may be listed along with the argument types.  The only
+; difference between Procedure and Entry macros is that Procedure generates
+; a PROC operation to start a segment.
+;
+;**
+ProcDef MACRO pname, args
+	PUBLIC	_&pname
+haveES = 0
+IF	MODEL AND 2
+	_arg	=	6
+	_&pname PROC	FAR
+ELSE
+	_arg	=	4
+	_&pname PROC	NEAR
+ENDIF
+pname	EQU	_&pname
+_argsT	= False
+IRP	x, <args>
+	IFNB	<x>
+		_argsT	= True
+	ENDIF
+	ENDM
+IF	_argsT
+		push	bp
+		mov	bp, sp
+	havbp	=	True
+		DecList <args>
+ELSE
+	havbp	=	False
+ENDIF
+	ENDM
+
+Entry	MACRO	pname, args
+	PUBLIC	_&pname
+IF	MODEL AND 2
+	_arg	=	6
+	_&pname LABEL	FAR
+ELSE
+	_arg	=	4
+	_&pname LABEL	NEAR
+ENDIF
+pname	EQU	_&pname
+IFNB	<args>
+	IF	havebp
+			push	bp
+			mov	bp, sp
+	ELSE
+		IF2
+			%OUT	Must declare main proc with args, if entry has args.
+		ENDIF
+			.ERR2
+	ENDIF
+	DecList <args>
+ENDIF
+	ENDM
+
+ProcEnd MACRO pname
+_&pname ENDP
+	ENDM
+
+;**
+;
+; The following macros are used to process ProcDef and Entry declaration
+; lists.
+;
+;**
+Declare MACRO	aname, atype, argOff
+havtyp	=	False
+IFIDN	<atype>, <byte>
+	aname	EQU	byte PTR argOff[bp]
+	_arg	=	_arg + 2
+	havtyp	=	True
+ENDIF
+IFIDN	<atype>, <word>
+	aname	EQU	word ptr argOff[bp]
+	_arg	=	_arg + 2
+	havtyp	=	True
+ENDIF
+IFIDN	<atype>, <long>
+	aname	EQU	dword ptr argOff[bp]
+	_arg	=	_arg + 4
+	havtyp	=	True
+ENDIF
+IFIDN	<atype>, <dptr>
+	IF	MODEL AND 1
+		aname	EQU	dword ptr argOff[bp]
+		_arg	=	_arg + 4
+	ELSE
+		aname	EQU	word ptr argOff[bp]
+		_arg	=	_arg + 2
+	ENDIF
+	havtyp	=	True
+ENDIF
+IFIDN	<atype>, <cptr>
+	IF	MODEL AND 2
+		aname	EQU	dword ptr argOff[bp]
+		_arg	=	_arg + 4
+	ELSE
+		aname	EQU	word ptr argOff[bp]
+		_arg	=	_arg + 2
+	ENDIF
+	havtyp	=	True
+ENDIF
+IFE	havtyp
+	IF2
+		%OUT	Type is unknown.
+	ENDIF
+	.ERR2
+ENDIF
+	ENDM
+
+DecList MACRO	list
+	IRP	i, <list>
+	Declare i, %_arg
+	ENDM
+	ENDM
+
+;**
+;
+; The following macros are used to return from a procedure.  The specified
+; argument type is returned, either from registers or from memory.  If
+; the procedure was declared with arguments, BP is popped.  Then a RET is
+; generated.
+;
+;**
+RetVal	MACRO	rtype, stype, src, seg
+havstyp =	False
+havrtyp =	False
+IFIDN	<rtype>, <byte>
+	havrtyp =	True
+	IFIDN	<stype>, <reg>
+		IFDIF	<src>, <al>
+				mov	al, src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <imm>
+			mov	al, src
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <mem>
+			mov	al, byte ptr src
+		havstyp =	True
+	ENDIF
+	IFE	havstyp
+		IF2
+			%OUT	Return source type unknown.
+		ENDIF
+		.ERR2
+	ELSE
+			mov	ah, 0
+	ENDIF
+ENDIF
+IFIDN	<rtype>, <word>
+	havrtyp =	True
+	IFIDN	<stype>, <reg>
+		IFDIF	<src>, <ax>
+				mov	ax, src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <imm>
+			mov	ax, src
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <mem>
+			mov	ax, word ptr src
+		havstyp =	True
+	ENDIF
+	IFE	havstyp
+		IF2
+			%OUT	Return source type unknown.
+		ENDIF
+		.ERR2
+	ENDIF
+ENDIF
+IFIDN	<rtype>, <long>
+	havrtyp =	True
+	IFIDN	<stype>, <reg>
+		IFB	<seg>
+				mov	dx, 0
+		ELSE
+			IFDIF	<seg>, <dx>
+					mov	dx, seg
+			ENDIF
+		ENDIF
+		IFDIF	<src>, <ax>
+				mov	ax, src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <imm>
+		IFB	<seg>
+				mov	dx, 0
+		ELSE
+				mov	dx, seg
+		ENDIF
+			mov	ax, src
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <mem>
+			mov	ax, word ptr src
+			mov	dx, word ptr src+2
+		havstyp =	True
+	ENDIF
+	IFE	havstyp
+		IF2
+			%OUT	Return source type unknown.
+		ENDIF
+		.ERR2
+	ENDIF
+ENDIF
+IFIDN	<rtype>, <dptr>
+	havrtyp =	True
+	IFIDN	<stype>, <reg>
+		IF	MODEL AND 1
+			IFB	<seg>
+					mov	dx, ds
+			ELSE
+				IFDIF	<seg>, <dx>
+						mov	dx, seg
+				ENDIF
+			ENDIF
+			IFDIF	<src>, <ax>
+					mov	ax, src
+			ENDIF
+		ELSE
+			IFDIF	<src>, <ax>
+					mov	ax, src
+			ENDIF
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <imm>
+		IF	MODEL AND 1
+				mov	ax, src
+				mov	dx, 0
+		ELSE
+				mov	ax, src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <mem>
+		IF	MODEL AND 1
+				mov	ax, word ptr src
+				mov	dx, word ptr src+2
+		ELSE
+				mov	ax, word ptr src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFE	havstyp
+		IF2
+			%OUT	Return source type unknown.
+		ENDIF
+		.ERR2
+	ENDIF
+ENDIF
+IFIDN	<rtype>, <cptr>
+	havrtyp =	True
+	IFIDN	<stype>, <reg>
+		IF	MODEL AND 2
+			IFB	<seg>
+					mov	dx, cs
+			ELSE
+				IFDIF	<seg>, <dx>
+						mov	dx, seg
+				ENDIF
+			ENDIF
+			IFDIF	<src>, <ax>
+					mov	ax, src
+			ENDIF
+		ELSE
+			IFDIF	<src>, <ax>
+					mov	ax, src
+			ENDIF
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <imm>
+		IF	MODEL AND 2
+				mov	ax, src
+				mov	dx, 0
+		ELSE
+				mov	ax, src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFIDN	<stype>, <mem>
+		IF	MODEL AND 2
+				mov	ax, word ptr src
+				mov	dx, word ptr src+2
+		ELSE
+				mov	ax, word ptr src
+		ENDIF
+		havstyp =	True
+	ENDIF
+	IFE	havstyp
+		IF2
+			%OUT	Return source type unknown.
+		ENDIF
+		.ERR2
+	ENDIF
+ENDIF
+IFE	havrtyp
+	IF2
+		%OUT	Unknown return type.
+	ENDIF
+	.ERR2
+ENDIF
+	ENDM
+
+Return	MACRO
+IF	havbp
+		pop	bp
+ENDIF
+	ret
+	ENDM
+
+;**
+;
+; The following are miscellaneous macros
+;
+;**
+LoadPtr MACRO	dest, argname, seg
+IF	MODEL AND 1
+	IFNB	<seg>
+		IFIDN	<seg>, <es>
+				les	dest, argname
+		ELSE
+			IFIDN	<seg>, <ds>
+					lds	dest, argname
+			ELSE
+					mov	dest, word ptr argname
+					mov	seg, word ptr argname[2]
+			ENDIF
+		ENDIF
+	ELSE
+		IFIDN	<dest>, <si>
+				lds	si, argname
+		ELSE
+			IFIDN	<dest>, <di>
+				les	di, argname
+			ELSE
+				IF2
+					%OUT LoadPtr: No segment name for long pointer.
+				ENDIF
+				.ERR2
+			ENDIF
+		ENDIF
+	ENDIF
+ELSE
+	IFIDN	<seg>, <es>
+		IFE haveES
+			push ds
+			pop es
+			haveES = 1
+		ENDIF
+	ENDIF
+	mov	dest, word ptr argname
+ENDIF
+	ENDM
+
+pushds	MACRO
+IF	Model AND 1
+		push	ds
+ENDIF
+	ENDM
+
+popds	MACRO
+IF	Model AND 1
+		pop	ds
+ENDIF
+	ENDM
+
+pushes	MACRO
+IF	(MODEL AND 1) EQ 0
+		push	es
+ENDIF
+	ENDM
+
+popes	MACRO
+IF	(MODEL AND 1) EQ 0
+		pop	es
+ENDIF
+	ENDM
+
+pushsi	MACRO
+	push	si
+	ENDM
+
+pushdi	MACRO
+	push	di
+	ENDM
+
+popsi	MACRO
+	pop	si
+	ENDM
+
+popdi	MACRO
+	pop	di
+	ENDM
+
+resetd	MACRO
+	cld
+	ENDM
+
+ChkNull MACRO	smashReg, reg, seg
+IF	Model AND 1			;; Works only for dptr's
+	mov	smashReg, seg
+	or	smashReg, reg
+ELSE
+	or	reg, reg
+ENDIF
+	ENDM
+
+DecPExt MACRO	var, vtype
+	EXTRN	_&var:vtype
+	var	EQU	_&var
+	ENDM
+
+PExtern MACRO	args
+IF	(MODEL AND 2)
+	IF	havPSg EQ 0
+		IRP	i, <args>
+		DecPExt i, <far>
+		ENDM
+	ELSE
+		IF2
+			%OUT	PExtern not allowed after PSeg (Large Code).
+		ENDIF
+		.ERR2
+	ENDIF
+ELSE
+	IF	havPSg EQ 0
+		PSeg
+		PSeg	MACRO
+		ENDM
+	ENDIF
+	IRP	i, <args>
+	DecPExt i, <near>
+	ENDM
+ENDIF
+	ENDM
+
+DExtern MACRO	args
+IF	havDSg EQ 0
+	DSeg
+	DSeg	MACRO
+	ENDM
+ENDIF
+	IRP	i, <args>
+	DecExt	i
+	ENDM
+	ENDM
+
+DecExt	MACRO	aname, atype
+havtyp = False
+IFIDN	<atype>, <byte>
+	havtyp	=	True
+	EXTRN	_&aname:byte
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <word>
+	havtyp	=	True
+	EXTRN	_&aname:word
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <long>
+	havtyp	=	True
+	EXTRN	_&aname:dword
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <dptr>
+	havtyp	=	True
+	IF	MODEL AND 1
+		EXTRN	_&aname:dword
+	ELSE
+		EXTRN	_&aname:word
+	ENDIF
+	aname	EQU	_&aname
+ENDIF
+IFE	havtyp
+	IF2
+		%OUT	Invalid type (DExtern).
+	ENDIF
+	.ERR2
+ENDIF
+	ENDM
+
+VExtern MACRO	pname, ptype
+IF	(MODEL AND 2)
+	IF	havPSg EQ 0
+		extrn pname:ptype
+	ELSE
+		IF2
+			%OUT	VExtern not allowed after PSeg (Large Code).
+		ENDIF
+		.ERR2
+	ENDIF
+ELSE
+	IF	havPSg EQ 0
+		PSeg
+		PSeg	MACRO
+		ENDM
+	ENDIF
+	extrn pname:ptype
+ENDIF
+	ENDM
+
+GlobalData	MACRO	args
+	IRP	i, <args>
+	DecGlob i
+	ENDM
+	ENDM
+
+DecGlob MACRO	aname, atype, aval
+havtyp	=	False
+IFIDN	<atype>, <byte>
+	havtyp	=	True
+	IFB	<aval>
+		_&aname db	?
+	ELSE
+		_&aname db	aval
+	ENDIF
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <word>
+	havtyp	=	True
+	IFB	<aval>
+		_&aname dw	?
+	ELSE
+		_&aname dw	aval
+	ENDIF
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <long>
+	havtyp	=	True
+	IFB	<aval>
+		_&aname dd	?
+	ELSE
+		_&aname dd	aval
+	ENDIF
+	aname	EQU	_&aname
+ENDIF
+IFIDN	<atype>, <dptr>
+	havtyp	=	True
+	IF	MODEL AND 1
+		IFB	<aval>
+			_&aname dd	?
+		ELSE
+			_&aname dd	aval
+		ENDIF
+	ELSE
+		IFB	<aval>
+			_&aname dw	?
+		ELSE
+			_&aname dw	aval
+		ENDIF
+	ENDIF
+	aname	EQU	_&aname
+ENDIF
+IFE	havtyp
+	IF2
+		%OUT	Invalid type (Global).
+	ENDIF
+	.ERR2
+ELSE
+	public	_&aname
+ENDIF
+	ENDM
+
+CmpRVal Macro	atype, aval, bval
+	Local	lab
+havtyp	=	False
+IFIDN	<atype>, <byte>
+	havtyp	=	True
+	cmp	al, aval
+ENDIF
+IFIDN	<atype>, <word>
+	havtyp	=	True
+	cmp	ax, aval
+ENDIF
+IFE	havtyp
+	IF2
+		%OUT	Invalid type (CmpRVal).
+	ENDIF
+	.ERR2
+ENDIF
+	ENDM
+
+;
+;	macro to build VAP compatible NIT library
+;
+
+
+EnterDOS	Macro
+	Local	ReturnAddr
+IFDEF	VAP
+	push	es
+	push	bp
+	mov	bp, seg NetWareShellServices
+	mov	es, bp
+	mov	bp, offset ReturnAddr
+	push	cs
+	push	bp					;Return address 2
+	push	word ptr es:NetWareShellServices + 2
+	push	word ptr es:NetWareShellServices	;Return address 1
+	mov	bp, sp
+	mov	es, [bp + 10]	;pop	es
+	mov	bp, [bp + 8]	;pop	bp
+	db	0cbh	;Return to address 1 which returns to address 2
+;i.e.,	call	far NetWareShellServices
+ReturnAddr:
+	add	sp, 4		;restore sp
+ELSE
+	int	21h
+ENDIF
+ENDM
+
+EnterIPX	Macro
+	Local	IPXInstalled, ReturnAddr, IPXDone
+IFDEF	VAP
+	push	es
+	push	bp
+	mov	bp, seg IPXSPXServices
+;	push	cs
+;	pop	bp
+	mov	es, bp
+	mov	bp, offset ReturnAddr
+	push	cs
+	push	bp				;Return address 2
+	push	word ptr es:IPXSPXServices + 2
+	push	word ptr es:IPXSPXServices	;Return address 1
+	mov	bp, sp
+	mov	es, [bp + 10]	;pop	es
+	mov	bp, [bp + 8]	;pop	bp
+	db	0cbh	;Return to address 1 which returns to address 2
+;i.e.,	call	far IPXSPXServices
+ReturnAddr:
+	add	sp, 4		;restore sp
+ELSE
+	push	es
+	push	bp
+IFDEF LProg
+	mov	bp, seg IPXLocation
+ELSE
+	push	cs
+	pop	bp
+ENDIF
+	mov	es, bp
+	cmp	word ptr es:IPXLocation + 2, 0
+	jne	IPXInstalled
+	pop	bp
+	pop	es
+	RetVal	byte, imm, 0f0h
+	jmp	short IPXDone
+IPXInstalled:
+	mov	bp, offset ReturnAddr
+	push	cs
+	push	bp			;Return address 2
+	push	word ptr es:IPXLocation + 2
+	push	word ptr es:IPXLocation ;Return address 1
+	mov	bp, sp
+	mov	es, [bp + 10]	;pop	es
+	mov	bp, [bp + 8]	;pop	bp
+	db	0cbh	;Return to address 1 which returns to address 2
+;i.e.,	call	far IPXLocation
+ReturnAddr:
+	add	sp, 4		;restore sp
+IPXDone:
+ENDIF
+ENDM
+	.LIST
+

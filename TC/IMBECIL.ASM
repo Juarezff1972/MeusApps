@@ -1,3 +1,5 @@
+_TEXT	segment byte public 'CODE'
+_TEXT	ends
 DGROUP	group	_DATA,_BSS
 	assume	cs:_TEXT,ds:DGROUP
 
@@ -15,6 +17,7 @@ _TEXT	segment byte public 'CODE'
    ;
    ;	void inics1 (s1 *s)
    ;
+
 _inics1	proc	near
 	push	bp
 	mov	bp,sp
@@ -34,6 +37,7 @@ _inics1	proc	near
 	pop	bp
 	ret
 _inics1	endp
+
    ;
    ;	void inics1tab(s1tab s[], int i)
    ;
@@ -58,7 +62,7 @@ _inics1tab	proc	near
 	call	near ptr _inics1
 	pop	cx
 	inc	si
-@2@114:
+@2@114:        // @test
 	cmp	si,word ptr [bp+6]
 	jl	short @2@58
    ;
@@ -148,6 +152,8 @@ _DATA	segment word public 'DATA'
 s@	label	byte
 _DATA	ends
 
+_TEXT	segment byte public 'CODE'
+_TEXT	ends
 	public	_main
 	public	_inics2
 	public	_inics1tab

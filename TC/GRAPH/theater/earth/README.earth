@@ -1,0 +1,51 @@
+
+
+This animation is a revolving earth that morphs into a flat plane, paying
+special attention to the USA.  This is a work in progress to be used as
+the opening sequence for the "EPF/HLA" demos at the NAWCAD-ACETEF Testing
+Facility in Maryland.  This is included with the Pixcon/Anitroll
+example directory to show that while Anitroll can't do everything
+(like morphing - at least not yet) it can be supplimented with short
+programs.
+
+The anitroll script file "spin.cnt" creates the .lst file for generating
+the revolving scenes.  The .lst file is created by executing:
+
+	"anitroll spin.cnt spin.lst"
+	"mv spin.lst ../../gallery"
+
+which is then moved (hopefully) to the ~graph/gallery" directory, where
+the frames may be rendered by executing:
+
+	"convert obj globe.obj globe"		// converts a Wavefront globe
+						//    to OFF format
+	"pixcon -f spin -l spin.lst -x 512 -y 256"
+
+Note: you need to have generated stars.rgb using stars.list in
+	graph/gallery before rendering this animation, as it
+	uses stars.rgb as a background.
+
+The morph animation was created by creating 60 inbetween meshes by using
+"sphere2.sp" and "square2.sp" as end meshes to the "morph" program in the
+graph/prog directory.  The inbetween meshes may be created by executing:
+
+	"cd <goto graph/gallery>"
+	"morph sphere2.sp square2.sp 60 x"
+
+To render the morph, a short program called "m.c" exists in this directory.
+Just compile it with a C++ compiler (ex "g++ -o m m.c") and run it.  It will
+create "morph.lst".  Then to render, execute:
+
+	"mv morph.lst ../../gallery"
+	"cd ../../gallery"		// should be in graph/gallery
+	"pixcon -f morph -l morph.lst -x 512 -y 256"
+
+To see the whole animation together, I suggest using "movie" (from the
+graph/prog directory) :
+
+	"movie 0.03333 -z 2 spin.*.rgb morph.*.rgb"
+
+(The -z is to make the frames larger - I have yet to find a computer that
+	can flip through larger image files at 30 frames a sec without
+	pixel doubling like the above example)
+

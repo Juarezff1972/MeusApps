@@ -1,0 +1,16 @@
+quark {
+   name base
+   children 1
+
+   neutron {
+	name stars
+	file backgrnd.spg
+	shade constant stars.ilm
+	luminate
+	transparent
+	raycast
+	2d_texture stars.tex
+	translate 0 0 -400
+   }
+
+}

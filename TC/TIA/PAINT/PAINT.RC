@@ -1,0 +1,45 @@
+#include <owlrc.h>
+#include <owldefs.h>
+
+ELLIPSECURSOR     CURSOR ellipse.cur
+ARCELLIPSECURSOR  CURSOR arcelip.cur
+FILLCURSOR        CURSOR fill.cur
+CIRCLECURSOR      CURSOR circulo.cur
+ARCCIRCLECURSOR   CURSOR arccirc.cur
+POLYGONCURSOR     CURSOR polig.cur
+LINECURSOR        CURSOR linha.cur
+PLINECURSOR       CURSOR plinha.cur
+PENCURSOR         CURSOR pen.cur
+RECTCURSOR        CURSOR rect.cur
+BEZIERCURSOR      CURSOR curvas.cur
+SPLINECURSOR      CURSOR curvas.cur
+CLEANCURSOR       CURSOR limpar.cur
+TEXTCURSOR        CURSOR texto.cur
+
+ELLIPSETOOL       ICON   ellipse.ico
+ARCELLIPSETOOL    ICON   arcelip.ico
+FILLTOOL          ICON   fill.ico
+CIRCLETOOL        ICON   circulo.ico
+ARCCIRCLETOOL     ICON   arccirc.ico
+POLYGONTOOL       ICON   polig.ico
+LINETOOL          ICON   linha.ico
+PLINETOOL         ICON   plinha.ico
+PENTOOL           ICON   pen.ico
+RECTTOOL          ICON   rect.ico
+BEZIERTOOL        ICON   bezier.ico
+SPLINETOOL        ICON   spline.ico
+CLEANTOOL         ICON   limpar.ico
+TEXTTOOL          ICON   texto.ico
+PAINTICON         ICON   acoypnt.ico
+
+SD_INPUTDIALOG DIALOG DISCARDABLE LOADONCALL PURE MOVEABLE 20, 24, 180, 64
+STYLE WS_POPUP | WS_CAPTION | DS_SETFONT
+FONT 8, "Helv"
+BEGIN
+  CONTROL "" ID_PROMPT, "STATIC", WS_CHILD | WS_VISIBLE | WS_GROUP, 10, 8, 160, 10
+  CONTROL "" ID_INPUT, "EDIT", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL, 10, 20, 160, 12
+  CONTROL "&OK" IDOK, "BUTTON", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON, 47, 42, 40, 14
+  CONTROL "&Cancel" IDCANCEL, "BUTTON", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 93, 42, 40, 14
+END
+
+

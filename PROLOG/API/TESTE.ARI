@@ -1,0 +1,10 @@
+casado(a,b).
+pai(a,c).
+mae(b,d).
+pai(a,d).
+mae(b,c).
+casado(Y,X):-casado(X,Y).
+filho(X,Y):-pai(Y,X).
+filho(X,Y):-mae(Y,X).
+irmao(X,Y):-filho(X,Z),filho(Y,Z),X\=Y.
+

@@ -1,3 +1,5 @@
+/* Turbo C++ - (C) Copyright 1987-1991 by Borland International */
+
 #include <string.h>
 #include <math.h>
 #include <ctype.h>

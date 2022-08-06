@@ -1,0 +1,19 @@
+anitroll
+
+frame_count	80
+shadow_plane	0 1 0 20
+
+actors		2
+
+flock.atm {
+	event_time	1
+	time_mult	1
+	event		flock.evt
+}
+
+cage.atm {
+	event_time	1
+	time_mult	1
+	event		on.evt
+}
+

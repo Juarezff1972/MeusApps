@@ -1,0 +1,37 @@
+
+
+-----------------------------------------------------------------------
+
+Send all bug reports and comments to dunbar@saltmine.radix.net
+
+For bug reports, please include any relevent script files so that I may
+duplicate the problem.
+
+-----------------------------------------------------------------------
+
+Known bugs:
+
+PIXCON -
+
+*       On select SGI Indigo2's, the <-p> option on Pixcon
+                crashes the graphics server if using the libGL.a
+                library.  Works fine on Onyx's or if using the
+                libMesa.a libary (haven't figured out why...)
+
+        Crashes under DOS 6.22 when trying to render the animation
+                created by the files in graph/theater/flock
+        -verbose mode in DOS causes the image to "scroll"
+
+ANITROLL -
+        bounding volumes - BRECT and BPLANE have rotation problems...
+                boid code is not fully debugged.  Use at your own risk...
+
+CONVERT -
+        convert was written as a fast and dirty way of converting the
+        various 3D object files that I have to the .OFF format.  The code
+        looks ugly, and is not complete, but it does what I want it to.
+        Basicly, if it works for you, great.  If not, send me the file
+        that you are trying to convert, and Ill try to force it...
+
+-----------------------------------------------------------------------
+

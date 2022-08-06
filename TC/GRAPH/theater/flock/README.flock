@@ -1,0 +1,18 @@
+
+			Flock of Birds of Prey
+
+This animation is an example of using the boid animation module in
+Anitroll.  The boid animation module is an implementation of the
+"flock of birds" algorithm.  It creates the script for a 80 frame
+(1.3333 seconds) animation.
+
+To generate the animation, enter:
+
+	"anitroll flock.cnt flock.lst"
+	"mv flock.lst ../../gallery"  // should be move to the graph/gallery dir
+	"cd ../../gallery"
+	"pixcon -l flock.lst"
+
+Note:	You may want to render smaller frames using the "-x", "-y"
+	options, or save the animation to a file, then play back
+	using "mflip" or "movie".  See the MANUAL for details.

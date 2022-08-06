@@ -9,6 +9,7 @@
 #include <string.h>
 #include <dos.h>
 #include <io.h>
+#include <conio.h>
 
 #define BUFF_SIZE 32768
 #define EndOF(a) filelength(fileno(a))
@@ -82,10 +83,21 @@ void main(int argc,char *argv[])
      Receptor();
   if(strcmp(toupper(argv[1]),"T")==0)
      Transmissor();
-  printf("\nFim do programa.\n");
+  printf("\nFim do programa.\n");*/
+  com=0; // com2:
+  InicializaPorta();
+  while(!kbhit()) {
+    //w.x.dx=com;
+    //w.h.ah=2;
+    //int86(0x14,&w,&w);
+    //if(w.h.al=='i') break;
+//    flag=w.h.al;
+    flag=inportb(0x3f8);
+    printf("%d - %c\n",flag,flag);
+  }
 }
 //////////////////////////////////////////////////////////////////////////
-void InicializaPorta();
+void InicializaPorta()
 {
    w.x.dx=com;   // porta serial
    w.h.ah=0;   // 0 = Funcao de CONFIGURACAO
@@ -193,7 +205,7 @@ void Xmite()
 	if(!chflag) return !read1();
 	incheck=(getmod()<<8)+getmod();
 	if(incheck!=checksum) {
-		for (n=0;n<20000;n++); 	/* let line settle down */
+		for (n=0;n<20000;n++); 	// let line settle down
 		printf("\nError. Resending sector %d...\n",scount+1);
 		outmod(NAK);
 	}

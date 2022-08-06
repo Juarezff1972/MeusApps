@@ -1,0 +1,78 @@
+
+
+
+	PIXCON & ANITROLL Frequently Asked Questions (FAQ)
+
+	1.0	Installation
+
+
+-------------------------------------------------------------------
+1.0	Installation
+
+Q:	When I compile, the compiler reports multiple occurances
+	of function 'x'
+
+A:	Pixcon/Anitroll was written using C++.  Your system is
+	probably defaulting to the C compiler.  There are 2 ways to
+	fix this:  The hard way is to edit the Makefiles in
+	graph/src, graph/src/jpeg, graph/prog, and graph/anitroll so that
+	the variable "CC" is set to your C++ compiler (I didnt mention
+	graph/src/tiff because its a "C" library).  The easy way is to
+	compile graph/src/tiff first, then set the environment
+	variable "CC" to your C++ compiler and compile the rest.
+
+Q:	When I compile, I get a bunch of errors due to a missing
+	"glx.h" file
+
+	or
+
+	I get a bunch of errors due to undefined "glxxx" functions
+
+A:	You probably don't have an OpenGL library, or haven't specified
+	where it is on your system.  Pixcon looks for the OpenGL
+	include files in /usr/include or /usr/local/include (actually in
+	/usr/local/include/GL), and the libraries in /usr/lib or usr/local/lib.
+
+	If you have the libraries already installed somewhere else,
+	you'll have to edit the Makefiles in graph/src , graph/prog ,
+	and graph/anitroll or set the environement variable LD_LIBRARY_PATH
+	to point to it.
+
+	The SGI version assumes that you have native SGI OpenGL, and the
+	linux version assumes that you have MesaGL.
+
+	If you dont have the OpenGL library, there is a freeware
+	implementation available from:
+
+                ftp://iris.ssec.wisc.edu/pub/Mesa/
+                http://www.ssec.wisc.edu/~brianp/Mesa.html
+
+	I have tested Pixcon w/ Mesa 1.28 and 2.2 w/o any problems.
+
+Q:	I'm using an SGI, and (for some strange reason) am using g++
+	as the compiler, and I get a bunch of errors around line 83
+	of shader.c .  Whats wrong?
+
+A:	I made the mistake in assuming that all SGI computers came
+	with a native C++ compiler.  There are some #ifdefs around
+	line 83 that I used to differentiate the SGI native C++ compiler
+	from other compilers.  Just comment out the #ifdefs and the
+	SGI specific line, leaving the other option alone, and it
+	should work.
+
+Q:	The MANUAL keeps referring to "tokens" - what are they?
+			or
+	Pixcon saying that my script has invalid tokens, but they
+	look ok.  Whats wrong?
+
+A:	A token is a character string that is separated by white
+	space (<space>, <tab>, <eoln>, <eof>, etc...)  Make sure
+	that each token is separated by white space -> this includes
+	the comment token as well.
+
+	ex:
+
+	invalid -	//hi there
+	valid -		// hi there
+
+

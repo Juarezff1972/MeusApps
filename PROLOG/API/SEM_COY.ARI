@@ -1,0 +1,706 @@
+vai:-cria_frame(churrascaria,coyote),a.
+a:-cria_frame2(alimentos,churrascaria),
+cria_frame2(fregueses,churrascaria),
+cria_frame2(normais,fregueses),
+cria_frame2(preferenciais,fregueses),
+cria_frame(adultos,normais),
+cria_frame(adultos,preferenciais),
+cria_frame(criancas,normais),
+cria_frame(criancas,preferenciais),
+cria_frame(homens,adultos),
+cria_frame(mulheres,adultos),
+cria_frame(meninos,criancas),
+cria_frame(meninas,criancas),
+cria_frame(comidas,alimentos),
+cria_frame(saladas,alimentos),
+cria_frame2(verduras,saladas),
+cria_frame2(legume,saladas),
+cria_frame(carnes,comidas),
+cria_frame(sobremesas,comidas),
+cria_frame(massas,comidas),
+cria_frame(frango,carnes),
+cria_frame(boi,carnes),
+cria_frame(porco,carnes),
+cria_frame2(peito,frango),
+cria_frame2(asa,frango),
+cria_frame2(coxa,frango),
+cria_frame2(picanha,boi),
+cria_frame2(costela,boi),
+cria_frame2(alcatra,boi),
+cria_frame2(pernil,porco),
+cria_frame2(linguica,porco),
+cria_frame2(costela,porco),
+cria_frame(tortas,sobremesas),
+cria_frame(pudins,sobremesas),
+cria_frame(sorvetes,sobremesas),
+cria_frame(lazanhas,massas),
+cria_frame(pizzas,massas),
+write('Foi. Foi pra conta.').
+
+/****************************************************************************
+ *									    *
+ *	 Procedimento para criar um frame em um sistema de frames     	    *
+ *									    *
+ ****************************************************************************/
+% 		     *	cria_frame(?Frame,?Pai). *
+%	     	     *****************************
+%            +    +
+cria_frame(Frame,Pai):-
+			nonvar(Frame),
+			nonvar(Pai),!,
+			poe_frame(Frame,ako,valor,Pai).
+
+%	     +	  -
+cria_frame(Frame,Pai):-
+			nonvar(Frame),!,
+		    	Pai = xyz,
+			poe_frame(Frame,ako,valor,Pai).
+
+%	     -	  +	
+cria_frame(Frame,Pai):-
+			nonvar(Pai),!,
+			nome_unico(Frame),
+			poe_frame(Frame,ako,valor,Pai).
+
+%	     -	  -	
+cria_frame(Frame,Pai):-
+			nome_unico(Frame),
+			Pai = xyz,
+			poe_frame(Frame,ako,valor,Pai).
+/****************************************************************************
+ *									    *
+ *	 Procedimento para criar um frame em um sistema de frames     	    *
+ *									    *
+ ****************************************************************************/
+% 		     *	cria_frame(?Frame,?Pai). *
+%	     	     *****************************
+%            +    +
+cria_frame2(Frame,Pai):-
+			nonvar(Frame),
+			nonvar(Pai),!,
+			poe_frame(Frame,pof,valor,Pai).
+
+%	     +	  -
+cria_frame2(Frame,Pai):-
+			nonvar(Frame),!,
+		    	Pai = xyz,
+			poe_frame(Frame,pof,valor,Pai).
+
+%	     -	  +	
+cria_frame2(Frame,Pai):-
+			nonvar(Pai),!,
+			nome_unico(Frame),
+			poe_frame(Frame,pof,valor,Pai).
+
+%	     -	  -	
+cria_frame2(Frame,Pai):-
+			nome_unico(Frame),
+			Pai = xyz,
+			poe_frame(Frame,pof,valor,Pai).
+
+/****************************************************************************
+ *									    *
+ *	 Procedimento para instanciar um frame em um sistema de frames	    *
+ *									    *
+ ****************************************************************************/
+% 		     *	instancia_frame(+Frame,?Slot,?Faceta,?Valor). *
+%	     	     **************************************************
+%	           
+instancia_frame(Frame,Slot,Faceta,Valor):-
+			nonvar(Frame),
+			poe_frame(Frame,Slot,Faceta,Valor).
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame em um sistema de frames                                    *
+ ****************************************************************************/
+% 		     *	existe_frame(?Frame). *
+%	     	     **************************
+%	       +		
+existe_frame(Frame):-
+			keys(Frame),			
+			pegue_frame(Frame,ako,_,_,_).
+existe_frame(Frame):-
+			keys(Frame),			
+			pegue_frame(Frame,pof,_,_,_).
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame pai de um frame filho em um sistema de frames              *
+ ****************************************************************************/
+% 		     *	existe_pai(+Frame,?Pai). *
+%	     	     *********************************
+%
+existe_pai(xyz,xyz):-!.
+
+%            +    ?		
+existe_pai(Frame,Pai):-
+        		nonvar(Frame),
+			pegue_frame(Frame,ako,valor,Pai,_).
+existe_pai(Frame,Pai):-
+        		nonvar(Frame),
+			pegue_frame(Frame,pof,valor,Pai,_).
+									
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame filho de um frame pai em um sistema de frames              *
+ ****************************************************************************/
+% 		     *	existe_filho(+Frame,?Filho). *
+%	     	     *********************************
+%	       +     ?		
+existe_filho(Frame,Filho):-
+        		nonvar(Frame),
+			keys(Filho),
+			pegue_frame(Filho,ako,valor,Frame,_).
+existe_filho(Frame,Filho):-
+        		nonvar(Frame),
+			keys(Filho),
+			pegue_frame(Filho,pof,valor,Frame,_).
+ 									
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame part_of de um frame em um sistema de frames                *
+ ****************************************************************************/
+% 		     *	contem_frame(+Frame,?Parte). *
+%	     	     *********************************
+%	       +     ?		
+contem_frame(Frame,Parte):-
+        		nonvar(Frame),
+			keys(Parte),
+			pegue_frame(Parte,pof,valor,Frame,_).
+     						
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame que contem um frame part_of em um sistema de frames                *
+ ****************************************************************************/
+% 		     *	contido_frame(+Parte,?Frame). *
+%	     	     **********************************
+%	        +     ?		
+contido_frame(Parte,Frame):-
+        		nonvar(Parte),
+			pegue_frame(Parte,pof,valor,Frame,_).
+     
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do frame que nao esteja ligado a um outro frame                     *
+ ****************************************************************************/
+% 		     *	desligado_frame(?Frame). *
+%	     	     *****************************
+%	          ?   
+desligado_frame(Frame):-
+			keys(Frame),		
+			not existe_slot(Frame,ako).
+				
+/****************************************************************************
+ *									    *
+ *	Procedimento para remover um determinado frame de um sistema de     *
+ *	frames								    *
+ ****************************************************************************/
+% 		     *	remova_frame(+Frame). *
+%	     	     **************************
+%	       +
+remova_frame(Frame):-
+			nonvar(Frame),
+			elimina_frame(Frame),
+			expunge.
+
+/****************************************************************************
+ *									    *
+ *   Procedimento utilitario para mostrar um determinado frame de um 	    *
+ *   sistema de frames                                                      *
+ *			     						    *
+ ****************************************************************************/
+% 		     *	mostra_frame(+Frame). *
+%	     	     **************************
+%	       +		
+mostra_frame(Frame):-
+			nonvar(Frame),			
+			existe_frame(Frame),
+			imprime_frame(Frame).
+/****************************************************************************
+ *									    *
+ *   Procedimento utilitario para mostrar um determinado filho de um 	    *
+ *   sistema de frames                                                      *
+ *			     						    *
+ ****************************************************************************/
+% 		     * mostra_filhos(+Frame). *
+%	     	     **************************
+%	       +		
+mostra_filhos(Frame):-
+			nonvar(Frame),			
+			existe_frame(Frame),
+                        existe_slot(Frame,Slot),
+                        existe_filho(Frame,Filho),
+                        write(Filho),nl,fail.
+
+/****************************************************************************
+ *									    *
+ *   Procedimento utilitario para mostrar os irmaos de um 	            *
+ *   sistema de frames                                                      *
+ *			     						    *
+ ****************************************************************************/
+% 		     * mostra_irmaos(+Frame). *
+%	     	     **************************
+%	       +		
+mostra_irmaos(Frame):-
+			nonvar(Frame),
+			existe_frame(Frame),
+                        existe_slot(Frame,Slot),!,
+                        pegue_regra(Frame,Slot,_,Regra),
+                        mostra_filhos(Regra).
+					   
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar um determina- *
+ *      do slot em um frame                                                 *
+ ****************************************************************************/
+% 		     *	existe_slot(+Frame,?Slot). *
+%	     	     *******************************
+%	      +     +		
+existe_slot(Frame,Slot):-
+		        nonvar(Frame),
+		        nonvar(Slot),!,
+	     		pegue_frame(Frame,Slot,_,_,_).
+	
+%	      +	   -
+existe_slot(Frame,Slot):-
+			nonvar(Frame),
+			setof(S,F^V^R^pegue_frame(Frame,S,F,V,R),Lslots),!,
+			pertence(Slot,Lslots).
+
+/****************************************************************************
+ *									    *
+ *	Procedimento para remover um determinado slot de um frame           *
+ *	 								    *
+ ****************************************************************************/
+% 		     *	remova_slot(+Frame,+Slot). *
+%	     	     *******************************
+%	      +	    +
+remova_slot(Frame,Slot):-
+			nonvar(Frame),
+			nonvar(Slot),!,
+			elimina_slot(Frame,Slot),
+			expunge.
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar a existencia ou encontrar uma determi-  *
+ *      nada faceta pertencente a um slot de um frame           	    *
+ ****************************************************************************/
+% 		     *	existe_faceta(+Frame,+Slot,?Faceta,?Valor). *
+%	     	     ************************************************
+%	        +     +	    +	  ?
+existe_faceta(Frame,Slot,Faceta,Valor):-
+		        nonvar(Frame),
+			nonvar(Slot),
+			nonvar(Faceta),!,
+			pegue_frame(Frame,Slot,Faceta,Valor,_).
+
+%	        +     +	    -	  ?
+existe_faceta(Frame,Slot,Faceta,Valor):-
+		        nonvar(Frame),
+			nonvar(Slot),
+			setof([F,V,R],pegue_frame(Frame,Slot,F,V,R),Lfacetas),!,
+			pertence([Faceta,Valor,_],Lfacetas).
+								
+/****************************************************************************
+ *									    *
+ *	Procedimento para remover uma determinada faceta de um slot         *
+ *	 								    *
+ ****************************************************************************/
+% 		     *	remova_faceta(+Frame,+Slot,+Faceta). *
+%	     	     *****************************************
+%	        +     +	    +
+remova_faceta(Frame,Slot,Faceta):-
+			nonvar(Frame),
+			nonvar(Slot),
+			nonvar(Faceta),!,
+			elimina_faceta(Frame,Slot,Faceta),
+			expunge.
+ 
+/****************************************************************************
+ *									    *
+ * 	Procedimento para obter o valor de um determinado slot de um frame  *
+ *                                                                          *
+ ****************************************************************************/
+% 		     *	obtem_valor_slot(+Frame,+Slot,?Valor). *
+%	     	     *******************************************
+% 
+obtem_valor_slot(Frame,Slot,Valor) :-
+			nonvar(Frame),
+			nonvar(Slot),
+			obtem_valor(Frame,Frame,Slot,Valor),!.
+
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-           % pela faceta valor
+	                pegue_frame(Frame,Slot,valor,Valor,_).
+
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-         % pela faceta default
+	                pegue_frame(Frame,Slot,default,Valor,_).
+
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-       % pela faceta if_needed
+	                pegue_frame(Frame,Slot,if_needed,Regra,_),
+        	        F =.. [Regra, Frame_parametro, Valor],
+                	F.
+
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-       % por um aponta frame
+	                pegue_frame(Frame,_,aponta,Aponta,_),
+	                obtem_valor(Frame_parametro,Aponta,Slot,Valor).
+        	        
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-       % por um frame superior
+	                pegue_frame(Frame,ako,valor,Pai,_),  
+        	        obtem_valor(Frame_parametro,Pai,Slot,Valor). 
+
+obtem_valor(Frame_parametro,Frame,Slot,Valor) :-       % por um frame lateral
+	                pegue_frame(Frame,pof,valor,Pai,_),  
+        	        obtem_valor(Frame_parametro,Pai,Slot,Valor). 
+
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para por um valor em um determinado slot de um frame   *
+ *                                                                          *
+ ****************************************************************************/
+% 		     *	poe_valor_slot(+Frame,+Slot,?Valor). *
+%	     	     *****************************************
+% 
+poe_valor_slot(Frame,Slot,Valor) :-  
+			nonvar(Frame),
+			nonvar(Slot),
+			poe_valor(Frame,Slot,Valor),!.
+
+poe_valor(Frame,Slot,Valor):- % Se if_added, poe valor e executa procedimento
+	                pegue_regra(Frame,Slot,if_added,Regra),!,
+        	        poe_frame(Frame,Slot,valor,Valor),
+                	F =.. [Regra, Frame, Valor],
+                	F.
+
+poe_valor(Frame,Slot,Valor) :- % Caso contrario simplesmente poe valor
+			poe_frame(Frame,Slot,valor,Valor).
+
+/****************************************************************************
+ *									    *
+ *     Procedimento para remover o valor de um determinado slot de um frame *
+ *                                                                          *
+ ****************************************************************************/
+% 		     *	remove_valor_slot(+Frame,+Slot). *
+%	     	     *************************************
+% 
+remove_valor_slot(Frame,Slot):-
+			nonvar(Frame),
+			nonvar(Slot),
+			remove_valor(Frame,Slot),!.
+
+remove_valor(Frame,Slot) :- % Se if_removed, executa procedimento e remove 
+	                pegue_regra(Frame,Slot,if_removed,Regra),!,
+        	        F =.. [Regra, Frame],
+                	F,
+                	elimina_faceta(Frame,Slot,valor).  
+
+remove_valor(Frame,Slot) :- % Caso contrario simplesmente remove valor
+	                elimina_faceta(Frame,Slot,valor).
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para substituir o valor de um determinado slot de um   *
+ *      frame                                                               *
+ ****************************************************************************/
+% 		     *	substitui_valor_slot(+Frame,+Slot,?Valor). *
+%	     	     ***********************************************
+% 
+substitui_valor_slot(Frame,Slot,Valor):-
+			nonvar(Frame),
+			nonvar(Slot),
+			substitui_valor(Frame,Slot,Valor),!.
+
+substitui_valor(Frame,Slot,Valor) :- % Se if_replaced, substitui e exec. proc.
+	                pegue_regra(Frame,Slot,if_replaced,Regra),!,
+        	        substitui_slot(Frame,Slot,Valor),
+                	F =.. [Regra, Frame],
+                	F.
+
+substitui_valor(Frame,Slot,Valor) :- % Caso contrario simplesmente subst. valor
+	                substitui_slot(Frame,Slot,Valor).
+
+substitui_slot(Frame,Slot,Valor) :-
+	                elimina_faceta(Frame,Slot,valor),
+        	        poe_valor_slot(Frame,Slot,Valor).
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para concatenar  um valor a um determinado slot de um  *
+ *      frame                                                               *
+ ****************************************************************************/
+% 		     *	concatena_valor_slot(+Frame,+Slot,?Valor). *
+%	     	     ***********************************************
+% 
+concatena_valor_slot(Frame,Slot,Valor) :-  
+	                nonvar(Frame),
+			nonvar(Slot),
+			concatena_valor(Frame,Slot,Valor),!.
+
+concatena_valor(Frame,Slot,Valor) :- % Se if_appended, concatena e exec.proc.
+	                pegue_regra(Frame,Slot,if_appended,Regra),!,
+        	        concatena_slot(Frame,Slot,Valor),
+                	F =.. [Regra, Frame],
+                	F.
+
+concatena_valor(Frame,Slot,Valor) :-% Caso contrario simplesmente conc. valor
+	                concatena_slot(Frame,Slot,Valor).
+
+concatena_slot(Frame,Slot,Valor) :-
+	                pegue_frame(Frame,Slot,valor,Velho,_),!,
+        	   %     ( pertence(Valor,Velho) % Se ja pertence nada eh feito 
+                   %	 ;
+                	  elimina_faceta(Frame,Slot,valor),
+                 	  poe_valor_slot(Frame,Slot,[Valor|Velho]).
+                   % 	). 	      % Caso contrario o valor eh concatenado
+
+concatena_slot(Frame,Slot,Valor) :- % Se nao existir valor, o mesmo eh criado
+	                 poe_valor_slot(Frame,Slot,[Valor]).
+
+/****************************************************************************
+ *									    *
+ * 	Procedimento para verificar o tipo de um determinado valor          *
+ *                                                                          *
+ ****************************************************************************/
+% 		     *	verifica_tipo_valor(+Frame,+Slot,+Valor). *
+%	     	     **********************************************
+% 
+verifica_tipo_valor(Frame,Slot,Valor) :-
+			nonvar(Frame),
+			nonvar(Slot),
+                        nonvar(Valor),	
+                        pegue_frame(Frame,Slot,tipo,Tipo,_), 
+			verifica_valor(Tipo,Tipo,Valor),!.
+
+verifica_valor(Tipo_parametro,Tipo,Valor) :-            % pelo slot if_verifeed
+	                pegue_frame(Tipo,if_verifeed,valor,Regra_tipo,_),
+        	        F =.. [Regra_tipo,Valor],
+                	F.
+
+verifica_valor(Tipo_parametro,Tipo,Valor) :-       % por um frame superior
+	                pegue_frame(Tipo,ako,valor,Super_tipo,_),  
+        	        verifica_valor(Tipo_parametro,Super_tipo,Valor). 
+
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para determinar um nome unico para um frame   *
+ *									    *
+ ****************************************************************************/
+
+nome_unico(Frame):-
+			key(unico,Ref),
+			pref(Ref,Ref1),
+			instance(Ref1,unico(X)),!,
+			erase(Ref1),
+			expunge,
+			encontre_nome(Frame,X).
+
+
+nome_unico(Frame):-
+			encontre_nome(Frame,1).
+			
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para encontrar o nome unico		    *
+ *									    *
+ ****************************************************************************/
+
+encontre_nome(Frame,X):-
+			int_text(X,Y),
+			concat($xyz$,Y,Nome),
+			string_term(Nome,Frame),
+			Z is X + 1,
+			recordz(unico,unico(Z),_).
+
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para gravar um frame na base de conhecimento  *
+ *									    *
+ ****************************************************************************/
+
+poe_frame(Frame,Slot,Faceta,Valor):-					
+			F=..[Frame,Slot,Faceta,Valor],
+			recordz(Frame,F,_).
+
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para encontrar um frame na base de conheci-   *
+ *      mento   						            *
+ ****************************************************************************/
+
+pegue_frame(Frame,Slot,Faceta,Valor,Ref):-					
+			F=..[Frame,Slot,Faceta,Valor],
+			recorded(Frame,F,Ref).
+
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para encontrar uma regra na base de conheci-  *
+ *      mento   						            *
+ ****************************************************************************/
+
+pegue_regra(Frame,Slot,Tipo,Regra):-					
+			pegue_frame(Frame,Slot,Tipo,Regra,_).
+
+pegue_regra(Frame,Slot,Tipo,Regra):-					
+			pegue_frame(Frame,ako,valor,Pai,_),
+			pegue_regra(Pai,Slot,Tipo,Regra).
+
+pegue_regra(Frame,Slot,Tipo,Regra):-					
+			pegue_frame(Frame,pof,valor,Pai,_),
+			pegue_regra(Pai,Slot,Tipo,Regra).
+
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para indicar se um elemento pertence a uma    *
+ *      lista   					                    *
+ ****************************************************************************/
+
+pertence(X,[X|_]).
+pertence(X,[_|Y]):-
+			pertence(X,Y).
+									
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para eliminar um frame			    *
+ * 									    *
+ ****************************************************************************/
+
+elimina_frame(Frame):-
+			elimina_filhos(Frame),!,
+			elimina_proprio(Frame).
+
+elimina_frame(Frame):-
+			elimina_proprio(Frame).
+												
+/****************************************************************************
+ *			     						    *
+ * 	Procedimento auxiliar para eliminar os frames filhos de frame	    *
+ *									    *
+ ****************************************************************************/
+
+elimina_filhos(Frame):-
+			existe_filho(Frame,Filhos),
+			elimina_frame(Filhos),
+			fail.
+
+elimina_filhos(_).
+						
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para remover o proprio frame		    *
+ *									    *
+ ****************************************************************************/
+			
+elimina_proprio(Frame):-
+			existe_slot(Frame,Slot),
+			elimina_slot(Frame,Slot),
+			fail.
+			
+elimina_proprio(_).
+			       									
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para eliminar um slot			    *
+ * 									    *
+ ****************************************************************************/
+
+elimina_slot(Frame,Slot):-
+			existe_faceta(Frame,Slot,Facetas,_),
+			elimina_faceta(Frame,Slot,Facetas),
+			fail.
+			
+elimina_slot(_,_).
+																
+/****************************************************************************
+ *									    *
+ *	Procedimento auxiliar para eliminar uma faceta			    *
+ * 									    *
+ ****************************************************************************/
+
+elimina_faceta(Frame,Slot,Faceta):-
+		        pegue_frame(Frame,Slot,Faceta,_,Ref),
+		        erase(Ref).
+		        		       
+elimina_faceta(_,_,_).
+     
+
+/****************************************************************************
+ *									    *
+ *   Procedimento auxiliar para mostrar um determinado frame                *
+ *			     						    *
+ ****************************************************************************/
+ 
+imprime_frame(Frame):-	
+		    	cls,
+                        poe_linha(0,77),
+                        nl,
+                        tget(L,C),
+                        tmove(L,0),write('Frame'),
+			tmove(L,10),write('|'),
+			tmove(L,12), write('Slot'),
+			tmove(L,30), write('|'),
+			tmove(L,32),write('Faceta'),
+			tmove(L,45),write('|'),
+			tmove(L,47),write('Valor'),
+			nl,
+			poe_linha(0,77),
+			nl,
+			tget(L1,C),
+			tmove(L1,0),write(Frame),
+			imprime_slots(Frame).
+
+poe_linha(_,0).
+			
+poe_linha(X,Y):-
+			tget(L,C),
+			tmove(L,X),
+			write('-'),
+			dec(Y,W),
+			inc(X,Z),
+			poe_linha(Z,W).
+			
+/****************************************************************************
+ *									    *
+ *   Procedimento auxiliar para mostrar os slots de um frame                *
+ *			     						    *
+ ****************************************************************************/
+ 
+imprime_slots(Frame):-
+			existe_slot(Frame,Slot),
+			tget(L,_),
+			tmove(L,10),write('|'),
+			tmove(L,12),write(Slot),
+			imprime_facetas(Frame,Slot),
+			fail.
+			
+imprime_slots(_).
+			
+/****************************************************************************
+ *									    *
+ *   Procedimento auxiliar para mostrar as facetas de um slot               *
+ *			     						    *
+ ****************************************************************************/
+ 
+imprime_facetas(Frame,Slot):-
+			existe_faceta(Frame,Slot,Faceta,Valor),
+			tget(L,_),
+			tmove(L,10),write('|'),
+			tmove(L,30), write('|'),
+			tmove(L,32),write(Faceta),
+			tmove(L,45),write('|'),
+			tmove(L,47),write(Valor),
+			nl,
+			fail.
+						    
+imprime_facetas(Frame,Slot):-	
+			tget(L,_),
+			tmove(L,10),write('|'),
+			poe_linha(11,65).
+			    				   

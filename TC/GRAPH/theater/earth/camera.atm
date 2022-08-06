@@ -1,0 +1,14 @@
+quark {
+   name base
+   children 1
+
+   electron {
+      name	camera1
+      origin	0 0 5
+      coa	0 0 0
+      up	0 1 0
+   }
+
+}
+
+

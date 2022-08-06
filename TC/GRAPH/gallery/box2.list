@@ -1,0 +1,70 @@
+list
+frame_count 1
+object_count 8
+
+
+camera {					// define a camera
+	location 0 5 1
+	coa 0 5 -1
+	up 0 1 0
+}
+
+light {						// define a light source
+	type point
+	location 0 10 -15
+	ambient 0.3 0.3 0.3
+	diffuse 0.7 0.7 0.7
+	fatt 0.000001 0.000005 0.00001
+}
+
+polygon {					// define the picture/window in the back
+	shade alex celeste.ilm
+	raycast
+	2d_texture picture.tex
+	file picture.spg
+	translate 0 9 -29.8
+}
+
+polygon {					// define back wall
+	shade alex celeste.ilm
+	raycast
+	3d_texture wood2.3dt
+	file back.spg
+	translate 0 9 -30
+}
+
+polygon {					// define floor
+	shade alex celeste.ilm
+	raycast
+	3d_texture wood2.3dt
+	file board2.spg
+	translate 0 -1 -15
+}
+
+polygon {					// define left wall
+	shade alex celeste.ilm
+	raycast
+	3d_texture wood2.3dt
+	file board2.spg
+	rotate_z -90
+	translate -10 9 -15
+}
+
+polygon {					// define right wall
+	shade alex celeste.ilm
+	raycast
+	3d_texture wood2.3dt
+	file board2.spg
+	rotate_z 90
+	translate 10 9 -15
+}
+
+polygon {					// define ceiling
+	shade alex celeste.ilm
+	raycast
+	3d_texture wood2.3dt
+	file board2.spg
+	rotate_z 180
+	translate 0 19 -15
+}
+

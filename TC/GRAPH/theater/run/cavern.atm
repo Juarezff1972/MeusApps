@@ -1,0 +1,38 @@
+
+
+
+
+quark {
+	name base
+	children 2
+
+		helix {
+			name floor
+			shade palex sbfast.ilm
+			3d_texture cave_floor.3dt
+			rotate_x -90
+			translate 40 -173.5 0
+			back 1000
+			octaves 100
+			h 0.9
+			lacunarity 2.1
+			scale 157.241
+		}
+
+		helix {
+			name ceiling
+			shade palex sbfast.ilm
+			3d_texture cave_ceiling.3dt
+			rotate_x -90
+			translate -40 -176.5 0
+			rotate_z 180
+			back 1000
+			octaves 100
+			h 0.9
+			lacunarity 2.1
+			scale 157.241
+		}
+
+}
+
+

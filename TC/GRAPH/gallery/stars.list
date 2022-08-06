@@ -1,0 +1,32 @@
+list
+frame_count 1
+object_count 3
+
+camera {					// define camera
+	location 0 0.392699 2.1
+	coa 0 0.392699 0
+	location 0 0 5
+	coa 0 0 0
+	frame 1
+}
+
+polygon {					// define upper star field
+        shade alex stars.ilm
+        luminate
+        transparent
+        raycast
+        3d_texture stars.3dt
+        translate 0 100 0
+        file stars.spg
+}
+
+polygon {					// define lower star field
+        shade alex stars.ilm
+        luminate
+        transparent
+        raycast
+        3d_texture stars.3dt
+        translate 0 -100 0
+        file stars.spg
+}
+

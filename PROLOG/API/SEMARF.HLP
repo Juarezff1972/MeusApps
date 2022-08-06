@@ -1,0 +1,141 @@
+PREDICATE LISTING
+Semarf/Prolog Version 1.0
+May 1992
+Copyright (c) 1992, iti Corporation
+-------------------------------------
+
+mostra_frame(+Frame)
+	  Mostra todos os slots, facetas e valores de um 
+	  determinado {Frame}.
+
+cria_frame(?Frame,?Pai)
+	  Cria um frame {Frame} o qual e' filho do frame {Pai}.
+	  Caso a variavel {Frame} nao esteja  instanciada  na 
+	  ativacao do procedimento, um nome unico ao sistema 
+	  de frames sera criado e unificado com a variavel 
+	  {Frame}. Caso a variavel {Pai} nao esteja instanciada, 
+	  esta sera unificada com o atomo xyz --- o superpai.
+ 
+instancia_frame(+Frame,?Slot,?Faceta,?Valor)
+	  Instancia um frame {Frame} com o slot {Slot}, a faceta
+	  {Faceta} e o valor {Valor}. A variavel {Frame} devera 
+	  estar instanciada, ficando sob a responsabilidade do 
+	  usuario a instanciacao dos outros argumentos.
+
+existe_frame(?Frame)
+	  Se {Frame} estiver instanciada verifica a existencia 
+	  desse frame, caso contrario retorna no retrocesso, 
+	  todos os frames do sistema de frames.
+
+existe_pai(+Frame,?Pai)
+	  Se {Pai} estiver instanciada verifica a existencia 
+	  desse frame pai, caso contrario retorna, no retrocesso, 
+	  o pai do frame especificado.
+
+existe_filho(+Frame,?Filho)
+	  Se {Filho} estiver instanciada verifica a existencia 
+	  desse frame filho, caso contrario retorna, no retrocesso, 
+	  todos os filhos do frame especificado.
+
+contem_frame(+Frame,?Parte)
+	  Se {Parte} estiver instanciada verifica se o frame
+	  {Parte} e' {part_of} {Frame}, caso contrario retorna,
+	  no retrocesso, todos os frames {part_of} do frame 
+	  especificado.
+
+contido_frame(+Parte,?Frame)
+	  Se {Frame} estiver instanciada verifica se o frame 
+	  {Parte} e' {part_of} {Frame}, caso contrario retorna,
+	  no retrocesso, todos os frames em que o frame {Parte}
+	  esta contido.
+
+desligado_frame(?Frame)
+	  Se {Frame} estiver instanciada verifica se {Frame}
+	  e' um ako de outro frame, caso contrario retorna,
+	  no retrocesso, todos os frames --- definidos no 
+	  sistema --- que estao desligados.
+
+remova_frame(+Frame)
+	  Remove o frame {Frame} da base de frames. A remocao
+	  de {Frame} implica tambem na remocao de todos os 
+	  seus descendentes.
+
+existe_slot(+Frame,?Slot)
+	  Se {Slot} estiver instanciada verifica se e' um slot
+	  desse frame, caso contrario retorna, no retrocesso, 
+	  todos os slots de um determinado frame.
+
+remova_slot(+Frame,+Slot)
+	  Remove o slot {Slot} de um frame {Frame}.
+
+existe_faceta(+Frame,+Slot,?Faceta,?Valor)
+	  Se {Faceta} estiver instanciada verifica se ela e' 
+	  uma faceta desse slot, caso contrario retorna, no 
+	  retrocesso, todas as facetas e valores associados 
+	  a um determinado slot.
+
+remova_faceta(+Frame,+Slot,+Faceta)
+	  Remove a faceta {Faceta} do slot {Slot} do frame 
+	  {Frame}.
+
+poe_valor_slot(+Frame,+Slot,?Valor)
+	  Dado um frame {Frame}, atribui o valor {Valor} --- 
+	  criando a faceta valor --- a um determinado {Slot}.
+ 	  Caso exista neste {Slot} a faceta {if_added}, primeiro
+ 	  sera atribuido o valor ao slot para depois ser 
+ 	  executado o procedimento associado a faceta {if_added}.
+ 	  Caso nao exista a faceta {if_added}, somente sera 
+ 	  atribuido o valor ao slot.
+
+obtem_valor_slot(+Frame,+Slot,?Valor)
+	  Dado um frame {Frame}, obtem o valor {Valor} de um 
+	  determinado {Slot}. A busca do valor do slot sera 
+	  realizada na seguinte ordem: primeiro sobre a faceta
+	  {valor} do slot, depois sobre a faceta {default} e 
+	  finalmente sobre a faceta {if_needed}. No caso de 
+	  nao haver sucesso nesta busca, o procedimento procura 
+	  pela faceta {aponta} desse slot. Se ela existir, a 
+	  busca continua no frame apontado pelo valor da faceta 
+	  {aponta}, da forma acima descrita. Somente quando a 
+	  busca nao e bem sucedida nos quatro casos descritos 
+	  acima, e' que o procedimento procura pelo pai desse 
+	  frame, onde todo o processo e' recursivamente aplicado.
+           
+remove_valor_slot(+Frame,+Slot)
+	  Dado um frame {Frame}, remove o valor de um determinado
+	  {Slot}. Caso exista neste {Slot} a faceta {if_removed}, 
+	  primeiro sera executado o procedimento associado a 
+	  faceta {if_removed} para depois ser removido o valor 
+	  do slot. Caso nao exista a faceta {if_removed}, somente 
+	  sera removido o valor do slot.
+
+substitui_valor_slot(+Frame,+Slot,?Valor)
+	  Dado um frame {Frame}, substitui o valor em um 
+	  determinado {Slot}. Caso exista neste {Slot} a 
+	  faceta {if_replaced}, primeiro sera substituido o 
+	  valor do slot para depois ser executado o procedimento 
+	  associado a faceta {if_replaced}. Caso nao exista a 
+	  faceta {if_replaced}, somente sera substituido o valor 
+	  do slot.
+ 
+concatena_valor_slot(+Frame,+Slot,?Valor)
+	  Dado um frame {Frame}, concatena o valor {Valor} 
+	  em um determinado {Slot}. A faceta valor deste {Slot} 
+	  --- quando existir --- devera ser do tipo lista. 
+	  Caso exista neste {Slot} a faceta {if_appended}, 
+	  primeiro sera concatenado o valor no slot para depois
+	  ser executado o procedimento associado a faceta 
+	  {if_appended}. Caso nao exista a faceta {if_appended},
+	  somente sera concatenado o valor no slot.
+
+verifica_tipo_valor(+Frame,+Slot,+Valor)
+	  Dado um frame {Frame}, verifica o tipo de um determinado 
+	  valor {Valor} de um {Slot}. O procedimento procurara 
+	  pela faceta {tipo} desse slot. Se ela existir, a 
+	  busca passa a ser realizada no mundo dos frames de 
+	  tipo comecando no frame por ela apontado. A busca 
+	  no frame de tipo sera realizada na faceta {valor} 
+	  do slot {if_verified}. Caso o slot {if_verified} 
+	  nao exista nesse frame de tipo, entao, a busca sera
+	  realizada, recursivamente, no frame pai do frame 
+	  de tipo, na mesma ordem como definido anteriormente.

@@ -1,0 +1,20 @@
+
+
+
+KA 1 0.3 0.3
+KP 1 0.3 0.3
+KS 1 0.3 0.3
+SPECN 4
+LUM 1 0.3 0.3
+
+no_of_sides 0
+
+
+
+
+
+KA 0.3 0 0.3
+KP 0.5 0 0.5
+KS 0.5 0.5 0.5
+SPECN 4
+no_of_sides 0

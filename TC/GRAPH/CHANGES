@@ -1,0 +1,17 @@
+
+        This file represents changes in the pixcon libraries that
+        prevents backward compatibility w/ previous versions.
+
+version 1.04
+        anitroll -
+                flight/buckey - removal of the "axis_x/y/z" attribute;
+                        for flight, this was replaced by "orientation_mx"
+                boid -  modified syntax for "yellow_alert"
+
+version 1.05
+        pixcon - remove "MORPH" option from polygon 2D texturing
+        pixcon/anitroll - remove "luminate" option - "LUM" from
+                .ilm files is used automaticly
+        pixcon - removed SGI multiprocessor support (unable to
+                support due to lack of access to platform)
+

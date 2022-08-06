@@ -1,0 +1,26 @@
+anitroll
+
+frame_count 	430
+
+shadow_plane 	0 0 1 -150
+
+actors		2
+
+cavern.atm { }
+
+xwing.atm {
+	event_time 0
+	time_mult 1
+	event on.evt
+
+	event_time 0
+	time_mult 1
+	event lon.evt
+
+	event_time 0
+	time_mult 1
+	event xpath.evt
+}
+
+
+430

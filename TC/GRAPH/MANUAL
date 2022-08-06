@@ -1,0 +1,4556 @@
+
+
+-------------------------------------------------------------------------
+                        Table of Contents
+
+
+         1.0    Directory Structure
+         1.1    Pixcon & Anitroll History & Overview
+         1.2    Compilation/Installation/Requirements
+         1.3    Description of the Executables
+
+         2.0    PIXCON
+         2.1            Usage
+         2.2            Antialiasing Filters
+         2.3            Laser Disk Support
+         2.4            Multiprocessing
+         2.5            Saving Images
+         2.6            Buffers
+         2.8            Data Files
+         2.8.1                  Color File Specs
+         2.8.2                  2D Textures
+         2.8.2.1                        Video Textures
+         2.8.3                  3D Textures/Shaders
+         2.8.3.1                        Writing Shaders
+         2.8.3.2                        Declaring Shaders
+         2.8.3.3                        Using Shaders
+         2.8.4                  Polygon File Format
+         2.8.5                  Surface Patch - NURB File Format
+         2.9            PIXCON scripting language
+         2.9.1                  Primitive Descriptions
+         2.9.2                  Attribute Descriptions
+         2.9.99         Tips
+
+         3.0            ANITROLL
+         3.1                    Usage
+         3.2                    Description
+         3.3                    Script <.cnt>
+         3.4                    Actors/Atoms <.atm>
+         3.4.1                          Structure
+         3.4.2                          Attribute List
+         3.5                    Parts/Events <.evt>
+         3.5.1                          Specification
+
+         4.0            CONVERT
+         4.1                    Sliders
+         4.2                    Surface of Revolution (SOR)
+         4.3                    Symetry
+         4.4                    Dive
+
+	 5.0		3DSMAX I/O Plugin
+
+        10.0            LAST PAGE
+-------------------------------------------------------------------------
+
+1.0                        DIRECTORY STRUCTURE
+
+        anitroll        -       src for ANITROLL
+        bin             -       executables directory
+	dos		- 	dos based executables
+	gallery		-	example scripts for use w/ Pixcon
+	lib             -       library directory
+        prog            -       misc programs that use pixcon libraries
+        src             -       source code for PIXCON
+	theater		-	example animation scripts for use w/ Anitroll
+	win95		-	3DSMAX import/export plugin
+
+-------------------------------------------------------------------------
+
+1.1                 P I X C O N  &  A N I T R O L L
+
+     Pixcon is a 3D renderer and a set of graphics libraries.  It was
+     originally developed on SUN workstations, then later moved to the
+     SGI platform to take advantage of the multiprocessing capabilities
+     of the IRIX operating system.  Later, Pixcon was ported to Linux,
+     then DOS, so I could work on it at home :).
+
+     Of course, what render is complete w/o some kind of animation
+     system... So I came up with Anitroll, which has some pretty neat
+     features...
+
+     This started out as a series of assignments in a few grad/graphics
+     classes.  Eventually, I took a class that was based more on artistic
+     rendering, rather than technical.  For this, we were required to use
+     Renderman - specifically BMRT by Larry Gritz.  BMRT, for those
+     of you who don't know, is a Renderman complient ray-tracer.  It
+     produces great pictures, but is slow (its a ray-tracer - what do
+     you expect???) and doesn't include source code.  Anyway, my
+     ex-homework assignments were significantly faster than BMRT (by a
+     factor from about x4 to x8) and while it doesn't produce ray-tracer
+     quality pictures, they look better than some of the other renders I've
+     seen.  So I made a couple of mods, and voila - the first version of
+     Pixcon and Anitroll.  Since then, I've been working on it, and have
+     given it to a few people who saw my old web page.  Its now gotten
+     to the point where I'm not debugging as often, and the script language
+     has more or less stablized - therefore, I released it to the general
+     public.
+
+     So you say to yourself why PIXCON?  There are better freeware
+     renders out there, such as POV-RAY, BMRT, and for those of you
+     with the money, there is Renderman, 3D-Studio, LightWave, Alias,
+     SoftImage, etc, etc, etc.  Well, here are the reasons:
+
+        1) ITS FREE!!!!
+        2) It includes source
+        3) ITS FAST!!! (not real time, but fast enough.... )
+        4) It incorporates some rendering techniques/algorithms
+                that have yet to be published (or will be in
+                SIGGRAPH '96 - if the paper gets published).
+        5) Did I mention the fact that its FREE????
+
+     Now as to what it can't do:
+
+         - Pixcon is not a ray-tracer (ie no realistic shadows, reflections,
+                and refractions)
+
+         - To date, there is no displacement mapping (though, once
+                I figure out an easy way of doing this, there will be)
+
+        - There isn't any gui system - its all done w/ script files.
+
+        - not realtime - except for specific lighting/texture models
+
+     Now that I've shot it down, here's what it can do:
+
+         - for most primitives, the choice of fast polygonal rendering,
+           or ray-casting (1 level deep raytracing)
+
+         - Supports "fake" shadows, double buffer shadows, and transparency.
+
+         - Supports the use of 3D texture/shaders.
+
+         - Supports 2D texture mapping for most rendering primitives
+                using lerp and mipmaping antialiasing techniques.
+                - also can do "video" mapping (explained later)
+
+         - Supports the following rendering primitives:
+
+                - polygons and bi-planes
+                - spheres/ellipsoids
+                - cylinders
+                - cones
+                - surface patches (NURBS)
+                - radiant spheres (spherical objects with coronas)
+                - points/lines
+                - ray-creep terrain/height fields (more later)
+                - camera
+                - light source - point, far, and double buffer
+
+         - Rendering can be saved as a series of .rgb images, as well
+           as to a Panasonic Laser Disk recorder
+
+         - Render to any screen dimension. (DOS is limited to 640 x 480 when
+		rendered to the screen)
+
+         - based on a 32 bit UNIX/DOS architecture
+
+         - rendering can be done in the background
+
+   Why Anitroll?
+
+         - its FREE :)
+
+         - it's output is designed to be rendered by Pixcon
+
+         - supports hiearchical forward kinematics with flocking
+           flight and particle behavior.
+
+-------------------------------------------------------------------------
+
+1.2                     Installation/Compilation/Requirements :
+
+
+        Requirements -
+
+                At least 10M of free real/virtual memory, 10M disk space,
+                and one of the following OS:
+
+                Linux: 32 bit unix system with gcc/g++ compiler, and
+                        sizeof(int) == sizeof(float) == 4
+
+                IRIX: 32 bit unix system with cc/CC compiler, and
+                        sizeof(int) == sizeof(float) == 4
+
+		DOS/Win95: Pentium processor, SVGA 640x480x24 or 640x480x32
+			w/ vesa 2.0 drivers.
+
+        1) uncompress/untar the archive
+           (if you can read this, you have probably done this already)
+
+        2) To make, type "make" to get a list of supported systems, then
+           type "make <system>" to compile.  The binaries will be stored
+           in the bin directory, libs in the library directory.
+	   (DOS/Win95 binaries included)
+
+        Note: UNIX versions of this software needs an OpenGL lib for displaying
+                frames to the the screen.
+
+                The SGI version assumes you have libGL.a.
+                The Linux version is configured for libMesaGL.a.
+
+                If you do not have an OpenGL lib, Mesa is free, and is
+                available at:
+
+                ftp://iris.ssec.wisc.edu/pub/Mesa/
+                http://www.ssec.wisc.edu/~brianp/Mesa.html
+
+        As of 09/01/97, supported OS are:
+                        Linux using gcc/g++,
+                        IRIX 5.2/5.3 using CC or KCC
+                        IRIX 6.02 (very new... may still have 32->64 bit bugs...)
+			DOS/Win95
+
+-------------------------------------------------------------------------
+
+1.3                             Executables
+
+        The following is a list of the executables produced
+        in the bin directory:
+
+        anitroll -      animation system that outputs a .lst file that may
+                        be rendered by PIXCON.  See section 3.0 for details.
+
+        convert -       Object format converter.  This utility will convert:
+
+                        - .byu into .spg objects
+                        - .tpoly into .spg objects
+                        - .lwo (Lightwave IFF files) into .spg objects and
+                                .ilm color files (2D/3D texture files
+                                will be extracted in the future when I
+                                find out what each of the texture chunks
+                                are used for ???)
+                        - .obj (Wavefront) into .spg/.ilm/.tex files
+                        - .dxf (Autocad) into .spg/.ilm files
+                        - .dive into .spg/.ilm/.tex files
+                        - .slide to .spg
+                        - .sor to .spg
+                        - .mirror to .spg
+
+                        Usage: convert <byu/ply/lw/obj/dxf/dive/slide/sor/mirror> <infilename> \
+                                        <outfilename> <-r>
+
+                        Note: the <-r> is used to reverse the order of the
+                                polygons (reverse the normal)
+
+        flip -          animation viewer for .rgb, .gif, .ppm, .jpg, .ilbm,
+                        and 24 bit color .tiff.
+
+                        Usage: flip <time> <pic1> <pic2> ... <picn>
+
+                                where:
+                                        time = time between frames
+                                        pic<n> = list of pictures to "flip"
+
+                                ex. a frame rate of 30 frames a sec
+                                    with 4 .rgb pictures:
+
+                                    flip 0.03333 1.rgb 2.rgb 3.rgb 4.rgb
+
+                        NOTE: In order to achieve a high frame rate, all
+                        images are loaded into memory.  Use "mflip" or "movie"
+                        if you perceive page thrashing.
+
+        mflip -         Same usage/function as "flip" except mflip
+                        keeps only one image in memory at a time...
+                        May not be able to obtain high frame rates,
+                        but does not require much memory...
+
+        movie -         Similar to "flip" except that it only supports
+                        .rgb images and images of the same dimensions.
+                        However, it stores these images in memory using
+                        rle compression.  Advantage - requires less memory;
+                        Disadvantage - slower than "flip" but faster than
+                        "mflip".  Use the -z option after the time to
+                        magnify/shrink the movie.
+
+                        Usage: movie <time> <-z #> <pic1> <pic2> ... <picn>
+
+        mviewer -       picture viewer for .rgb, .gif, .ppm, .jpg, .ilbm
+                        and 24 bit color .tiff .
+
+                        Usage:  mviewer <image>
+
+        render -        rendering system.  See section 2.0 for details.
+
+	DOS/Win95 binaries are already included under graph/dos and
+	graph/win95.
+
+-------------------------------------------------------------------------
+
+2.0                             P I X C O N
+
+-------------------------------------------------------------------------
+
+2.1                                USAGE
+
+     The command line to run PIXCON is:
+
+
+        render  <-a <filename> > <-f filename> <-g float> \
+                <-l filename> <-nixmap> <-noscreen> <-noshadow> <-p> \
+                <-r start end> <-silent> <-verbose>
+
+        -a <filename> : antialias image using a default 7x7 filter or use
+                        a filter defined by <filename>
+
+        -ae <filename> : antialias "edges" of the image using a default
+                         7x7 filter or use a filter defined by <filename>
+
+        -f filename : render each frame to an .rgb file with "filename"
+                        as a base name for each frame.
+
+        -g float : gamma correct the image with "float" as the gamma value
+
+        -l filename : user defined script file, otherwise default is
+                        "object.lst".  The script file defines what is to
+                        be rendered and the language is defined in sec. 2.9
+
+        -nixmap : turn off texture antialiasing - suggested for previewing
+                        work in progress, not recommended for final results
+
+        -noscreen : do not render to the screen.  Negates preceeding <-p>
+                        and <-r start end> options.  Normally used to
+                        render off screen and in the background.
+
+        -noshadow : turn off "fake" shadows
+
+        -p : render all as a pencil test (wireframe), and negates preceeding
+                        <-noscreen>, and the <-f> option.
+
+                        WARNING: This option has been known to bring
+                        down the graphics server on select Indigo2
+                        machines (Dunno why)
+
+        -silent:        turns off most of the printf's (default for DOS)
+
+	-verbose:	turns on most printf's (default for IRIX/Linux)
+
+	-interlace:	interlace mode - causes the render to render every other
+			line, but halves the rendering time.  Also disables "-x2"
+			option.
+
+	-x2:		pixel doubling - causes each image pixel to occupy a 4x4 pixel
+			on the screen (renders 4 times faster than w/o)  Also
+			disables "-interlace" option.
+
+------------------------------------------------------------------------
+
+2.2                             ANTIALIASING
+
+                Antialiasing of images is activated with the "-a" option.
+        If no filter filename is provided, a default 7x7 gaussian filter
+        is used.  The format of an antialias filter file is pretty simple:
+
+        1) All user defined filters are square, with odd numbers
+                of rows and columns - ie 1x1, 3x3, 5x5, 7x7, etc
+
+        2) The first line contains the dimension of the filter
+
+        3) The rest of the file contains the filter itself.
+
+        4) Sum of the filter = 1.0
+
+        example 3x3 filter (same as the 3x3 filter in the "script" directory)
+
+        --------3x3--------
+
+        3
+
+        0.05 0.05 0.05
+        0.05 0.60 0.05
+        0.05 0.05 0.05
+
+        -------------------
+
+------------------------------------------------------------------------
+
+2.3                             LASER DISK
+
+                Most of the code for the device driver to the Panasonic Laser
+        disk was written by Brian Solan, of whom I "liberated" the library.
+        Most of the laser disk code is in the file "laser.c" in the src
+        directory.  However, most of the calls to the interface is in the main
+        function of "pixcon.c".  The routines that access this piece of
+        hardware will stay "beta" and attached to "/dev/ttdy2" because I no
+        longer have access to such a device, and therefore any code changes
+        that may affect this device can no longer be tested.  None the less,
+        I see no real reason to take this piece of code out.  If someone
+        out there is willing to test this section for me, so much the better :)
+
+                In addition, there is a device driver for what I think is a
+        sony worm drive under src/misc.  It is similar to the panasonic driver,
+        but its been an even longer time since I had access to one, and I
+        phased out the calls from PIXCON when I put in the panasonic driver.
+        But if someone asks, I can put them back in....
+
+------------------------------------------------------------------------
+
+2.4                             MULTIPROCESSING
+
+		Multiprocessing options have been removed due to lack
+	of access to platforms for testing.
+
+------------------------------------------------------------------------
+
+2.5				SAVING IMAGES
+
+                Pixcon can save your renderings as a series of images in the
+        Iris RGB format using the "-f <base name>" parameter.  The name
+        given after the "-f" is the name of the series that Pixcon will save
+        your renderings with a serial number.  An example of a rendering of
+        five images:
+
+                pixcon -f test
+
+                ls
+
+                test.00000.rgb
+                test.00001.rgb
+                test.00002.rgb
+                test.00003.rgb
+                test.00004.rgb
+
+
+                Display programs such as XV and the utilities included with
+        PIXCON are able to display your rendered files.  The spec for the
+        Iris RGB format may be downloaded from ftp.sgi.com.
+
+		The DOS version is limited to 4 character filenames
+	(a 4 digit number is appended to the filename)
+------------------------------------------------------------------------
+
+2.6				BUFFERS
+
+                In order to create some of the affects normaly associated
+        with raytracers, I use 4 types of buffers.  The first is a
+        zbuffer for object culling.  The second and third are ambient
+        and diffuse color buffers.  This allows "fake shadows" (surfaces
+        in shadow have the diffuse part zeroed) as well as transparency,
+        (transparent objects colors are merged w/ the background, as
+        explained in 2.9.2). The fourth type of buffer is an image
+        map, which contains the final image, which is bitblt'ed onto
+        the screen and/or saved to a file.
+
+------------------------------------------------------------------------
+
+2.8                     	DATA FILES
+
+                There are several types of data needed by Pixcon to render
+        images, and each has its own format.  Bellow is a list of data/file
+        types.
+
+        2.8.1 Color:                    Defines how an object is colored
+        2.8.2 2D Texture:               Defines how 2D textures are to be
+                                                applied
+        2.8.3 3D Texture/Shader:        Defines how shaders are to be applied
+        2.8.4 Polygons:                 Defines polygon data
+        2.8.5 Surface Patches (NURBS):  Defines mesh data
+
+                What follows here is the specifications for all the data
+        files needed to create an image.  The specifications may be a little
+        vague, and are easier to understand if you bring up an example of the
+        file that you are reading about and compare the file with the
+        description.
+
+------------------------------------------------------------------------
+
+2.8.1                   COLOR FILES     (.ilm)
+
+                The format for declaring color files (.ilm) in Pixcon is quite
+        simple, providing that you understand the basic terminology of color.
+        In general, color may be defined as a combination of the following
+        terms:
+
+                (Note:  these definitions may not be exactly correct)
+
+                Ambient - Amount of light reflected from a surface that
+			indirectly comes from a light source
+
+                Diffuse - Amount of light reflected from a surface,
+                        which is traced directly from a light source but which
+                        is reflected in the camera's direction because of
+                        imperfections in the surface.
+                        (ex concrete, rugs, dirt, rocks, etc)
+
+                Specular - Amount of light reflected from a surface,
+                        which is traced directly from a light source,
+                        as a percentage from the true reflection of
+                        a surface (ex mirror, metal, etc)
+
+                Shininess - The specular power, ie how "shiny" something is.
+
+                Luminesence - The amount of light generated by an object
+                        (ex light bulbs, glow-in-the-dark paint, etc)
+
+                Atmospheric Attenuation (ATT) - The farther an object is away
+                        from the camera, the less light that is perceived.
+
+                        ATT = 1.0/(A*SQR(d) + B*d + C)
+                                where d = distance, and A,B,C are constants
+
+                In general,
+
+                        COLOR = LIGHT = AMBIENT + LUMINESENCE + ATT *
+                                        (DIFFUSE*NL + SPECULAR*(R)^SHININESS)
+
+        where NL is based upon the cosine of the surface normal and the
+        direction of light , and R is based upon the cosine of the reflected
+        light ray.
+
+                Each term, (with the exception of ATT and shininess), is
+        defined for each of the basic colors: red, green, and blue.  ATT is
+        defined by 3 user constants: A, B, C and is defined as a characteristic
+        of the light source (see 2.9.1), not color.  Shininess is defined as
+        an exponent of the specular color.
+
+                Now that the basic terms and requirements have been defined,
+        here is the file format for color for Pixcon:
+
+                The color file format consists of 2 parts.  The first part is
+        the general color for the entire object.  The second part is for
+        objects with multiple parts that may have other colors, such as
+        polygons and surface patches.
+
+                The format for the first part is as follows:
+
+        -------------------------------
+
+        KA <ka_r> <ka_g> <ka_b>
+        KD <kd_r> <kd_g> <kd_b>
+        KS <ks_r> <ks_g> <ks_b>
+        SPECN <n>
+        LUM <lum_r> <lum_g> <lum_b>
+
+        no_of_sides <m>
+
+        -------------------------------
+
+                Where the r,g,b values range from 0..1, and "m" is the number of
+        polygons/patches that differ from the base definition.  In general, good
+        values of "n" range from 1..5 for dull objects, 5..40 for shiny objects.
+
+                Because of the mathematics involved, the sum of the DIFFUSE
+        and SPECULAR components should NOT exceed 1 for red, green, and blue,
+        but can, since the final calculations are clamped to 1.
+
+                The format for the second part is as follows:
+
+        -------------------------------
+
+        SIDE <n0>
+        KA <ka_r0> <ka_g0> <ka_b0>
+        KD <kd_r0> <kd_g0> <kd_b0>
+        KS <ks_r0> <ks_g0> <ks_b0>
+        SPECN <n0>
+        LUM <lum_r0> <lum_g0> <lum_b0>
+
+        SIDE <n1>
+        KA <ka_r1> <ka_g1> <ka_b1>
+        KD <kd_r1> <kd_g1> <kd_b1>
+        KS <ks_r1> <ks_g1> <ks_b1>
+        SPECN <n1>
+        LUM <lum_r1> <lum_g1> <lum_b1>
+
+        ...
+
+        SIDE <nm-1>
+        KA <ka_rm-1> <ka_gm-1> <ka_bm-1>
+        KD <kd_rm-1> <kd_gm-1> <kd_bm-1>
+        KS <ks_rm-1> <ks_gm-1> <ks_bm-1>
+        SPECN <nm-1>
+        LUM <lum_rm-1> <lum_gm-1> <lum_bm-1>
+
+        -------------------------------
+
+        Where n0... nm-1 are the polygon/patch numbers whose surface colors
+        are different from the norm.
+
+        ex:
+
+                The following is the color file for an object whose
+        ambient color is a dark grey, diffuse and specular color as
+        cyan, moderately shiny, and no luminocity.  In addition,
+        polygon/patch number 2 is black.
+
+        --------------------------------
+
+        KA 0.3 0.3 0.3
+        KD 0.05 0.4 0.4
+        KS 0.05 0.4 0.4
+        SPECN 10
+        LUM 0 0 0
+
+        no_of_sides 1
+
+        SIDE 2
+        KA 0 0 0
+        KD 0 0 0
+        KS 0 0 0
+        SPECN 1
+        LUM 0 0 0
+
+        --------------------------------
+
+        Note: KA, KD, KS, SPECN, LUM, no_of_sides, SIDE are just generic
+        descriptors, and may be replace with whatever... however, they must
+        be 1 continuous phrase w/ no whitespace.
+
+------------------------------------------------------------------------
+
+2.8.2                   2D TEXTURES     (.tex/.tes)
+
+                Several primitives in Pixcon can have 2D textures applied to
+        their surfaces.  The formats that Pixcon recognizes are IRIS RGB,
+        JPEG, GIF, PPM, ILBM, and 24 bit color TIFF files, or an animation
+        (a series of images played once or in an autoloop) in these formats.
+
+                Pixcon performs 2D texture antialiasing for better results.
+        By default, Pixcon preprocesses mipmaps of each 2D texture used in
+        the rendering process.  These mipmaps are used for texture
+        compression.  Linear interpolation (LERP) is used for texture
+        expansion.  This feature may be turned of for faster rendering,
+        using the "-nixmap" command line argument.
+
+                Texture coordinates, or texels, are specified as follows:
+        the upper left hand corner is (0,0) and lower right hand corner
+        is (length-1, height-1).
+
+                For simple objects, such as spheres, cones, and cylinders,
+        only one image/animation may be applied to these primitives at a
+        time.  The texture is applied to the surface of the object in its
+        local coordinate system, where the Y axis of the corresponds
+        to the Y axis of the texture, and the texture is applied in a
+        clockwise direction around the Y axis.
+
+                For complex objects such as polygons, NURBS, and SBFAST, 2D
+        texturing must be done using .tex, .tes, and .tsb files, as described
+        below:
+
+        Token Definitions:
+                ALL -   Then next texture description is to be used as the
+                        default for all surfaces which may be overridden
+                        by later texture specifications.
+
+                MONO -  There are no default textures for this object.
+
+                CORNER - The texture corners are mapped to 4 specified vertices
+                        in the surface.
+
+                COORD - A texel (x,y) location is to be assigned to each
+                        vertex of the specified surface.  If a texel location
+                        is specified beyond the bounds of the texture, this
+                        will cause a "repeating" or "tiling" effect.  Range
+                        of texels are (0..length_x-1, 0..height_y-1).
+
+                AFFINE - A 2D texture space can be defined by specifying 3 texture
+                        coordinates that are to be linked w/ 3 verticies.
+
+                REPEAT - The specified texture is to be used to "tile" the
+                        primitive.
+                TEXELS - 2 coordinates in the texture image that map a
+                         pixel in the image to a vertex in a polygon.
+                         Texels must be non-negative.
+
+        Primitive:      polygon
+
+        File:           .tex
+
+        Description: The .tex file specifies what textures are to be applied
+                to each polygon, and how.  The following is the format for
+                defining a .tex file for use with a polygonal object:
+
+                The first token is either "mono" or "all".
+
+                if "all"
+                        this starts the definition of a default texture
+                        for all polygons...
+
+                        the next token is "corner"
+
+                        followed by:
+                                4 vertex # are specified next, mapping the
+                                4 corners of texture to each vertex.
+                                NOTE: all polygons must have AT LEAST
+                                        as many vertices as the highest
+                                        vertex # specified here.
+
+                        The next token is the <image name> or <.vid> file
+                        to be used as the texture
+                endif
+
+                The next token is a count of the number of individual
+                        textured polygons listed next
+
+                for each polygon
+                        The next token is the polygon # which the texture
+                        is to be applied.
+
+                        The next token may either be "corner", "affine", or
+                        "coord"
+
+                        if "corner"
+                                what follows next is the same as the
+                                description in the "all" section above
+                        else if "coord"
+                                what follows next is an xy coordinate,
+                                mapping an xy texel coordinate to
+                                each vertex in the polygon.
+                        else if "affine"
+                                what follows next is 3 texels that are
+                                to be mapped to the first 3 verticies in
+                                the polygon.
+                        endif
+
+                        The next token is the <image name> or <.vid> file
+                        to be used as the texture
+                endfor
+
+
+                example - polygonal object is a box w/ 6 polygons,
+                                 each has 4 vertices
+                --------------- box.tex ---------------------
+
+                ALL
+                CORNER 1 2 3 4          metalt.rgb
+
+                4
+
+                1 CORNER 1 2 3 4        mnb.vid
+                2 CORNER 1 2 3 4        jud1.rgb
+                3 COORD  0      0
+                         0      100
+                         100    100
+                         100    0       cyborg1.gif
+                4 CORNER 2 3 4 1        rach2.jpg
+                ---------------------------------------------
+
+        Primitive:      spatch (NURBS)
+
+        File:           .tes
+
+        Description: The .tes file specifies what textures are to be
+                applied to a section of the 2D mesh, and how.  To
+                apply textures to the spatches, you have to know
+                how spatch's are defined (see 2.8.5).
+
+                The following is the format for for defining a .tes file
+                for use with a spatch object.
+
+                The first token is a count of the # of texture
+                        specifications in this file.
+
+                for each texture specification:
+                        The next token is either "corner" or "coord".
+
+                        if "corner" 2 spatch knot pairs are specified which
+                                signifies the upper-left and lower-right
+                                corners that the texture is mapped to.
+                        else if "coord", 2 spatch knot pairs are specified,
+                                which signifies the upper-left and lower-right
+                                corners of the grid to be textured. Next, 2
+                                texel pairs are specified, which correspond
+                                to the knot pairs
+                        endif
+
+                        The next token is the <image name> or <.vid> file
+                        to be used as the texture
+                endfor
+
+
+                example - NURB surface is defined by a 7x7 grid (5x5 boundary)
+                        which is covered by a metal texture with
+                        a speed limit texture (45 x 59) in the center
+                --------------- sphere.tes ---------------------
+
+                2
+                CORNER 0 0 5 5 metalt.rgb
+                COORD 2 2 4 4 0 0 45 59 sign.rgb
+
+                ---------------------------------------------
+
+        Primitive:      sbfast
+
+        File:           .tsb
+
+        Description: The .tsb file specifies what textures are to be applied
+                to the landscape, and the order that they are applied.
+                The following is the format for defining a .tsb file for use
+                with an sbfast primitive:
+
+                The first token is a count of the number of texture
+                definitions.
+
+                for each definition:
+
+                        The next token is "coord" or "repeat" followed by the
+                        texture/vid name, and 4 XY pairs which represent the
+                        boundaries of the base texture in the XY plane
+                        (remember, sbfast is defined in its local frame as an
+                        XY plane w/ Z as the height field... see 2.9.1).
+                        If repeat was chosen, the coordinates supplied must be
+                        a right rectangle in local coordinates (corners are
+                        right angles w/ respect toe the XY axes) and are then
+                        tiled over the sbfast landscape.
+
+------------------------------------------------------------------------
+
+2.8.2.1                 VIDEO TEXTURES  (.vid)
+
+
+                2D textures, as defined above, consist of either an image
+        or an animation .vid file.  A .vid file is a list of the images that
+        make up the frames in the animation.  The only restriction is that
+        each image has the same dimensions.  The format of a .vid file is as
+        follows:
+
+        Token 1: asdf                   - "magic" string
+        Token 2: <repeat/mono>          - loop the animation, or show it once
+        Token 3: <count>                - # of frames in the animation
+
+        Next is a list of entries:
+
+        Token 4: <series/mono>          - determines next tokens
+
+
+                If token 4 is "SERIES", this means that the next series
+        of tokens represent a series of images, with similar names, differing
+        by a serial number somewhere in the name.
+
+        Token 5: prefix                 - prefix to the series name
+        Token 6: <start #>              - starting # of series
+        Token 7: <ending #>             - ending # of series
+        Token 8: postfix                - postfix to the series name
+          (next entry)
+
+        Note: start and end numbers are 5 digits, and can be reversed.
+
+                If token 4 is "MONO", this means that the next token is
+        an image file name.
+
+                This is continued until the number of frames stated
+        in token 3 are processed.
+
+        example: an repeating animation series of 5 images from
+                        mnb.00000.rgb to mnb.00004.rgb,
+
+                followed by jud1.rgb,
+
+                followed by a series of 4 images from
+                        run.00009.rgb to run.00006.rgb
+
+        ---------------- mnb.vid ---------------
+        ASDF REPEAT
+        10
+        SERIES mnb 00000 00004 rgb
+        MONO   jud1.rgb
+        SERIES run 00009 00006 rgb
+        ----------------------------------------
+
+------------------------------------------------------------------------
+
+2.8.3                   3D TEXTURES/SHADERS
+
+                Pixcon supports 3D textures, also known as shaders.  Shaders
+        are functions used to calculate material color, surface normals,
+        and physical displacement in order to affect the surface color of an
+        object.  The 3D textures accessable by Pixcon are listed in the file
+        "src/shader.c" in function "setup_shader".  You may use any of the
+        shaders listed there, or write your own.
+
+                Most of the existing shaders depend upon a noise lattice in
+        the file "perlin.4".  If this lattice file is missing from the
+        rendering directory, Pixcon will try to recreate it using the "random()"
+        function.  However, different platforms can have different
+        implementations of the random function, so you may not be able to
+        exactly duplicate images on different platforms.  With this in mind,
+        I have included my "perlin.4" lattice file in the "graph/src" and
+        "graph/gallery" directories to be used as the default.
+
+                Please keep in mind that using shaders can cause rendering
+        time to rise dramaticly, depending on how computation intensive
+        the shaders are written.  However, the results can be better than
+        flat shading or 2D texturing.
+
+                The process of using shaders in Pixcon is a 3 step process:
+
+                        1) write the shader
+                        2) register it with Pixcon
+                        3) apply it to an object
+
+------------------------------------------------------------------------
+
+2.8.3.1                         WRITING SHADERS
+
+                Shader functions are grouped in pairs - the shader function
+        itself, and an optional initialization function (this is called
+        only once; generally used for precalculation and initialization of
+        data and variables.  These functions are written in C/C++ with
+        the following skeleton:
+
+                void my_shader_init() {         // optional
+
+                }
+
+                int my_shader(void *x) {
+
+                }
+
+        where the returned value represents success (1) or failure (0).
+
+                The parameter given to the shader function is really of the
+        following type (defined in "src/shader.h") :
+
+                class shaderparamtype {
+
+                   public:
+                      float in[4];              // pt in local coordinates
+                      float normal[4];          // normal in camera coordinates
+                      float pt[4];              // pt in camera coordinates
+                      float xform[4], ixform[4] // xform matricies to/from camera space
+                      int   frame;              // current frame #
+
+                      eye   *cam;               // ptr to camera
+                      light *lparm;             // ptr to light source
+                      pc    *ob;                // ptr to object being rendered
+
+                      float lacunarity, H;      // fractal variables for SBFAST terrain shaders
+                      float octaves;
+                      float *freq;
+
+                      float out[3];             // out color
+                      float add[3];             // out additional color
+
+                      shaderparamtype() {
+                         H = lacunarity = octaves = 0;
+                         freq = (float *)NULL;
+                         cam = (eye *)NULL;
+                         lparm = (light *)NULL;
+                         ob = (pc *)NULL;
+                      }
+
+                      ~shaderparamtype () {
+                         if (freq != (float *)NULL)
+                            delete freq;
+                      }
+
+                };
+
+        Variable definitions:
+
+        IN variables:   (These variables should NOT be altered)
+
+                in:             xyz location in LOCAL coordinates
+                                        (ie no transformations except shader
+                                         scale)
+                frame:          current frame being rendered
+                xform:          4x4 xform matrix from local space to
+                                camera space
+                ixform:         inverse of xform
+                cam:            pointer to current camera object
+                lparm:          pointer to current light source
+                ob:             pointer to object being rendered
+
+                        The following 4 variables are only valid w/
+                        terrain height field shaders
+
+                lacunarity:     gap between frequencies of terrain
+                H:              fractal increment of terrain
+                octaves         maximum number of frequencies of terrain
+                freq:           multifractional frequency array
+
+        IN/OUT variables: (These variables contain the result of the
+                        application of 3D textures/shaders)
+
+                out:            output texture color            (range 0..1)
+                add:            output additional texture color (range 0..1)
+                pt:             output xyz location in WORLD coordinates
+                normal:         output normal in WORLD coordinates
+
+        The IN/OUT variables are the result of one or more shaders applied
+        to the in variables.  As a result, these variables should not simply
+        be assigned values.  Instead, they should be modified (otherwise
+        the results of previous shaders would be negated).  The following
+        modification rules apply to the IN/OUT variables:
+
+        - The "out" variable is a result of successive multiplications:
+                This simulates the "blend" of several shaders.
+
+                ex.  application of an "orange" shader with a "marble"
+                        shader produces an orange based marble surface.
+
+        - The "add" variable is a result of successive additions:
+                This simulates changes in color that are independant
+                of other shaders or lighting affects.
+
+                ex.  application of a "fog" shader with a "marble" shader
+                        produces a marble shaded object with the appearance
+                        of being in fog.
+
+        - the "pt" variable is the result of successive displacements from
+                the camera xyz location which would affect final color
+                calculations, but not the actual xyz locations.
+
+        - the "normal" variable is the result of successive perturbulations
+                from the original normal which is used to simulate
+                affects, such as ripples, waves, irregular surfaces on
+                flat objects...
+
+                I'm not going to explain the multifractal IN variables here,
+        as it can take up a book, and in fact, does. For info on the
+        multifractal variables refer to Ebert/Musgrave/Gardner/Perlin's book
+        "Texturing and Modeling".  I will say that they are only used
+        in SBFAST terrain shaders that calculate height values.
+
+                For examples of how to write shaders for Pixcon, see file
+        "src/shaders.c" (Yes, I know they ain't pretty, and full of commented
+        out code, but that' how they're written - you hack at a shader till
+        it has the look you want, and you keep things around in case you
+        need them or until you forget what they originally did...)
+
+------------------------------------------------------------------------
+
+2.8.3.2                 DECLARING SHADERS
+
+                Once a shader is written, it must be registered with
+        Pixcon.  Registration involves:
+
+        1) prototyping the function in "graph/src/shaders.h"
+                (see "shaders.h" for examples)
+
+        2) inserting the shader to a master list using the
+                function "setup_shader" in "graph/src/shader.c"
+                by adding the following line to the list of shaders:
+
+
+                insert_shader(  shaders,
+                                "my_shader_name",
+                                my_shader_func,
+                                my_shader_func_init);
+
+        or
+
+                insert_shader(  shaders,
+                                "my_shader_name",
+                                my_shader_func);
+
+        where:
+
+                shaders : The head of the list of shaders
+                        (DONT MESS W/ THIS)
+                my_shader_name: The name that you will be using to
+                        access this shader from the rendering script
+                        (see section 2.9)
+                my_shader_func: The actual name of your function
+                        (You might have to prototype the function
+                         before "setup_shader")
+                my_shader_func_init: The actual name of the optional
+                        initialization function.  If you don't have
+                        or need one, just leave it out.
+
+                Then recompile with your shader file added to the makefile.
+        Unlike other systems (such as BMRT) which allows you to write your
+        shader functions to be run through an interpreter for EACH PIXEL,
+        you can compile them in Pixcon for better performance.
+
+        Note: if you want to share shaders with others, please distribute
+        source, not binaries, as anyone can start building their own shader
+        library, independant of yours.  (Its also kind of dangerous when
+        assholes write shaders that delete your harddrive, then distribute
+        binaries to unsuspecting people)  If you want your shader included
+        with the Pixcon distribution, send me a copy, and if I like it,
+        I'll include it :)
+
+------------------------------------------------------------------------
+
+2.8.3.3                 USING SHADERS   (.3dt)
+
+                There are two ways of using a shader, which are dependent
+        on the type of shader - color or height.
+
+                To use a color shader, you must setup a script file
+        that describes the number and order of shaders that are applied
+        to the surface of an object.  There are 2 types of script files,
+        which are better explained by looking at the following examples
+        first:
+
+        ---------- shader_1.3dt --------        ---------- shader_2.3dt -------
+        ALL 2.5                                 MONO 2.5
+
+        2
+        terrain2        SURFACE
+        fog             ATMOSPHERE
+
+        1                                       1
+
+        1                                       1
+        2                                       2
+        marble          SURFACE                 marble  SURFACE
+        fog             ATMOSPHERE              fog     ATMOSPHERE
+
+        ---------------------------------       -------------------------------
+
+        Now for some definitions:
+
+                Mono shader - the shader is applied to specific surfaces of an
+                        object.
+                Global shader - the shader is applied to all surfaces of an
+                        object as a default, w/ the exception of those surfaces
+                        with Mono shaders.
+
+                The difference between shader 1 and shader 2 is that
+        shader 1 has a global shader.  The recognition of a global shader
+        is with the first token in the shader file, "ALL".  If no global
+        shader exists, then the token is "MONO".
+
+                The second token is a floating pt value which is a scale
+        value used to scale the object in "texture" space.  In the examples
+        above, the scale "2.5" is applied to the objects xyz coordinates when
+        calculating the texture color.  Since the scale is applied to the
+        object, this has the inverse affect on the size of the texture
+        (ie if scale > 1.0, the texture "shrinks" and if scale < 1.0,
+         the texture expands....)
+
+                If "ALL" was detected, what follows next is the global
+        shader.  In this case, the next token is the number of shader
+        functions that are to be applied to all surfaces (in shader 1 this
+        value is 2).  For each shader function, 2 tokens are defined - the
+        first represents the "shader name" given to the shader function
+        (defined in "register shader" above).  The second token represents
+        the type of shader (SURFACE/ATMOSPHERE).  A surface shader is applied
+        to an object before lighting calculations are made.  An atmosphere
+        shader is applied to an object after lighting calculations (After all,
+        we don't want a specular fog or rainbow, now do we?)
+
+                Next, whether a global shader was declared or not is a count
+        of all the surfaces (if the object has multiple surfaces -
+        polygons/patches) that have their own shaders (in shader 1 & 2 this
+        is 1).
+
+                For each surface with their own shaders, the surface
+        number is the next token (in shader 1 & 2 this is 1).  Next, a
+        count of the number of shaders applied to that surface
+        (in shader 1 & 2 this is 2).  Then follows the shader names with
+        the shader types.  This is done for each surface with its own
+        shaders.
+
+                In general, use a global shader with zero mono shaders
+        for objects with "1" surface (ellipsoids, cones, cylinders, sbfast)
+        For patches and polygons, use either the mono or global shaders.
+
+                If you are thoroughly confused now, look at the example
+        shader files included in the script directory for an idea of how to
+        write shader files.
+
+                                ----------------
+
+                Terrain height field shaders are used differently than
+        color shaders.  The height field shader is given (x,y) data for a
+        location on a flat plane, and distance from the camera for
+        antialiasing.  What the shader returns is the height at that
+        (x,y) point.
+
+                The only valid fields in the input structure are:
+
+                        in[0], in[1]:   contains (x,y) pair
+                        pt[0]:          contains distance from camera
+
+                        octaves, lacunarity, H: variables for use w/
+                                        multifractal algorithms
+
+                        freq:           precalculated frequency table for
+                                        use w/ multifractal algorithms
+
+                The only valid field in the input structure is:
+
+                        out[0]:         returned height value
+
+                Specifying terrain shaders for use w/ the SBFAST primitive
+        are done through SBFAST attributes, which are specified in the
+        .list file, and are described bellow under section 2.9
+
+------------------------------------------------------------------------
+
+2.8.4                   POLYGONS        (.spg/.geom)
+
+                Polygonal objects  are defined using a slight variation from
+        the OFF data format, developed at Ohio State, and usually have a
+        ".spg" or ".geom" extension.  Additional .spg files can be found at
+        avalon.chinalake.navy.mil.  In addition, there is a program in the
+        bin directory, "convert", that will convert several file formats to
+        .spg/.geom.
+
+                The first line of the polygon data file consist of 3
+        integers: # of vertices, # of polygons, # of polygon edges.
+
+                The next section consists of a list of all the 3D vertices
+        in the object;
+
+                The last section contains edge data for each polygon.
+        For each polygon, the polygon is defined with the format below:
+
+        <# of edges> <index to the first vertex in polygon> \
+                     <index to the second> ... <index to the last>
+
+        Polygons are rendered as closed loop (ie an edge exists between
+        the last vertex and the first for each polygon), and vertices are
+        listed in clockwise order (for normal calculations).
+
+        example
+        ------------ box.spg ------------
+        8 6 8
+
+        -2 -2  1
+        -2  2  1
+         2  2  1
+         2 -2  1
+        -2 -2 -1
+        -2  2 -1
+         2  2 -1
+         2 -2 -1
+
+        4 1 2 3 4
+        4 8 7 6 5
+        4 1 5 6 2
+        4 2 6 7 3
+        4 3 7 8 4
+        4 4 8 5 1
+        ---------------------------------
+
+------------------------------------------------------------------------
+
+2.8.5                   Surface Patches - NURBS  (.sp)
+
+                *Surface patch (spline based) object files end with the
+        extension ".sp" and are defined as follows:
+
+                The first line contains # of rows # of columns.  The following
+        lines contain a 2D grid of 3D control points (or knots).  The number
+        of patches in the mesh is (rows-3) * (col-3) as CATMULL-ROM splines
+        are used to calculate the surface patches.  The order that the control
+        points are placed determines the normals.  Since I lack the appropriate
+        terms to describe the ordering of the normals, I will give an example.
+
+                If you had a 2D mesh that represented a checkerboard, the
+        "top" row of control points would be the first line in the .sp file,
+        listed from left to right.  The bottom row would be the last line of
+        control points.
+
+        example: cboard.sp is a mesh of 5x5 knots with 4 patches
+                ( (5-3) * (5-3) = 2 * 2 = 4 )
+        ---------------- cboard.sp -----------------
+
+        5 5
+
+        -2  2 0   -1  2 0   0  2 0   1  2 0   2  2 0
+        -2  1 0   -1  1 0   0  1 0   1  1 0   2  1 0
+        -2  0 0   -1  0 0   0  0 0   1  0 0   2  0 0
+        -2 -1 0   -1 -1 0   0 -1 0   1 -1 0   2 -1 0
+        -2 -2 0   -1 -2 0   0 -2 0   1 -2 0   2 -2 0
+        --------------------------------------------
+
+        Texture maps are applied to knots, as each knot is given a texel
+        coordinate.  To apply a texture map, the knots are numbered in a
+        row/col pair, left to right, top to bottom.  Since the top/bottom
+        most rows and left/right most columns are just knot points, not
+        necessarily corners of a surface patch, they are not numbered.
+        So for cboard.sp, the knots are numbered:
+
+                x       x       x       x       x
+
+                x       1 1     1 2     1 3     x
+
+                x       2 1     2 2     2 3     x
+
+                x       3 1     3 2     3 3     x
+
+                x       x       x       x       x
+
+        Unlike textures, color is applied to patches, not knots.  Also,
+        patches are numbered sequentially, left to right, top to bottom.
+
+                        1       2
+
+                        3       4
+
+        The reason for sequential numbering instead of pairs is to keep
+        the <.ilm> file format the same for all primitives.
+
+------------------------------------------------------------------------
+
+2.9.0                   PIXCON scripting language <.list>
+
+                There are 2 scripting languages that may be used to generate
+        images.  The first, <.lst>, is a simple, somewhat cryptic language
+        that was created to make parsing fast.  This type of file is generated
+        by ANITROLL.  The second type, <.list> was created to be more user
+        friendly, though it may take a little longer to parse.  Since the
+        <.list> language was designed to be created by the user, this language
+        will be described below, and the <.lst> language will be described
+        in a later release, if there is enough interest.
+
+                The <.list> language itself is not case-sensitive,
+        with the exception of filenames.
+
+                The first token in a <.list> file is "list" which is used
+        which is used as an identifer for a <.list> file.
+
+                The next token is "frame_count" followed by the
+        number of frames to render.
+
+                The next token is "object_count" followed by the
+        number of rendering primitives to process.
+
+                What follows next is a list of all the primitives to
+        be rendered by Pixcon.  Each primitive is define by stating
+        its type, then a "{", a list of primitive attributes, finished
+        bye a "}".  For example,
+
+                polygon {
+                        file box.spg
+                }
+
+        represents a polygon primitive whose geometry is defined in "box.spg"
+        using the default attributes for a polygon.
+
+                There is a special token "//" which works the same way as
+        it does in C++ - it comments out the rest of the line.
+
+                The following sections describe each type of primitives and
+        their attributes.
+
+------------------------------------------------------------------------
+
+2.9.1                   Primitive Descriptions
+
+        ----------------------------------------------------------------
+        CAMERA
+
+        The camera primitive is just that - a camera.  It defines
+        from where the "picture" is to be taken, as well as what.
+        It needs 2 reference points - location and the center
+        of attention, or focus, as well as which way the camera is
+        oriented, defined by "up".  Several camera may be defined
+        for each frame, but only one will be used (ie the others
+        are ignored.  If a camera is not specified, the system
+        will default to a camera with all the default attributes.
+
+        The following is a list of the attributes that may be defined for
+        a camera, and are defined in 2.9.2:
+
+                        coa             x y z
+                        frame           #
+                        location        x y z
+                        up              x y z
+        ----------------------------------------------------------------
+        GEOCONE
+
+        The geocone primitive defines a cone. You can define a regular
+        cone with length and a base, or you can define a partial cone,
+        where the cone doesn't have a "point" on the top, by specifying
+        a "top radius" other than zero.  Cones are centered at the origin,
+        with its length defined along its local Y axis (-length/2 .. +length/2).
+
+        The following is a list of the attributes that may be defined for
+        a geocone, and are defined in 2.9.2:
+
+                2d_texture      <image/.vid name>
+                3d_texture      <.3dt name>
+                shade           <type> <.ilm name>
+                frame           #
+                luminate
+                raycast
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+                shadow          a b c d
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+
+                length          #
+                top_radius      #
+                bottom_radius   #
+        ----------------------------------------------------------------
+        GEOCYLINDER
+
+        The geocylinder primitive defines a cylinder.  Cylinders are
+        centered at the origin, with its length defined along its local
+        Y axis (-length/2 .. +length/2).
+
+        The following is a list of the attributes that may be defined for
+        a geocylinder, and are defined in 2.9.2:
+
+                2d_texture      <image/.vid name>
+                3d_texture      <.3dt name>
+                shade           <type> <.ilm name>
+                frame           #
+                raycast
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+                shadow          a b c d
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+                length          #
+                radius          #
+        ----------------------------------------------------------------
+        GEOSPHERE
+        The geosphere primitive defines an ellipsoid.  The ellipsoid
+        is centered around its local origin, and defined by specifying the
+        length of it's 3 axis.  If the axis are of the same magnitude, then a
+        spheroid is formed.
+
+        The following is a list of the attributes that may be defined for
+        a geosphere, and are defined in 2.9.2:
+
+                2d_texture      <image/.vid name>
+                3d_texture      <.3dt name>
+                shade           <type> <.ilm name>
+                frame           #
+                raycast
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+                shadow          a b c d
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+                axis            x y z
+                axis_x          x
+                axis_y          y
+                axis_z          z
+                radius          r
+        ----------------------------------------------------------------
+        LIGHT
+
+        This primitive defines what lighting effects exist.  There are
+        two types of light sources, and each has two subtypes.  The
+        first type is a basic light source - it is uniform, and global.
+        The second type is similar to a flashlight - it has a definite
+        source location, and uses filters (texture maps) to "project"
+        light/images onto objects - this creates real shadows and defines
+        non-uniform lighting.  Each of these types have two subtypes -
+        far and point.  A point light source radiates in all.  A far light
+        source radiates in one direction only.
+
+        In addition, there simplified versions of each of these light
+        source types.  These are rougher approximations to their
+        counterparts, but are faster to calculate.
+
+        Each frame may only have up to one normal light source defined,
+        and multiple beam light sources (if more than one normal light
+        source is defined, only one will be used).  If no light source
+        is defined, a default will be created, with default attributes.
+
+        The following is a list of the attributes that may be defined for
+        a light source, and are defined in 2.9.2:
+
+                FAR
+                        type            <string>
+                        direction       x y z
+                        ambient         r g b
+                        diffuse         r g b
+                        fatt            a b c
+
+                POINT
+                        type            <string>
+                        location        x y z
+                        ambient         r g b
+                        diffuse         r g b
+                        fatt            a b c
+
+                BEAM_FAR & BEAM_POINT
+                        type            <string>
+                        2d_texture      <image/.vid name>
+                        ambient         r g b
+                        diffuse         r g b
+                        distance2plane  #
+                        direction       x y z
+                        fatt            a b c
+                        location        x y z
+                        length          #
+                        up              x y z
+                        width           #
+        ----------------------------------------------------------------
+        LINE
+
+        This attribute defines a line in three space.
+
+        The following is a list of the attributes that may be defined for
+        a line, and are defined in 2.9.2:
+
+                shade           <type>  <r g b r g b>
+                frame           #
+                shadow          a b c d
+                point           x y z x y z
+                transparent
+        ----------------------------------------------------------------
+        PARTICLE
+
+        This primitive specifies a 3D point in three space.
+
+        The following is a list of the attributes that may be defined for
+        a particle, and are defined in 2.9.2:
+
+                shade           <type>  <r g b>
+                frame           #
+                shadow          a b c d
+                location        x y z
+                transparent
+        ----------------------------------------------------------------
+        POLYGON
+
+                Polygons are geometric planes that are bounded by edges.
+        Polygons are one of the most commonly used primitives in any renderer.
+        In Pixcon, polygon geometry is defined in .spg files (see 2.8.4).
+
+        The following is a list of the attributes that this primitive may
+        have, which are explained in 2.9.2:
+
+                2d_texture      <image/.vid name>
+                3d_texture      <.3dt name>
+                shade           <type> <.ilm name>
+                file            <.spg filename>
+                frame           #
+                inviso          r g b
+                biplane
+                raycast
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+                shadow          a b c d
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+        ----------------------------------------------------------------
+        RADIANT
+
+        The radiant primitive was designed as a way to create spheroids with
+        coronas.  This was programmed before 3D shaders were implemented,
+        and may eventually be converted.  It produces nice solar/lunar coronas,
+        planet atmospheres, and energy explosion effects :)
+
+        The following is a list of the attributes that this primitive may
+        have, which are explained in 2.9.2:
+
+                        shade           <type> <.ilm name>
+                        frame           #
+                        location        x y z
+                        hollow
+                        inner_radius    #
+                        outer_radius    #
+        ----------------------------------------------------------------
+        SBFAST
+
+        The sbfast primitive is based upon a paper being written by Ken
+        Musgrave.  The idea is that polygonal terrain needs a lot of
+        memory and compute power to be done in real time.  So he suggested
+        the idea of using a raycreeper though a multifractal terrain
+        algorithm to produce non-polygonal based terrain.  Unfortunately,
+        even with the optimizations used here, it isn't real time, but
+        is getting there and produces excellent landscapes.  To render an
+        average terrain frame takes ~7.5 minutes on a DX4, ~1 minute on a
+        R4400 Indigo2, or 7 seconds on a R4400 Onyx w/ 8 processors.
+        The original name of this algorithm was SLARTIBARTFAST (yes,
+        this name was used because of a dare) and is now being called
+        quad-analytical terrain rendering.
+
+        The following is a list of the attributes that this primitive may
+        have, which are explained in 2.9.2:
+
+                2d_texture      <.tsb file>
+                3d_texture      <.3dt name>
+                shade           <type> <.ilm name>
+                frame           #
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+                back            #
+                displacement    <shader name>
+                h               #
+                lacunarity      #
+                octaves         #
+                dither
+
+        Because this is based on a raycreeper and the 1/f noise function,
+        the greater in magnitude back, lacunarity, octaves, and "h", the
+        more detail is rendered at the expense of time.
+        ----------------------------------------------------------------
+        SPATCH          (Surface Patch)
+
+        This primitive is a NURBS surface (non uniform rational b-spline),
+        or to be more specific a Catmull-Rom surface.  By using a 2D
+        grid or mesh of points (knots), a smooth surface can be interpolated
+        between this 3D data structure.
+
+        The following is a list of the attributes that this primitive may
+        have, which are explained in 2.9.2:
+
+                2d_texture      <image/.vid name>
+                3d_texture      <.3dt name>
+                file            <.sp filename>
+                shade           <type> <.ilm name>
+                frame           #
+                raycast
+                rotate_x        x
+                rotate_y        y
+                rotate_z        z
+                scale           #
+                shadow          a b c d
+
+                tr_matrix       rxx rxy rxz tx
+                                ryx ryy ryz ty
+                                rzx rzy rzz tz
+                                0   0   0   1
+
+                translate       x y z
+                transparent
+
+------------------------------------------------------------------------
+
+2.9.2                   Attribute Descriptions
+
+                The following is a description of all the primitive
+        attributes that have been mentioned in this document.
+
+        ----------------------------------------------------------------
+        Attribute:      2D_TEXTURE              - Apply a 2D Texture/Animation
+
+        Primitive:      polygon, spatch, geosphere, geocone, geocylinder,
+                        sbfast, light
+
+        Parameters:     .tex/.tes/.tsb/.vid/<image name>
+
+        Usage:          polygon : 2d_texture x.tex
+                        spatch  : 2d_texture x.tes
+                        sbfast  : 2d_texture x.tsb
+                        geosphere/geocone/geocylinder/light :
+                                 2d_texture x.vid
+                                 2d_texture x.rgb
+                                 2d_texture x.gif
+                                 2d_texture x.tiff
+                                 2d_texture x.jpeg
+                                 2d_texture x.ppm
+                                 2d_texture x.lbm
+
+        Default:        N/A
+
+        Description:    This attribute specifies the use of 2D texture maps.
+                        A primitive may only have either the 2d_texture
+                        attribute or the 3d_texture attribute.  Mixing the two
+                        will cause undesired results.  The application of 2D
+                        texture maps for each primitive is different however,
+                        and is explained below:
+
+                ----------------------------------------------------------
+                Primitive: geosphere, geocone, geocylinder
+
+                Parameters: <image name>/.vid
+
+                Usage:  2d_texture <image name>/.vid
+
+                Description: Only one image/animation may be applied to
+                        these primitives at a time.  The texture is applied
+                        to the surface of the object in its local coordinate
+                        system, where the Y axis of the local coordinate
+                        system coresponds to the Y axis of the texture,
+                        and the texture is applied in a clockwise rotation
+                        around the Y axis.
+                ----------------------------------------------------------
+                Primitive: light
+
+                Parameters: <image name>/.vid
+
+                Usage:  2d_texture <image name>/.vid
+
+                Description: This attribute is only valid when the light
+                        source is a BEAM type.  This attribute then specifies
+                        the "filter" to be place between the light source
+                        and the surfaces it illuminates.
+                ----------------------------------------------------------
+                Primitive: polygon
+
+                Parameters: <.tex>
+
+                Usage:  2d_texture <.tex>
+
+                Description: See 2.8.2
+                ----------------------------------------------------------
+                Primitive: sbfast
+
+                Parameters: <.tsb>
+
+                Usage:  2d_texture <.tsb>
+
+                Description: See 2.8.2
+                ----------------------------------------------------------
+                Primitive: spatch
+
+                Parameters: <.tes>
+
+                Usage:  2d_texture <.tes>
+
+                Description: See 2.8.2
+                ----------------------------------------------------------
+
+        ----------------------------------------------------------------
+        Attribute:      3D_TEXTURE      - Apply 3D Shaders
+
+        Primitive:      polygon, spatch, geosphere, geocone, geocylinder, sbfast
+
+        Parameters:     <.3dt>
+
+        Usage:          3d_texture <.3dt>
+
+        Default:        N/A
+
+        Description:    This attribute allows the user to apply 3d textures
+                        or shaders as they are commonly called to a
+                        primitive.  See 2.8.3 for details on how to create
+                        a <.3dt> file
+
+        ----------------------------------------------------------------
+        Attribute:      AMBIENT         - Define Ambient Light
+
+        Primitive:      light
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          ambient r g b
+
+        Default:        ambient 0.3 0.3 0.3
+
+        Description:    ambient defines the amount of ambient light released
+                        by this light source.  Range is between (0.0 - 1.0)
+                        and for each segment the soft rule is ambient + diffuse
+                        should equal one, but isn't forbidden as the final
+                        final rendered colors are clamped to 1.
+        ----------------------------------------------------------------
+        Attribute:      AXIS
+
+        Primitive:      geosphere
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          axis x y z
+
+        Default:        axis 1 1 1
+
+        Description:    This attribute specifies the radius of the 3 principle
+                        axis that defines an ellipsoid.
+        ----------------------------------------------------------------
+        Attribute:      AXIS_X
+
+        Primitive:      geosphere
+
+        Parameters:     FLOAT (X)
+
+        Usage:          axis_x x
+
+        Default:        axis_x 1
+
+        Description:    This attribute specifies the radius of the "X" axis of
+                        an ellipsoid.
+        ----------------------------------------------------------------
+        Attribute:      AXIS_Y
+
+        Primitive:      sphere
+
+        Parameters:     FLOAT (Y)
+
+        Usage:          axis_y y
+
+        Default:        axis_y 1
+
+        Description:    This attribute specifies the radius of the "Y" axis of
+                        an ellipsoid.
+        ----------------------------------------------------------------
+        Attribute:      AXIS_Z
+
+        Primitive:      geosphere
+
+        Parameters:     FLOAT (Z)
+
+        Usage:          axis_z z
+
+        Default:        axis_z 1
+
+        Description:    This attribute specifies the radius of the "Z" axis of
+                        an ellipsoid.
+        ----------------------------------------------------------------
+        Attribute:      BACK
+
+        Primitive:      sbfast
+
+        Parameters:     FLOAT (#)
+
+        Usage:          back #
+
+        Default:        1000.0
+
+        Description:    This attribute defines the far back plane where
+                        the raycreeper gives up trying to intersect the
+                        surface.
+        ----------------------------------------------------------------
+        Attribute:      BIPLANE
+
+        Primitive:      polygon
+
+        Parameters:     N/A
+
+        Usage:          biplane
+
+        Default:        (off)
+
+        Description:    this attribute reinitiallizes the rotation part of the
+                        rotation/translation matrix.  This has the effect of
+                        causing the object to be facing the camera at the
+                        orientation, at all times.  This is similar to SGI's
+                        Performer biplanes, except this may be done with a
+                        polygon structure, instead of just a texture map.
+                        To achieve the full Performer biplane effect, use
+                        use 2d_texture and inviso attributes with this one.
+        ----------------------------------------------------------------
+        Attribute:      BOTTOM_RADIUS
+
+        Primitive:      cone
+
+        Parameters:     FLOAT (#)
+
+        Usage:          bottom_radius #
+
+        Default:        bottom_radius 1
+
+        Description:    if either the top_radius or the bottom_radius equals
+                        zero, then these two attributes help define a perfect
+                        cone.  If bottom_radius == top_radius, this defines a
+                        cylinder (more expensive to calculate than the cylinder
+                        primitive).  Otherwise, the resulting object will look
+                        like a cone with the top portion lopped off.
+        ----------------------------------------------------------------
+        Attribute:      COA     - Center of Attention
+
+        Primitive:      camera
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          coa x y z
+
+        Default:        coa 0 0 -1
+
+        Description:    Center Of Attention.  In order to get the camera
+                        to face a specific direction, an xyz coordinate
+                        is to be defined to be the "focus" of the camera.
+        ----------------------------------------------------------------
+        Attribute:      DIFFUSE         - Define Diffuse Light
+
+        Primitive:      light
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          diffuse r g b
+
+        Default:        diffuse 0.7 0.7 0.7
+
+        Description:    diffuse defines the amount of diffuse light released
+                        by this light source, used by the equation stated
+                        in 2.8.1.  Range is between (0.0 - 1.0) and for each
+                        segment the soft rule is ambient + diffuse should
+                        equal one, but isn't forbidden as the final rendered
+                        colors are clamped to 1.0.
+        ----------------------------------------------------------------
+        Attribute:      DIRECTION
+
+        Primitive:      light
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          direction x y z
+
+        Default:        0 0 -1
+
+        Description:    direction is a vector that defines the direction of
+                        the light rays of the light source.
+        ----------------------------------------------------------------
+        Attribute:      DISPLACEMENT
+
+        Primitive:      sbfast
+
+        Parameters:     <shader name>
+
+        Usage:          sbfast <shader name>
+
+        Default:        default_alt
+
+        Description:    This attribute defines the algorithm to be used
+                        to generate the terrain.  The algorithms specified
+                        here are similar to 3D shaders used by pixcon,
+                        and are specified exactly the same way (see 2.8.3)
+                        except that there is only one output variable, stored
+                        in out[0] - this is the height at this coordinate.
+        ----------------------------------------------------------------
+        Attribute:      DISTANCE2PLANE
+
+        Primitive:      light
+
+        Parameters:     FLOAT (#)
+
+        Usage:          distance2plane #
+
+        Default:        1
+
+        Description:    for BEAM type light sources, distance2plane defines
+                        the distance between the light source and the
+                        texture/filter - length, width and distance2plane
+                        help define the fov (field of view) of the light
+                        source.
+
+        ----------------------------------------------------------------
+        Attribute:      DITHER
+
+        Primitive:      sbfast
+
+        Parameters:     N/A
+
+        Usage:          dither
+
+        Default:        (off)
+
+        Description:    This option causes Pixcon to render every other
+                        pixel and extrapolate the rest from adjacent pixels.
+                        This roughly reduces rendering time of this
+                        primitive by 50-60%.
+
+        ----------------------------------------------------------------
+        Attribute:      FILE
+
+        Primitive:      polygon, spatch
+
+        Parameters:     STRING (<FILENAME>)
+
+        Usage:          file <filename>
+
+        Default:        N/A
+
+        Description:    this attribute specifies the (.spg/.geom) file to
+                        use for polygons, or the (.sp) 2D mesh file to
+                        use for spatches.
+        ----------------------------------------------------------------
+        Attribute:      FATT    -       Atmospheric Attenuation
+
+        Primitive:      light
+
+        Parameters:     FLOAT (A B C)
+
+        Usage:          fatt a b c
+
+        Default:        fatt 0 0 0
+
+        Description:    the FATT model attempt to simulate the inverse
+                        squared fallout of light w/ respect to distance.
+
+                        The equation:
+
+                                ATT = 1.0/(A*SQR(d) + B*d + C)
+
+                        where d = distance, and A,B,C are constants
+
+                        The fatt model is turned off if a == b == c == 0.0.
+        ----------------------------------------------------------------
+        Attribute:      FRAME   - Frame Number
+
+        Primitive:      camera, light, polygon, spatch, particle, line,
+                        radiant, geosphere, geocone, geocylinder, sbfast
+
+        Parameters:     INTEGER (#)
+
+        Usage:          frame #
+
+        Default:        frame 1
+
+        Description:    Frame number.  Each rendering primitive is assigned
+                        a frame number to be rendered in.  A still picture
+                        is the same as an animation of only 1 frame.
+        ----------------------------------------------------------------
+        Attribute:      H
+
+        Primitive:      sbfast
+
+        Parameters:     FLOAT (#)
+
+        Usage:          h #
+
+        Default:        0.9
+
+        Description:    any multifractal function is usually based on
+                        1/f^h -> this is the "h" defined here.
+        ----------------------------------------------------------------
+        Attribute:      HOLLOW
+
+        Primitive:      radiant
+
+        Parameters:     N/A
+
+        Usage:          hollow
+
+        Default:        (off)
+
+        Description:    this attribute turns off the inner sphere of this
+                        primitive, leaving a "black hole" in the corona.
+                        This is generally done to place your own sphere
+                        object in its place.
+        ----------------------------------------------------------------
+        Attribute:      INNER_RADIUS
+
+        Primitive:      radiant
+
+        Parameters:     FLOAT (#)
+
+        Usage:          inner_radius #
+
+        Default:        inner_radius 1
+
+        Description:    this attribute defines the radius of the inner
+                        sphere of the radiant primitive
+        ----------------------------------------------------------------
+        Attribute:      INVISO
+
+        Primitive:      polygon
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          inviso r g b
+
+        Default:        inviso 0 0 0
+
+        Description:    this attribute defines the "transparent" color in
+                        a texture for the biplane attribute (ie assumes
+                        that this primitive has both the 2d_texture and
+                        biplane attributes).  Since this is a precise color,
+                        rgb is specified in the range from 0..255.
+        ----------------------------------------------------------------
+        Attribute:      LACUNARITY
+
+        Primitive:      sbfast
+
+        Parameters:     FLOAT (#)
+
+        Usage:          lacunarity #
+
+        Default:        2.1
+
+        Description:    this attribute is the gap between successive
+                        frequencies.  In calculating 1/f noise, it is used
+                        in 1.0/(f * lacunarity)^h
+        ----------------------------------------------------------------
+        Attribute:      LENGTH
+
+        Primitive:      cone, cylinder, light
+
+        Parameters:     FLOAT (#)
+
+        Usage:          length #
+
+        Default:        length 1.0
+
+        Description:    For each primitive it has different meanings:
+
+                        cone - length refers to the length of the dimension
+                                associated w/ the axis of revolution.
+
+                        cylinder - length refers to the length of the dimension
+                                associated w/ the axis of revolution.
+
+                        light - for BEAM type light sources, length defines
+                                the length of the virtual filter in front
+                                of the light source - length, width
+                                and distance2plane help define the fov
+                                (field of view) of the light source.
+        ----------------------------------------------------------------
+        Attribute:      LOCATION
+
+        Primitive:      camera, light, radiant, location
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          location x y z
+
+        Default:        location 0 0 0
+
+        Description:    Location.  This defines a fixed xyz location for the
+                        object.  This is similar to TRANSLATE, however,
+                        while TRANSLATE is cumulative (ie you can do
+                        several translates which build up upon each other)
+                        LOCATION is fixed and not cumulative.
+        ----------------------------------------------------------------
+        Attribute:      OCTAVES
+
+        Primitive:      sbfast
+
+        Parameters:     FLOAT (#)
+
+        Usage:          octaves #
+
+        Default:        100
+
+        Description:    This is the upper bound for the number of frequencies
+                        used in generating a multifractal terrain.  If your
+                        multifractal terrain exceeds this amount, then bad
+                        things happen (I've never seen any of my sbfast
+                        height shaders need more than 100 octaves);
+        ----------------------------------------------------------------
+        Attribute:      OUTER_RADIUS
+
+        Primitive:      radiant
+
+        Parameters:     FLOAT (#)
+
+        Usage:          outer_radius #
+
+        Default:        N/A
+
+        Description:    this attribute defines the radius of the outer
+                        sphere of the radiant primitive.
+        ----------------------------------------------------------------
+        Attribute:      POINT
+
+        Primitive:      line
+
+        Parameters:     FLOAT (X Y Z X Y Z)
+
+        Usage:          point x y z x y z
+
+        Default:        point 0 0 0 0 0 0
+
+        Description:    this attribute defines the two endpoints of a line.
+        ----------------------------------------------------------------
+        Attribute:      RADIUS
+
+        Primitive:      cylinder, sphere
+
+        Parameters:     FLOAT (#)
+
+        Usage:          radius #
+
+        Default:        1
+
+        Description:    this attribute defines the radius for a cylinder or a sphere.
+        ----------------------------------------------------------------
+        Attribute:      RAYCAST
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere
+
+        Parameters:     N/A
+
+        Usage:          raycast
+
+        Default:        N/A
+
+        Description:    if the primitive is polygonalized, the system will
+                        use a 1 level deep raycaster instead of a scanline
+                        zbuffer to calculate depth (scanline zbuffering
+                        inheritly has severe problems with large polygons).
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_X
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (X)
+
+        Usage:          rotate_x x
+
+        Default:        0
+
+        Description:    This causes the primitive to rotate around the
+                        x axis in its local coordinate system.  X is
+                        expressed in degrees.  Note: all rotations and
+                        translations are initialized to zero when a primitive
+                        is declared, and from then on is cumulative.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_Y
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (Y)
+
+        Usage:          rotate_y y
+
+        Default:        0
+
+        Description:    This causes the primitive to rotate around the
+                        y axis in its local coordinate system.  Y is
+                        expressed in degrees.  Note: all rotations and
+                        translations are initialized to zero when a primitive
+                        is declared, and from then on is cumulative.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_Z
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (Z)
+
+        Usage:          rotate_z z
+
+        Default:        0
+
+        Description:    This causes the primitive to rotate around the
+                        z axis in its local coordinate system.  Z is
+                        expressed in degrees.  Note: all rotations and
+                        translations are initialized to zero when a primitive
+                        is declared, and from then on is cumulative.
+        ----------------------------------------------------------------
+        Attribute:      SCALE
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (#)
+
+        Usage:          scale #
+
+        Default:        1.0
+
+        Description:    This attribute scales the primitive along the
+                        x, y, and z axis.
+        ----------------------------------------------------------------
+        Attribute:      SHADE
+
+        Primitive:      polygon, spatch, sphere, cone, cylinder, radiant,
+                        sbfast
+
+        Parameters:     <type> <.ilm>
+
+        Usage:          shade dot               // NOT IMPLEMENTED YET
+                        shade wfbw
+                        shade bw
+                        shade constant <.ilm>
+                        shade gouraud <.ilm>
+                        shade gouraud r g b         // particle primitive only
+                        shade gouraud r g b r g b   // line primitive only
+                        shade alex <.ilm>
+                        shade phong <.ilm>
+                        shade pdot              // NOT IMPLEMENTED YET
+                        shade pwfbw
+                        shade pbw
+                        shade pconstant <.ilm>
+                        shade pgouraud <.ilm>
+                        shade palex <.ilm>
+                        shade pphong <.ilm>
+                        shade irradiant <.ilm>
+                        shade rsolid    <.ilm>
+
+        Default:        wfbw
+
+        Description:    The shade attribute describes how the surface
+                        color/shading is calculated.  Below is a
+                        description of each type and the applicable
+                        primitive.
+
+                Type:   dot
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder,
+                                radiant
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                then only vertice points will be rendered.
+                                -------------------------------------
+                Type:   wfbw
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder,
+                                radiant, particle, line
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                then only the edges of the polygons will
+                                be rendered as white lines.
+                                -------------------------------------
+                Type:   bw
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                then the edges of the polygons will be
+                                rendered as white lines, while the rest
+                                of the polygon will be rendered in black.
+                                (ie wfbw with culling)
+                                -------------------------------------
+                Type:   constant
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                applying the lighting calculation only
+                                once per polygon.
+                                -------------------------------------
+                Type:   gouraud (type I)
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                applying the lighting calculation at each
+                                vertex, and interpolating the shade across
+                                each polygon.
+                                -------------------------------------
+                Type:   gouraud (type II)
+
+                Primitive:      particle
+
+                Description:    This shade type will apply the rgb color
+                                specified (range 0.0 - 1.0) to the point.
+                                -------------------------------------
+                Type:   gouraud (type III)
+
+                Primitive:      line
+
+                Description:    This shade type will apply the rgb colors
+                                to the end points of the line, and
+                                interpolate across.
+                                -------------------------------------
+                Type:   alex
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                and applying the lighting calculation at
+                                each pixel.
+                                -------------------------------------
+                Type:   phong
+
+                Primitive:      polygon, spatch, sphere, cone, cylinder
+
+                Description:    This shade type will cause the specified
+                                primitive to be converted to polygons,
+                                and applying the lighting calculation at
+                                each pixel, while interpolating the
+                                normals between vertices to give the
+                                appearance of a a more rounded/smooth
+                                surface.
+                                -------------------------------------
+                Type:   pdot
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to dot, except
+                                at greater detail (50:1 to be exact)
+                                -------------------------------------
+                Type:   pwfbw
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to wfbw, except
+                                at greater detail (50:1 to be exact)
+                                -------------------------------------
+                Type:   pbw
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to bw, except
+                                at greater detail (50:1 to be exact)
+                                -------------------------------------
+                Type:   pconstant
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to constant,
+                                except at greater detail (50:1 to be exact)
+                                -------------------------------------
+                Type:   pgouraud
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to gouraud, except
+                                at greater detail (50:1 to be exact)
+                                -------------------------------------
+                Type:   palex
+
+                Primitive:      spatch, sphere, cone, cylinder, sbfast
+
+                Description:    This shade type is similar to alex, except
+                                at greater detail (NOTE: the only shade
+                                type for sbfast)
+                                -------------------------------------
+                Type:   pphong
+
+                Primitive:      spatch
+
+                Description:    This shade type is similar to gouraud, except
+                                at greater detail (50:1 to be exact)
+                                -------------------------------------
+
+                Type:   irradiant
+
+                Primitive:      radiant
+
+                Description:    This object will not use lighting to calculate
+                                the surface color, only its luminate value
+                                (therefore by specifying this shade type, the
+                                 object also receives the "luminate" attribute)
+                                -------------------------------------
+
+                Type:   rsolid
+
+                Primitive:      radiant
+
+                Description:    This object will use lighting to calculate the
+                                surface color, as well as its luminate value.
+                                -------------------------------------
+        ----------------------------------------------------------------
+        Attribute:      SHADOW
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, line, point
+
+        Parameters:     FLOAT (A B C D)
+
+        Usage:          shadow a b c d
+
+        Default:        (off)
+
+        Description:    This attribute indicates that the primitive casts
+                        a shadow.  Since Pixcon is not a ray-tracer, it
+                        does "fake" shadows.  The object is projected onto
+                        the plane ax + by + cz + d = 0, where a, b, c, d
+                        are the parameters of the attribute.  From this
+                        plane, the diffuse lighting is removed.  As a
+                        general practice, The "real" floor should be a little
+                        below the shadow "floor", as floating point errors
+                        can cause the zbuffer to put holes in the shadows.
+                        suggested difference ~ 0.02 or more.
+
+                        Note: objects that cast shadows cannot be
+                        transparent.
+        ----------------------------------------------------------------
+        Attribute:      TOP_RADIUS
+
+        Primitive:      cone
+
+        Parameters:     FLOAT (#)
+
+        Usage:          top_radius #
+
+        Default:        top_radius 1
+
+        Description:    if only one of the top_radius or the bottom_radius
+                        equals zero, then these two attributes help define
+                        a perfect cone.  If bottom_radius == top_radius,
+                        this defines a cylinder (more expensive to calculate
+                        than the cylinder primitive).  Otherwise, the
+                        resulting object will look like a cone with the
+                        top portion lopped off.
+        ----------------------------------------------------------------
+        Attribute:      TR_MATRIX
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (
+                                        rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+                                                        )
+
+        Usage:          tr_matrix       rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+
+        Default:        tr_matrix       1 0 0 0
+                                        0 1 0 0
+                                        0 0 1 0
+                                        0 0 0 1
+
+        Description:    This matrix is multiplied to the current rotation/
+                        translation matrix for this primitive.  The
+                        translation part of this matrix is the 4th column,
+                        and the rotation part is in the first 3 rows/columns,
+                        where row 1 is the orientation of the new +x axis,
+                        row 2 is the orientation of the new +y axis, and
+                        row 3 is the orientation of the new +z axis.  In
+                        general, each "axis" should be normalized.  If
+                        not, scaling and shearing will occur.
+        ----------------------------------------------------------------
+        Attribute:      TRANSLATE
+
+        Primitive:      polygon, spatch, cone, cylinder, sphere, sbfast
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          translate x y z
+
+        Default:        translate 0 0 0
+
+        Description:    This attribute translates the current primitive.
+                        Note: all rotations and translations are initialized
+                        to zero when a primitive is declared, and from then
+                        on is cumulative.
+        ----------------------------------------------------------------
+        Attribute:      TRANSPARENT
+
+        Primitive:      polygon, spatch, radiant, cone, cylinder, sphere,
+                        sbfast
+
+        Parameters:     N/A
+
+        Usage:          transparent
+
+        Default:        see Description.
+
+        Description:    This attribute indicates that the primitive is
+                        transparent.  Since this is not a raytracer,
+                        this is how it is achieved:  Transparent objects
+                        are rendered last.  Ambient and diffuse color
+                        is determined by the greater of the transparent
+                        primitives or the current values in the ambient
+                        and diffuse buffers.
+
+                        Note: transparent object do not cast shadows
+        ----------------------------------------------------------------
+        Attribute:      TYPE
+
+        Primitive:      light
+
+        Parameters:     STRING ( FAR/POINT/BEAM_FAR/BEAM_POINT )
+
+        Usage:          type far
+                        type point
+                        type beam_far
+                        type beam_point
+                        type simple_far
+                        type simple_point
+                        type simple_beam_far
+                        type simple_beam_point
+
+        Default:        type far
+
+        Description:    See 2.9.1, under the light primitive.
+        ----------------------------------------------------------------
+        Attribute:      UP
+
+        Primitive:      camera, light
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          up x y z
+
+        Default:        up 0 1 0
+
+        Description:    UP.  The vector up is used by the camera for
+                        orientation (ie it helps define "up").  While this
+                        vector does not have to be a "true" 90 deg up vector,
+                        it is used to calculate the "right" vector, which is
+                        then used to calculate the "true" up vector.
+
+                        The light object uses the up vector if it is of the
+                        "BEAM" type, which is essentially modeling a
+                        flashlight/spotlight.  In this case, the light source
+                        uses the up vector to orient the y axis of the texture
+                        to the light source.
+        ----------------------------------------------------------------
+        Attribute:      WIDTH
+
+        Primitive:      light
+
+        Parameters:     FLOAT (#)
+
+        Usage:          width #
+
+        Default:        1
+
+        Description:    for BEAM type light sources, width defines the width or
+                        height of the virtual filter in front of the light
+                        source - length, width and distance2plane help define
+                        the fov (field of view) of the light source.
+        ----------------------------------------------------------------
+------------------------------------------------------------------------
+
+2.9.99                          Tips
+
+                Even though Pixcon is a faster renderer than some of the
+        other renderers out there, it isn't real time.  In addition,
+        memory, cache, compiler, and OS plays an important part in the
+        performance of Pixcon.  The examples in graph/gallery show off some
+        of the best features of Pixcon, which are also the most expensive.
+        However, once you render the final image, a time expensive image
+        can be allowed, since you only have to render it once.  The
+        following tips are to facilitate the development towards your
+        final renderings.
+
+                Just to get an initial feel for the placements of
+        rendering primitives, use "wfbw" or "bw" as the shade types.
+        This creates a "pencil test" of wireframe skeletons.  Note
+        that this shade type is not available to all primitives.
+
+                To play with the initial lighting and material color,
+        use the shade type "constant".  This shadetype makes very few
+        lighting calculations and has imbedded assembly for better
+	performance.
+
+                Another way to speed up a rendering is to remove the
+        "raycast" attribute from the primitive.  This will cause the
+        render to use a faster "scanline zbuffer" method over the
+        raycasting method.  The tradeoff is speed vs accuracy - a
+        scanline zbuffer has some serious problems when dealing with
+        big polygons.
+
+		If your using 2d textured polygons, render your test
+	frames w/ the "-nixmap" option - antialiasing of texture maps
+	is expensive.
+
+                Another speedup is to render your initial frames at
+        a smaller resolution.  By default, Pixcon generates a 640 x 480
+        image.  If you reduce the parameters, say 320 x 240 by typing
+        "pixcon -x 320 -y 240 -l <list filename>", you will get about
+        a 75% reduction in rendering time.  True, the picture will be
+        small, but when your tweeking a picture, this gives enough pixels
+        to evaluate it.  When you are satisfied, you can render it full
+        sized.  Other options are to use the "-x2" option (4 times speed up)
+	or "-i" option (2 times speed up)
+
+                If you find yourself constantly rerendering expensive
+        background primitives, such as sbfast, then you can try rendering
+        the background as a separate image, then use that image as a
+        "background canvas", ie render it as a 2D texture on a big polygon
+        in the background.  I have an example of this (chase.list) in
+        graph/gallery.
+
+------------------------------------------------------------------------
+
+3.0                     A N I T R O L L
+
+-------------------------------------------------------------------------
+
+3.1                         USAGE
+
+
+     The command line to run Anitroll is:
+
+
+        anitroll <input filename> <output filename> \
+                 <-t> <-f [start] [end]> <-c>
+
+        <input filename> : input script file <.cnt>
+
+        <output filename> : output file <.lst>
+
+        <-t> : test mode - remove all references to shading (ie wireframe)
+
+        <-f [start] [end]> : render a partial animation, from frame # [start]
+                                to frame # [end]
+
+        <-c> : if a partial animation is specified, number the frames
+                with the numbers they would have received if the entire
+                animation was computed, otherwise the first frame will
+                be numbered "1".
+
+-------------------------------------------------------------------------
+
+3.2                     Description
+
+
+        Anitroll is a hiearchical forward kinematic system with a few
+        quirks.  It's development revolves around three motifs:
+
+                Pixcon - Anitroll's output becomes Pixcon's input
+                Chemistry - the the hiearchical links are analogous
+                                to molecular, atomic, and subatomic links
+                Movies - terms such as actors, scripts, actions, storyboarding,
+                                etc are applicable to animations.
+
+        In Anitroll, everything is based on a hiearchy of linkages -
+        the toe bone's connected to the foot bone, the foot bone's
+        connected to the ankle bone, the ankle bone's connected ...
+        (well you get the picture).  The point is that if you affect
+        one link, this effect cascades down the hiearchy (move the knee,
+        and the lower leg, foot, toes move as well).  In this document,
+        a hiearchy will be refered to as an "actor" or an "atom"
+        (the chemistry/movie motif again :) )
+
+        In order to assign "parts", actions, or events to an actor,
+        "parts" must be scripted and assigned by the "director"/animator.
+        As time progresses, each actor will play out its assigned parts.
+        All this gets "filmed" (stored to a file) then processed (inputed
+        into Pixcon for rendering).
+
+-------------------------------------------------------------------------
+3.3                     SCRIPT  <.cnt>
+
+        The <.cnt> file defines the overall animation.  It specifies which
+        actors are to be used, and the parts/events that are assigned to
+        them.  Keep in mind that Pixcon was the renderer that this was
+        designed for, and you will see it's influence in the script
+        language.
+
+        This file is broken up into 2 parts - global animation directives,
+        and a list of actors with actions/events.
+
+        The script format is as follows...
+
+        frame_count #
+        shadow_plane a b c d
+        actors n
+
+        <filename_1.atm> {
+                <name> | <events>
+        }
+
+        ...
+
+        <filename_n.atm> {
+                <name> | <events>
+        }
+
+
+        -----------------------------------------------------------------
+        FRAME_COUNT #
+
+        The first two tokens in this file is "frame_count #" where "#" is
+        the number of frames to generate for this animation.  Remember, for
+        high quality animations, 30 frames = 1 second of animation.
+
+        -----------------------------------------------------------------
+        SHADOW_PLANE A B C D
+
+        The next set of tokens is "shadow_plane a b c d" where a, b, c, and d
+        are float constants in the plane equation (ax + by + cz + d = 0).
+
+        This was arrange so that any Pixcon primitive that casts shadows will
+        do so on the same plane.
+
+        -----------------------------------------------------------------
+        ACTORS #
+
+        The next pair of tokens is "actors n" where "n" is an integer count
+        of the number of actors in this animation.  Next follows a list of
+        those actors and the actions/events assigned to them.
+
+        Actors are specified by the shell:
+
+                <filename.atm> {
+
+                        <name> | <events>
+
+                }
+
+        <filename.atm> is the filename for the actor's hiearchy and the
+        default name for that actor. Within the brackets the user may change
+        the name (to allow multiple instances of the same .atm file) and/or
+        specify events.
+
+        The format for <name> is:
+
+                        name <new_name>         // ex.  name smith
+
+        The name of an actor is the designation that this actor will respond
+        to when specified by actions.
+
+
+        If the token was not "name", what follows is assumed to be an event
+        declaration. Each event has 3 pairs in the following order:
+
+                event_time #
+                time_mult  #
+                event      <filename.evt>
+
+        -----------------------------------------------------------------
+        EVENT_TIME #
+
+        This specifies the starting frame # when the event is to start.
+
+        -----------------------------------------------------------------
+        TIME_MULT #
+
+        Event files (see section 3.5) contain a list of steps needed
+        to perform certain actions, along with execution times.  These
+        are defined genericly.  The time multiplier stretches or compresses
+        the time needed to perform these actions.  For example, a time
+        multiplier greater than one would slow down an action, as
+        it multiplies the time needed to complete the action.
+
+        ex.  if an event file is created cause an actor to "run", a time
+        multiplier less than one would slow the event down to a "walk".
+
+        -----------------------------------------------------------------
+        EVENT <FILENAME.EVT>
+
+        This specifies the event file that describes this event. (see
+        section 3.5
+
+        ex.
+
+        gunfighter.atm {
+
+                name            john_wayne
+
+                event_time      0
+                time_mult       1
+                event           shoot_bandit.evt
+
+                event_time      150
+                time_mult       1
+                event           kiss_girl.evt
+
+                event_time      250
+                time_mult       1
+                event           ride_into_sunset.evt
+        }
+
+-------------------------------------------------------------------------
+3.4                     ACTORS/ATOMS <.atm>
+
+        To define an actor, its linkages must be defined.  This is done
+        with an <.atm> file.  In general, actors are referenced by
+        Anitroll by their file names w/ the exception of those created
+        internally by events and actions (see section 3.5.1 for details)
+
+        Connected to each link are modules, of which there are two types.
+
+        The more basic type is a module that is tied to a Pixcon primitive
+        type.  This module also has the ability to do forward kinematic based
+        movements - movements via spline paths, and rotations via
+        quaternions.
+
+        The second type of module is a pure animation module - it has no
+        "physical" form, and whose sole purpose is to animate the sublinks
+        connected to it.
+
+-------------------------------------------------------------------------
+3.4.1                           Structure
+
+        An .atm file is defined as follows:
+
+        example: --------------------------
+
+        <module type> {
+
+                <list of attributes>
+
+        }
+
+        ------------------------------------
+
+        At first glance, it looks like that a .atm file only has one
+        module.  However, one of the attributes is "children", where
+        you define other modules that the current one links to.
+
+        Below lists the various first type modules and the associated
+        Pixcon primitives:
+
+                electron        camera
+                photon          light
+                neutron         polygon
+                shell           spatch
+                helix           sbfast
+                tachyon         particle
+                chain           line
+                ion             radiant
+                buckey          geosphere
+                funnel          geocone
+                tube            cylinder
+
+        ( as you can see, I started with the "chemestry" motif in my
+          naming scheme, but ran out of atomic/subattomic/molecular terms)
+        To avoid confusion, the module types and pixcon primitives are
+        both recognized by Anitroll.
+
+        Below lists the various second type modules and their descriptions
+
+                quarks  -       simple module that can affect sublinks with
+                                splines paths and quaternion rotations
+                                (actually, the list of modules above inherit
+                                 all the properties of a quark)
+
+                flight  -       designed to mimic bird/aircraft flight
+                                with the basic premise that:
+
+                                1) the object will always wish to stay
+                                        upright
+
+                                2) that for simple turns, yaw is sufficent
+
+                                3) for steep turns, the plane rolls into the
+                                        turn to pitch instead of yaw
+
+                boid    -       this module demonstrates flocking behavior,
+                                which propogates into its sub links
+
+                boidbait -      designated as flock leader
+
+                lock -          "locks" the orientation this module
+                                to "face" a specific module.  Usefull
+                                for locking a camera to track a specific
+                                object.
+-------------------------------------------------------------------------
+3.4.2                           ATTRIBUTES
+
+        Several module attributes are Pixcon attributes, and refer back to
+        section 2.9.2 for reference.
+
+        The following is a list of attributes that are possible in
+        a module, along with the module types that they can apply to:
+
+        -----------------------------------------------------------------
+        Attribute:      2D_TEXTURE
+
+        Module:         neutron (polygon), shell (spatch), helix (sbfast),
+                        buckey (geosphere), funnel (cone), tube (cylinder),
+                        photon (light)
+
+        Parameters:     .tex/.tes/.vid/<image name>
+
+        Usage:          neutron : 2d_texture x.tex
+                        shell   : 2d_texture x.tes
+                        helix   : 2d_texture x.tsb
+                        buckey/funnel/tube/photon :
+                                 2d_texture x.vid
+                                 2d_texture x.rgb
+                                 2d_texture x.gif
+                                 2d_texture x.tiff
+                                 2d_texture x.jpeg
+                                 2d_texture x.ppm
+                                 2d_texture x.lbm
+
+        Default:        N/A
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      3D_TEXTURE      - Apply 3D Shaders
+
+        Module:         neutron (polygon), shell (spatch), helix (sbfast),
+                        buckey (geosphere), funnel (cone), tube (cylinder)
+
+        Parameters:     <.3dt>
+
+        Usage:          3d_texture <.3dt>
+
+        Default:        N/A
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      ACTIVE
+
+        Module:         neutron (polygon), shell (spatch), tachyon (particle),
+                        ion (radiant), chain (line), buckey (sphere),
+                        funnel (cone), tube (cylinder), electron (camera),
+                        photon (light), helix (sbfast)
+
+        Parameters:     <on/off>
+
+        Usage:          active <on/off>
+
+        Default:        See Description
+
+        Description:    This attribute turns on/off the module.  The module
+                        will still pass its rotation and transformation data
+                        down the hiearchy, but will not appear in the <.lst>
+                        file unless it is "on".  The default is "on" for all
+                        of the above modules except for electron and photon.
+        ----------------------------------------------------------------
+        Attribute:      AMBIENT         - Define Ambient Light
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          ambient r g b
+
+        Default:        ambient 0.3 0.3 0.3
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      AXIS
+
+        Module:         buckey (geosphere)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          axis x y z
+
+        Default:        axis 1 1 1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      BACK
+
+        Module:         helix (sbfast)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          back #
+
+        Default:        1000.0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      BIPLANE
+
+        Module:         neutron (polygon)
+
+        Parameters:     N/A
+
+        Usage:          biplane
+
+        Default:        (off)
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      BOID_RANGE
+
+        Module:         boid
+
+        Parameters:     FLOAT (MIN MAX)
+
+        Usage:          boid_range min max
+
+        Default:        boid_range 1 1
+
+        Description:    This attribute specifies the "comfort" zone for
+                        a boid w/ respect to the nearest boid.  It specifies
+                        the nearest and farthest ranges that the boid will
+                        tolerate before taking evasive/pursuant action.
+        ----------------------------------------------------------------
+        Attribute:      BOTTOM_RADIUS
+
+        Module:         funnel (cone)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          bottom_radius #
+
+        Default:        bottom_radius 1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      BOUND
+
+        Module:         neutron (polygon), shell (spatch), buckey (geosphere),
+                        funnel (cone), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     see Description.
+
+        Usage:          see Description.
+
+        Default:        BNONE
+
+        Description:    This defines a bounding volume from which collision
+                        avoidance for boid modules are calculated.
+
+                        There are 5 types of bounding volumes.
+                        ---------------------------------------
+                        TYPE:   BRECT   - box/cube
+
+                        USAGE:  bound brect x1 y1 z1 ... x8 y8 z8
+
+                                where x1 y1 z1 ... x8 y8 z8 are the 3D
+                                coordinates for the box/cube in LOCAL
+                                space of the object, whose positions are:
+
+                                        6 ---- 7
+                                     /  |   /  |
+                                        |      |
+                                  /     5/---- 8
+                                      /      /
+                                2 ---- 3
+                                |   /  |   /
+                                |      |
+                                1 ---- 4
+
+                        ---------------------------------------
+                        TYPE:   BSPHERE - sphere
+
+                        USAGE:  bound bsphere <radius>
+
+                                where the sphere is defined in LOCAL
+                                space around the origin of the object
+                        ---------------------------------------
+                        TYPE:   BPLANE  - plane
+
+                        USAGE:  bound plane <a b c x y z>
+
+                                where a, b, c is the plane normal, and
+                                x y z is a point in local space that defines
+                                a rotation point for the plane.
+
+                        ---------------------------------------
+                        TYPE:   BPOINT  - point
+
+                        USAGE:  bound bpoint
+
+                                where the origin of the module in LOCAL
+                                space is the point
+                        ---------------------------------------
+                        TYPE:   BNONE   - no bounding volume
+
+                        USAGE:  bound bnone
+                        ---------------------------------------
+        ----------------------------------------------------------------
+        Attribute:      CHILDREN
+
+        Module:         neutron (polygon), shell (spatch), tachyon (particle),
+                        chain (line), buckey (sphere), funnel (cone),
+                        tube (cylinder), helix (sbfast), ion (radiant),
+                        photon (light), electron (camera), quark, flight,
+                        boid, boidbait, lock
+
+        Parameters:     See Description
+
+        Usage:          See Description
+
+        Default:        See Description
+
+        Description:    This attribute specifies all the links between
+                        this module and its "children".  The first token
+                        after "children" is the number of children-modules.
+                        The next tokens are declared the same way that
+                        all modules are declared.
+        ----------------------------------------------------------------
+        Attribute:      COA     - Center of Attention
+
+        Module:         electron (camera)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          coa x y z
+
+        Default:        coa 0 0 -1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      COLLISION_LOSS
+
+        Module:         boid
+
+        Parameters:     FLOAT (0..1)
+
+        Usage:          collision_loss #
+
+        Default:        collision_loss 0.5
+
+        Description:    This attribute sets the amount of energy/velocity
+                        lost due to a RED_ALERT collision.  Setting this too
+                        high may cause the boid to limp in object rich
+                        environments, and setting this too low may cause the
+                        boid to go through objects.
+        ----------------------------------------------------------------
+        Attribute:      DEATH
+
+        Module:         tachyon (particle), chain (line)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          death #
+
+        Default:        death 0
+
+        Description:    This attribute sets the minimum "intensity"
+                        before the module "extinguishes" itself.
+                        Used to implement a particle system.  Range
+                        is from (0.0 - 1.0).
+        ----------------------------------------------------------------
+        Attribute:      DECAY
+
+        Module:         tachyon (particle), chain (line)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          decay #
+
+        Default:        decay 0.0
+
+        Description:    This attribute sets the rate of decay of
+                        a module's intensity.  Range (0.0 - 1.0) where
+                        a decay rate of 0.0 means no decay.  Used to
+                        implement a particle system.
+        ----------------------------------------------------------------
+        Attribute:      DIFFUSE         - Define Diffuse Light
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          diffuse r g b
+
+        Default:        diffuse 0.7 0.7 0.7
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      DIRECTION
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          direction x y z
+
+        Default:        0 0 -1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      DITHER
+
+        Module:         helix (sbfast)
+
+        Parameters:     N/A
+
+        Usage:          dither
+
+        Default:        (off)
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      DISTANCE2PLANE
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          distance2plane #
+
+        Default:        1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      END_POINT
+
+        Module:         chain (line)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          end_point x y z
+
+        Default:        end_point 0 0 0
+
+        Description:    This attribute sets the second end point of the
+                        line.  The first end point is set at its origin.
+
+         if (!strcmp(token, "friction_per_sec")) {
+            get_token(infile, token);
+            ifps = 1.0-atof(token)/30.0;
+            return 1;
+         }
+
+        ----------------------------------------------------------------
+        Attribute:      FRICTION
+
+        Module:         BOID
+
+        Parameters:     FLOAT (#)
+
+        Usage:          friction_per_sec
+
+        Default:        friction_per_sec
+
+        Description:    This is the amount of friction/drag to apply to
+                        the velocity of the boid (units per frame).
+        ----------------------------------------------------------------
+        Attribute:      FATT    -       Atmospheric Attenuation
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (A B C)
+
+        Usage:          fatt a b c
+
+        Default:        fatt 0 0 0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      FILE
+
+        Module:         neutron (polygon), shell (spatch)
+
+        Parameters:     STRING (<FILENAME>)
+
+        Usage:          file <filename>
+
+        Default:        N/A
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      GRAVITY
+
+        Module:         boid
+
+        Parameters:     FLOAT (MAGNITUDE DX DY DZ)
+
+        Usage:          boid magnitude dx dy dz
+
+        Default:        (off)
+
+        Description:    This attribute turns on the "gravity" vector, which
+                        the boid will have to fight to stay in flight.
+                        Gravity is specified by the magnitude of the force,
+                        and a velocity vector in the direction of the gravity.
+        ----------------------------------------------------------------
+        Attribute:      H
+
+        Module:         helix (sbfast)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          h #
+
+        Default:        0.9
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      INNER_RADIUS
+
+        Module:         ion (radiant)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          inner_radius #
+
+        Default:        inner_radius 1
+
+        Description:    this attribute defines the radius of the inner
+                        sphere of the radiant primitive
+        ----------------------------------------------------------------
+        Attribute:      INTENSITY
+
+        Module:         tachyon (particle), chain (line)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          intensity #
+
+        Default:        intensity 1.0
+
+        Description:    This attribute sets the initial intensity of these
+                        modules.  As time progresses, the intensity is
+                        affected by the decay and death attributes.  The
+                        range is (0.0 - 1.0).  Intensity affects both
+                        color and sets the thresholds which determine
+                        if the object is to be modeled.  Designed for use
+                        with particle systems.
+        ----------------------------------------------------------------
+        Attribute:      INVISO
+
+        Module:         neutron (polygon)
+
+        Parameters:     FLOAT (R G B)
+
+        Usage:          inviso r g b
+
+        Default:        inviso 0 0 0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      LACUNARITY
+
+        Module:         helix (sbfast)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          lacunarity #
+
+        Default:        2.1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      LEADER_RANGE
+
+        Module:         boid
+
+        Parameters:     FLOAT (MIN MAX)
+
+        Usage:          leader_range min max
+
+        Default:        leader_range 1 1
+
+        Description:    This attribute specifies the "comfort" zone for
+                        a boid w/ respect to the nearest leader ("boidbait").
+                        It specifies the nearest and farthest ranges that the
+                        boid will tolerate before taking evasive/pursuant
+                        action.
+        ----------------------------------------------------------------
+        Attribute:      LENGTH
+
+        Module:         funnel (cone), tube (cylinder), photon (light)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          length #
+
+        Default:        length 1.0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      MAX_ACCELERATION
+
+        Module:         boid
+
+        Parameters:     FLOAT
+
+        Usage:          max_acceleration #
+
+        Default:        max_acceleration 1
+
+        Description:    This attribute specifies the maximum acceleration of
+                        a boid (units per frame).
+        ----------------------------------------------------------------
+        Attribute:      MAX_TURN_RADIUS
+
+        Module:         boid
+
+        Parameters:     FLOAT (#)
+
+        Usage:          max_turn_radius #
+
+        Default:        max_turn_radius 3.14159... (PI)
+
+        Description:    This attribute limits the maximum radius that a
+                        boid can change direction.
+        ----------------------------------------------------------------
+        Attribute:      NAME
+
+        Module:         neutron (polygon), shell (spatch), tachyon (particle),
+                        chain (line), buckey (sphere), funnel (cone),
+                        tube (cylinder), helix (sbfast), ion (radiant),
+                        photon (light), electron (camera), quark, flight,
+                        boid, boidbait, lock
+
+        Parameters:     STRING
+
+        Usage:          name <string>
+
+        Default:        N/A
+
+        Description:    This attribute assigns a name to a module.  Names
+                        must be unique within an actor, but may be reused
+                        in other actor.  Warning: when using the "MOVE"
+                        event (see section 3.5), the moved module must have
+                        a unique name in the receiving actor.
+        ----------------------------------------------------------------
+        Attribute:      OCTAVES
+
+        Module:         helix (sbfast)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          octaves #
+
+        Default:        100
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      ORIENTATION_MX
+
+        Module:         flight, boid, lock
+
+        Parameters:     FLOAT (3x3)
+
+        Usage:          orientation_mx xx xy xz yx yy yz zx zy zz
+
+        Default:        orientation_mx 1 0 0 0 1 0 0 0 1
+
+        Description:    This attribute sets up the initial orientation of
+                        the flight module.
+        ----------------------------------------------------------------
+        Attribute:      ORIGIN
+
+        Module:         neutron (polygon), shell (spatch), tachyon (particle),
+                        chain (line), buckey (sphere), funnel (cone),
+                        tube (cylinder), helix (sbfast), ion (radiant),
+                        photon (light), electron (camera), quark, lock, flight,
+                        boid
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          origin x y z
+
+        Default:        origin 0 0 0
+
+        Description:    This attribute defines the initial placement of the
+                        module in its "parent" coordinates.  It is from this
+                        point that all rotations and translations are done.
+                        If the module has no parent, then it is in world
+                        coordinates.
+        ----------------------------------------------------------------
+        Attribute:      OUTER_RADIUS
+
+        Module:         ion (radiant)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          outer_radius #
+
+        Default:        N/A
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      RADIUS
+
+        Module:         tube (cylinder), buckey (sphere)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          radius #
+
+        Default:        1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      RAYCAST
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder)
+
+        Parameters:     N/A
+
+        Usage:          raycast
+
+        Default:        N/A
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      RED_ALERT
+
+        Module:         boid
+
+        Parameters:     FLOAT (#)
+
+        Usage:          red_alert #
+
+        Default:        red_alert 1
+
+        Description:    This attribute specifies the distance at which a
+                        boid will do its best to avoid collisions.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_LOCAL_X
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Module:         neutron, shell, funnel, tube, buckey, helix,
+                        tachyon, chain, ion, quark
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_local_x #
+
+        Default:        rotate_local_x 0.0
+
+        Description:    This attribute causes a rotation in the X axis.
+                        This rotation is only local - it is not transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_LOCAL_Y
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_local_y #
+
+        Default:        rotate_local_y 0.0
+
+        Description:    This attribute causes a rotation in the Y axis.
+                        This rotation is only local - it is not transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_LOCAL_Z
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_local_z #
+
+        Default:        rotate_local_z 0.0
+
+        Description:    This attribute causes a rotation in the Z axis.
+                        This rotation is only local - it is not transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_X
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant),
+                        quark, boid, flight, lock
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_x #
+
+        Default:        rotate_x 0.0
+
+        Description:    This attribute causes a rotation in the X axis.
+                        This rotation is only local - it is transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_Y
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant),
+                        quark, boid, lock, flight
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_y #
+
+        Default:        rotate_y 0.0
+
+        Description:    This attribute causes a rotation in the Y axis.
+                        This rotation is only local - it is transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      ROTATE_Z
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant),
+                        quark, boid, lock, flight
+
+        Parameters:     FLOAT (#)
+
+        Usage:          rotate_z #
+
+        Default:        rotate_z 0.0
+
+        Description:    This attribute causes a rotation in the Z axis.
+                        This rotation is only local - it is transmitted
+                        down the hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      SCALE
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          scale #
+
+        Default:        scale 1.0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      SHADE
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     <type> <.ilm>
+
+        Usage:          shade dot               // NOT IMPLEMENTED YET
+                        shade wfbw
+                        shade bw
+                        shade constant <.ilm>
+                        shade gouraud <.ilm>
+                        shade gouraud r g b         // particle primitive only
+                        shade gouraud r g b r g b   // line primitive only
+                        shade alex <.ilm>
+                        shade phong <.ilm>
+                        shade pdot              // NOT IMPLEMENTED YET
+                        shade pwfbw
+                        shade pbw
+                        shade pconstant <.ilm>
+                        shade pgouraud <.ilm>
+                        shade palex <.ilm>
+                        shade pphong <.ilm>
+                        shade irradiant <.ilm>
+                        shade rsolid    <.ilm>
+
+        Default:        wfbw
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      SHADOW
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), chain (line),
+                        tachyon (particle)
+
+        Parameters:     FLOAT (A B C D)
+
+        Usage:          shadow a b c d
+
+        Default:        (off)
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      TOP_RADIUS
+
+        Module:         funnel (cone)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          top_radius #
+
+        Default:        top_radius 1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      TR_LOCAL_MATRIX
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     FLOAT (
+                                        rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+                                                        )
+
+        Usage:          tr_local_matrix rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+
+        Default:        tr_local_matrix 1 0 0 0
+                                        0 1 0 0
+                                        0 0 1 0
+                                        0 0 0 1
+
+        Description:    Similar to the "TR_MATRIX" attribute described in
+                        section 2.9.2, and is NOT transmitted down the
+                        hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      TR_MATRIX
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant),
+                        quark, boid, flight, lock
+
+        Parameters:     FLOAT (
+                                        rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+                                                        )
+
+        Usage:          tr_matrix       rxx rxy rxz tx
+                                        ryx ryy ryz ty
+                                        rzx rzy rzz tz
+                                        0   0   0   1
+
+        Default:        tr_matrix       1 0 0 0
+                                        0 1 0 0
+                                        0 0 1 0
+                                        0 0 0 1
+
+        Description:    Similar to the "TR_MATRIX" attribute described in
+                        section 2.9.2, but is also transmitted down the
+                        hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      TRANSLATE
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant),
+                        quark, boid, flock, lock
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          translate x y z
+
+        Default:        translate 0 0 0
+
+        Description:    Similar to the "TRANSLATE" attribute described in
+                        section 2.9.2, but is also transmitted down the
+                        hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      TRANSLATE_LOCAL
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        tachyon (particle), chain (line), ion (radiant)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          translate_local x y z
+
+        Default:        translate_local 0 0 0
+
+        Description:    Similar to the "TRANSLATE" attribute described in
+                        section 2.9.2, but is NOT transmitted down the
+                        hiearchy.
+        ----------------------------------------------------------------
+        Attribute:      TRANSPARENT
+
+        Module:         neutron (polygon), shell (spatch), funnel (cone),
+                        buckey (sphere), tube (cylinder), helix (sbfast),
+                        ion (radiant)
+
+        Parameters:     N/A
+
+        Usage:          transparent
+
+        Default:        see Description.
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      TYPE
+
+        Module:         photon (light)
+
+        Parameters:     STRING ( FAR/POINT/BEAM_FAR/BEAM_POINT/SIMPLE_FAR/
+                                 SIMPLE_POINT/SIMPLE_BEAM_FAR/SIMPLE_BEAM_POINT)
+
+        Usage:          type far
+                        type point
+                        type beam_far
+                        type beam_point
+                        type simple_far
+                        type simple_point
+                        type simple_beam_far
+                        type simple_beam_point
+
+        Default:        type far
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      UP
+
+        Module:         electron (camera), photon (light)
+
+        Parameters:     FLOAT (X Y Z)
+
+        Usage:          up x y z
+
+        Default:        up 0 1 0
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      VELOCITY
+
+        Module:         boid
+
+        Parameters:     FLOAT (#)
+
+        Usage:          velocity #
+
+        Default:        velocity 1
+
+        Description:    This attribute specifies the magnitude of the boid's
+                        speed (units per frame).
+        ----------------------------------------------------------------
+        Attribute:      VELOCITY_RANGE
+
+        Module:         boid
+
+        Parameters:     FLOAT (MIN MAX)
+
+        Usage:          velocity_range # #
+
+        Default:        velocity_range 1 1
+
+        Description:    This attribute specifies the "comfortable" range
+                        of speeds for a boid.
+        ----------------------------------------------------------------
+        Attribute:      WIDTH
+
+        Module:         photon (light)
+
+        Parameters:     FLOAT (#)
+
+        Usage:          width #
+
+        Default:        1
+
+        Description:    Pixcon primitive attribute.  Same description as in
+                        2.9.2.
+        ----------------------------------------------------------------
+        Attribute:      YELLOW_ALERT
+
+        Module:         boid
+
+        Parameters:     FLOAT (RANGE WEIGHT(0..1))
+
+        Usage:          yellow_alert # #
+
+        Default:        yellow_alert 1 0.5
+
+        Description:    This attribute specifies the distance at which a
+                        boid will start to swerve to avoid collisions, as
+                        well as to the amount of deviation from current
+                        course.
+        ----------------------------------------------------------------
+
+-------------------------------------------------------------------------
+3.5                     PARTS/EVENTS <.evt>
+
+        This section describes how to script events.  Certain modules such
+        as boid and flight perform autonomously, however other modules are
+        kinematicly based, and must be controlled by the director.
+
+        As stated in section 3.3, events are assigned to actors in the
+        control <.cnt> file.  Event files were designed so that each action
+        in an event is self contained and generic - generic in the sense
+        that if you have two actors whose module names/types are mirrored in
+        each other, then an action/event written for one can be applied to
+        the other.  In addition, as long as event files don't overlap
+        multiple actions on the same module, they may be run concurrently
+        (ie you can write one event file to jump up and down with its legs,
+        and another to rub its head and tummy with its arms/hands -> no
+        overlap, so it will work :) ).  An action/event will be performed
+        by the actor until 1) the time to complete the event passes, or
+        2) the event is replaced with another.
+
+        There are many types of actions, but there are two that are used
+        the most and need some explanation.
+
+        The first type is splines.  Splines define a path in three space
+        for a module/actor to follow in its local space.  Splines are defined
+        by knots, or key frames on the path.  Points must be evenly space w/
+        respect to distance, as the module/actor will spend equal amounts
+        of time traveling from one point to another.  Because a Catmull-Rom
+        spline algorithm is used, 2 extra knots must be specified, one at the
+        beginning of the path, and one at the end which helps define
+        the initial and final state of motion.
+
+        The second type is orientation.  To specify changes in orientation,
+        orientation angles must be defined (Boids and Flight objects are
+        exempt - they calculate their own orientation, and pass it down the
+        hiearchy).  Object orientations are interpolated from one orientation
+        to the next by converting the orientations to quaternions, then
+        interpolating.  The mechanism for specifying orientations is similar
+        to knots -> that is a start orientation is listed followed by key
+        frame orientations, followed by the final orientation (Note: unlike
+        splines, there is no need for 2 extra "knots" because there is no
+        spline algorithm used here).  Also, the mechanism allows the user to
+        specify three orientation degrees (X Y Z), but unless you understand
+        how quaternion matrices are built, I suggest that you only specify
+        one orientation degree per module.  If you need multiple orientations
+        per module, I suggest that you figure out the order that they are
+        applied, then put dummy "quarks" between the module and its parent,
+        then assign the extra orientations to these quarks, in the
+        order that they are performed (look at the some of the examples).
+
+        There is one other thing to mention about this implementation of
+        quaternions: the orientations are to be given in degrees, and the
+        difference between one key frame to another cannot exceed
+        +/-359.99999 degrees.  This is due to the fact that this implementation
+        of quaternions cannot differentiate between multiples of 2 PI.
+
+-------------------------------------------------------------------------
+3.5.1                   SPECIFICATION
+
+        The first token in an event file is the number of actions contained
+        in the file.
+
+        What follows next is a list of actions, which are described below:
+
+        ----------------------------------------------------------------
+        Action:         ABSORB
+
+        Description:    This action combines the modules of a specified
+                        actor with those of the actor doing the action.
+
+                        The first token is "absorb" followed by the name
+                        of the actor to be absorbed.
+
+                        If the next token is "link", then the hiearchy of
+                                the modules of both actors are attached to
+                                a dummy quark module called "child" as
+                                sublinks.
+
+                        else the next token is a "name" of a module within
+                                the actor doing the absorb, which attaches
+                                a sublink from the named module to the
+                                hiearchy of the actor to be absorbed.
+
+                        After this, the actor to be absorbed is removed
+                        from the animation. (Well, not really, but since
+                        the actor has no modules, then it can't do
+                        anything...)
+
+        Example:        absorb/pick up the "gun" actor into the "hand" module
+                        again
+                        -----------------------------------
+                                absorb gun hand
+        ----------------------------------------------------------------
+        Action:         COMPOSITE SPLINE
+
+        Description:    a composite spline is a spline applied to the actor
+                        as a whole.
+
+                        The first two tokens in a composite spline are
+                        "composite" and "spline".
+
+                        The next four tokens are control tokens, and are
+                                1) number of "knots"/key frames (INTEGER)
+                                2) catchup frames (FLOAT)
+                                3) # of frames per knot interval (FLOAT)
+                                4) loop flag (BOOLEAN)
+
+                        The next set of tokens are a list of 3D "knots"
+                        which define the spline path.
+
+                        The first control token is a count of how many
+                        knots to read in.
+
+                        The second control token the number of frames the
+                        actor is given to move from its current position to
+                        the starting position of the spline.  This value
+                        is multiplied by the "TIME MULTIPLIER" specified
+                        in section 3.3.
+
+                        The third control token is the number of frames
+                        needed to interpolate from one knot to another.
+                        This value is multiplied by the "TIME MULTIPLIER"
+                        specified in section 3.3.
+
+                        The fourth control token is a loop flag.  If set
+                        to one, then when the actor finishes the action,
+                        it repeats it.  Otherwise, it sits in its last
+                        calculated position.
+
+
+        Example:        do a circle, starting from (0 0 1) to (1 0 0) to
+                        (0 0 -1) to (-1 0 0) and back to (1 0 0), with no time
+                        to setup, 30 frames per keyframe interpolation, and
+                        repeating.
+                        (Note: have to throw in 2 extra knots as explained
+                         above)
+                        -----------------------------------
+                                composite spline
+                                7 0 30 1
+
+                                -1 0  0
+                                 0 0  1
+                                 1 0  0
+                                 0 0 -1
+                                -1 0  0
+                                 0 0  1
+                                 1 0  0
+        ----------------------------------------------------------------
+        Action:         COMPOSITE QUATERNION
+
+        Description:    a composite quaternion is a set of orientations
+                        applied to the actor as a whole.
+
+                        The first two tokens in a composite quaternion are
+                        "composite" and "quaternion".
+
+                        The next four tokens are control tokens, and are
+                                1) number of orientations/key frames (INTEGER)
+                                2) catchup frames (FLOAT)
+                                3) # of frames per orientation interval (FLOAT)
+                                4) loop flag (BOOLEAN)
+
+                        The next 3 tokens are a 3D location in 3space which
+                        specifies the "point of rotation".
+
+                        The next set of tokens are a list of tuples which
+                        represents the orientation key frames.
+
+                        The first control token is a count of how many
+                        orientation tuples to read in.
+
+                        The second control token the number of frames the
+                        actor is given to move from its current orientation
+                        to the starting orientation.  This value
+                        is multiplied by the "TIME MULTIPLIER" specified
+                        in section 3.3.
+
+                        The third control token is the number of frames
+                        needed to interpolate from one orientation to another.
+                        This value is multiplied by the "TIME MULTIPLIER"
+                        specified in section 3.3.
+
+                        The fourth control token is a loop flag.  If set
+                        to one, then when the actor finishes the action,
+                        it repeats it.  Otherwise, it sits in its last
+                        calculated orientation.
+
+                        The "point of rotation" allows the director to
+                        base the center of rotation in a 3D location other
+                        than the actor's local origin.  This can be
+                        used to get cheap effects (I use it to pan a camera
+                        around a spot instead of using splines...)
+
+        Example:        Rotate from the local origin, starting from a zero
+                        orientation to 90 degrees around the Y axis to 90
+                        degrees in the X axis, using 30 frames to get into the
+                        starting position, 30 frames per keyframe
+                        interpolation, then halting.
+                        -----------------------------------
+                                composite quaternion
+                                3 30 30 0
+
+                                0 0 0
+
+                                 0  0 0
+                                 0 90 0
+                                90  0 0
+        ----------------------------------------------------------------
+        Action:         DROP
+
+        Description:    this action drops a module and its sublinks from the
+                        hiearchy and creates a new actor from this.  Unlike
+                        specified actors who are referenced by their file
+                        names, this new actor must be given a unique name.
+
+                        The first token in this action is "drop", followed
+                        by the "name" of the module to be removed.  What
+                        follows next is similar to declaring a new actor.
+                        First is the actors "name" (which must be unique,
+                        but may be anything), followed by "{", followed
+                        by a number of event tuples, ended with a "}".
+
+                        Note: since actions were designed to be generic,
+                        the director/animator will not generally know exactly
+                        when the event file is to be activated until the
+                        control file is created.  Therefore, the event start
+                        frames assigned to the actor created by a drop will
+                        be offsets to the frame in which this action took
+                        place.
+
+        Example:        drop the "gun"module , which becomes the "gun" actor,
+                        and starts the "rust" event 30 frames after it is
+                        dropped with no frame multiplier.
+                        -----------------------------------
+                                drop gun
+
+                                gun {
+                                        event_time 30
+                                        time_mult  1
+                                        event      rust.evt
+                                }
+        ----------------------------------------------------------------
+        Action:         LOCK
+
+        Description:    (useable only w/ lock modules)
+                        This action specifies the lock module name, and what
+                        actor and module name the lock module is "locked"
+                        onto.
+
+        Example:        lock "lock1" to actor "sheriff", specificly the
+                        module "gun"
+                        -----------------------------------
+                                lock1 lock sheriff gun
+        ----------------------------------------------------------------
+        Action:         MOVE
+
+        Description:    this action moves a module and its sublinks from the
+                        hiearchy from one section to another.
+
+                        The first token to be specified is "move", followed
+                        by the "name" of the module to be moved, followed by
+                        the "name" of the parent which the moved module
+                        will be made a sub link
+
+
+        Example:        move a "gun" module to a "hand" module
+                        -----------------------------------
+                                move gun hand
+        ----------------------------------------------------------------
+        Action:         OFF
+
+        Description:    This action causes modules that have Pixcon
+                        counterparts to not be rendered.  It is similar
+                        to setting the module's attribute "active" to
+                        "off" (section 3.4.2).
+
+                        The first token is the "name" of the module.
+                        The second token is "off".
+
+        Example:        turn off "camera_1"
+                        -----------------------------------
+                                camera_1 off
+        ----------------------------------------------------------------
+        Action:         OFFSET
+
+        Description:    (useable only w/ lock modules)
+                        This action specifies the lock module name, and a
+                        3D offset from the origin of the module that the
+                        lock is set to (used in conjunction w/ "LOCK").
+
+        Example:        set the lock "lock1" offset to 1 unit up (y axis) above
+                        what the lock is "locked" onto
+                        -----------------------------------
+                                lock1 offset 0.0 1.0 0.0
+        ----------------------------------------------------------------
+        Action:         ON
+
+        Description:    This action causes modules that have Pixcon
+                        counterparts to be rendered.  It is similar
+                        to setting the module's attribute "active" to
+                        "on" (section 3.4.2).
+
+                        The first token is the "name" of the module.
+                        The second token is "on".
+
+        Example:        turn on "camera_1"
+                        -----------------------------------
+                                camera_1 on
+        ----------------------------------------------------------------
+        Action:         ORIENTATION_MX
+
+        Description:    (useable only w/ boid and flight modules)
+                        This action specifies the module to be changed, and
+                        a 3x3 mx as described in the Attribute section (3.4.2)
+                        by the attribute "ORIENTATION_MX"
+
+        Example:        changing an xwing's orientation to point in the +Y direction
+                        -----------------------------------
+                        xwing orientation_mx    1 0 0
+                                                0 0 -1
+                                                0 1 0
+        ----------------------------------------------------------------
+        Action:         QUATERNION
+
+        Description:    This action is similar to "composite quaternion",
+                        except that it 1) only applies to a specified module
+                        and it's sublinks, only rotates around its local
+                        origin (offset by the attribute "origin" of course).
+
+                        The first token is the name of the module, followed
+                        by "quaternion".
+
+                        The next four tokens are control tokens, and are
+                                1) number of orientations/key frames (INTEGER)
+                                2) catchup frames (FLOAT)
+                                3) # of frames per orientation interval (FLOAT)
+                                4) loop flag (BOOLEAN)
+
+                        The next set of tokens are a list of tuples which
+                        represents the orientation key frames.
+
+                        Definition of the control tokens is the same
+                        as "composite quaternion".
+
+        Example:        The "whiskers" module changes orientations the same
+                        way as the example for "composite quaternions".
+                        -----------------------------------
+                                whiskers quaternion
+                                3 30 30 0
+
+                                 0  0 0
+                                 0 90 0
+                                90  0 0
+        ----------------------------------------------------------------
+        Action:         SCALE
+
+        Description:    This action scales the transformation matrix of
+                        a module, which propogates to all its sublinks.
+
+                        The first token is "scale", followed by a FLOAT
+                        which is the scale value, followed by the "name"
+                        of the module to scale.
+
+        Example:        enlarge a "head" module to twice its normal size
+                        -----------------------------------
+                                scale 2.0 head
+        ----------------------------------------------------------------
+        Action:         SPLINE
+
+        Description:    This action is similar to "composite splines", except
+                        that it only applies to a specified module and
+                        it's sublinks.
+
+                        The first token in a spline event is the "name" of
+                        the module to be affected, followed by "spline"
+
+                        The next four tokens are control tokens, and are
+                                1) number of "knots"/key frames (INTEGER)
+                                2) catchup frames (FLOAT)
+                                3) # of frames per knot interval (FLOAT)
+                                4) loop flag (BOOLEAN)
+
+                        The next set of tokens are a list of 3D "knots"
+                        which define the spline path.
+
+                        Definition of the control tokens is the same
+                        as "composite spline".
+
+        Example:        a "whiskers" module revolving around the "SEA_QUEST"
+                        using the same path described in the "composite
+                        spline" section.
+                        (Note: have to throw in 2 extra knots as explained
+                         above)
+                        -----------------------------------
+                                whiskers spline
+
+                                7 0 30 1
+
+                                -1 0  0
+                                 0 0  1
+                                 1 0  0
+                                 0 0 -1
+                                -1 0  0
+                                 0 0  1
+                                 1 0  0
+        ----------------------------------------------------------------
+        Action:         TAKE
+
+        Description:    This action takes a module and its sublinks from
+                        a specified actor and creates a sublink from a
+                        specified module to what was taken.
+
+                        The first token is "take".  The second token
+                        is the "name" of the module that is to be taken.
+                        The third token is the "name" of the actor.
+                        The fourth module is the "name" of the module
+                        that the sublink is made to.
+
+        Example:        take module "candy" from actor "baby" and link it to
+                        module "hand"
+                        -----------------------------------
+                                take candy baby hand
+        ----------------------------------------------------------------
+        Action:         UNLOCK
+
+        Description:    (useable only w/ lock modules)
+                        This action specifies the lock module name, and
+                        removes the lock.  There after, the lock's orientation
+                        is fixed to its last calculated orientation.
+                        (until the next time the lock is set)
+
+        Example:        unlock "lock1"
+                        -----------------------------------
+                        lock1 unlock
+
+-------------------------------------------------------------------------
+
+4.0                             C O N V E R T
+
+                Convert is a program that was designed to convert other 3D
+        object file formats into a format that Pixcon can process
+        (namely the OFF polygon format).  The reason why Convert's abilities
+        were not incorporated into Pixcon is:
+
+                1) Only needs to be converted once
+                2) Reduces the size of Pixcon
+                3) Since not all formats include color and texture
+                        information in their files, it would be hard for
+                        the user to apply these to the polygons if the
+                        user doesn't know how Pixcon converts from one
+                        file format to another.
+
+                Currently, Convert can convert the following types of file
+        formats:
+
+                Lightwave (LWO)
+                Wavefront (OBJ)
+                Autocad (DXF)
+                DIVE (subset)
+                BYU
+                TPOLY
+                *Sliders
+                *Solids of Revolution (SOR)
+                *Symetry / Mirror
+                * = Special formats
+
+                Lightwave, Autocad, Wavefront, BYU, and TPOLY are
+        formats used by other renders, and I have found info to decode
+        some or all of the formats.  Sliders, SORs, and Symetries are
+        formats that I came up with that can create 3D objects with little
+        effort.  DIVE is a VRML type script language that was designed for
+        distributed 3D/VR.
+
+                Convert extracts all geometrical data from LWO, DXF,
+        OBJ, BYU, and TPOLY.  Convert extracts color data from LWO, DXF, OBJ.
+        The only data not extracted from Lightwave is texture data, as I have
+        found no info on how the data is used to apply textures (Its also
+        confusing, applying 3D space to a 2D texture???)
+
+-------------------------------------------------------------------------
+
+4.1                             SLIDERS
+
+                Sliders are simple geometrical objects that have basicly
+        one unique 2D polygon that "slides" through 3D space along a
+        direction to achieve 3D.
+
+                A slider file has 4 initial tokens - a 3D vector that
+        dictates the direction of the slide, and a scalar that determines
+        the magnitude of the slide.  The next token is a count of the
+        number of 3D vertices that make up the polygon that is to "slide".
+        Next follows the 3D vertices, listed in clockwise order when facing
+        the front side.
+
+        ex.  This produces a box w/ a perimeter of 2
+        --------------------------------------------
+        0 0 -1 2                        // this specifies the slide along the
+                                        // -Z axis, with magnitude of 2
+        4                               // this specifies that there is 4 vert.
+
+        -1 -1 1
+        -1  1 1
+         1  1 1
+         1 -1 1
+        --------------------------------------------
+-------------------------------------------------------------------------
+
+4.2                     SURFACE OF REVOLUTION (SOR)
+
+        Not currently implemented
+
+-------------------------------------------------------------------------
+
+4.3                             SYMETRY
+
+        Not currently implemented
+
+-------------------------------------------------------------------------
+
+4.4                             DIVE
+
+                DIVE is a distributed 3D VR script language that is driven
+        by the same concepts that VRML is based on.  Currently, Convert
+        processes a subset of the DIVE language - specificly enough of the
+        DIVE language to render the DIVE files generated by AC3D, a very
+        nice freeware 3D modeler available at:
+
+        http://www.comp.lancs.ac.uk/computing/users/andy/ac3dlinux.html
+
+                Convert will extract any polygons with shading and/or
+        2D textures assigned to them.  However, Pixcon does not extract
+        any wireframe/line objects as to encourage the user to create
+        better objects to render.  If you must have wireframe objects,
+        create them with shading, then when rendering in Pixcon, use the
+        "wfbw" shade type.
+
+                The DIVE subset conversion was added so that .div files
+        produced by AC3D (a freeware 3D modeler) could be used w/ Pixcon.
+
+-------------------------------------------------------------------------
+
+5.0                   3DSMAX I/O PLUGIN
+
+	For those of you lucky enough to have a working version of
+	3D Studio MAX, I've included an import/export plugin under
+	graph/win95.  This plugin allows the user to import/export
+	geometric/color/texture datafiles that can be used by Pixcon.
+
+	For importing, the importer looks into the current directory for
+	files w/ the ".spg" extension.  Once one is selected, the importer
+	looks for texture files (.tex) and surface color files (.ilm) w/
+	the same primary name as the ".spg" file.
+
+	For exporting, the exporter exports the currently selected object.
+	If multiple objects are selected, the plugin will prompt the user
+	to only select one.
+
+	When importing or exporting, a GUI pops up, prompting the user for
+	"Minimum Area" and "Minimum Angle".  In most cases the default
+	is fine.  If the imported/exported object gets distorted, or warnings
+	pop up to the screen, you can try altering these.
+
+	The Minimum Area is used in some cases when deciding whether a polygon
+	really is a polygon or a "sliver" - something that may be deleted.
+	The smaller this number, the less likely this will happen.
+
+	The Minimum Angle is used when deciding if 2 adjacent edges cause
+	"spikes" in the object, and determines how well MAX's triangles
+	are meshed into polygons for exporting, and how well polygons are
+	triangulated in the importer.  The smaller this number, the more
+	polygons/triangles are created in the conversion.  The larger
+	the number, the greater chance of your object's shape being distorted.
+
+-------------------------------------------------------------------------
+
+10.0                    	LAST PAGE
+
+        Thats about it for this manual.  A tip to keep in mind: as you
+        can probably tell, this manual probably has some gaps in it,
+        and some sections may not be to clear.  As time goes by, I
+        may rewrite various sections as I get feedback (btw, feel free
+        to ping me if you have questions - my email address should be
+        in the BUGLIST file included with Pixcon/Anitroll).  Your
+        best bet in the mean time is to compare examples in "graph/gallery"
+        with the various sections that they apply to.  Just about any
+        attribute/primitive in Pixcon can be found in those files.
+
+        However, as I've spent more time w/ Pixcon over Anitroll, I have
+        fewer examples of actors/atoms, events/actions, and controll
+        scripts.  But as time goes by, I hope to do more.
+
+        BTW, if you do something cool with this, let me know.  And if you
+        want to send me the scripts, I can included them with
+        Pixcon/Anitroll's distribution.
+
+        Thats about it... Now for some sleep.... Zzzzz...
+-------------------------------------------------------------------------
+
+

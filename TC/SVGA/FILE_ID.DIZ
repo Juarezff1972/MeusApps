@@ -1,0 +1,7 @@
+ZEN TIMER v2.2: The Zen Timer is a high
+ precision (microsecond accuracy) timing
+ library for 16 bit real mode, 16 bit
+ protected mode and 32 bit protected mode
+ programs. Supports Borland C++, Watcom C++,
+ Visual C++, Symantec C++, Metaware C++ and
+ DJGPP.

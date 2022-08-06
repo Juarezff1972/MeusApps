@@ -1,0 +1,113 @@
+
+
+-----------------------------------------------------------------------
+
+Version History:
+
+09/14/97        pixcon1.05.tgz -
+                        Implement DOS version
+
+                        Creation of a 3DSMAX import/export plugin
+
+                        pixcon -
+                                interlace and pixel doubling feature
+                                faster lighting model
+                                fixed pt 2D texturing for CONSTANT model
+                                        (soon for rest of models - 10
+                                         fold increase in speed)
+
+01/15/97        pixcon1.04.tgz -
+
+                        pixcon -
+                                reduce zbuffer memory requirements
+                                elimination of a memory leak w/ the polygon class
+                                speed optimizations of various algorithms
+
+07/20/96        pixcon1.03.tgz -
+                        fix to spatch 2D textures
+                        fix to animation scripts and Anitroll
+
+07/19/96        pixcon1.02.tgz -
+
+                        pixcon -
+                                improved "beam" light primitive
+                                fixed sphere primitive 3D shader
+                                improved polygon primitive 2D texturing
+                        anitroll -
+                                allows multiple instances of the same
+                                .atm file
+
+                        convert -
+                                added "sliding" objects
+                                added subset of DIVE format (specificly a
+                                        decoder for AC3D DIVE output)
+
+                        examples -
+                                minor mods to "run" and "earth" animation
+
+06/23/96        pixcon1.01.tgz  -
+                        fixed a problem w/ shader.c that only exists
+                        on gcc versions 2.7 and up
+
+06/22/96        pixcon1.0.tgz   - first release
+
+
+-----------------------------------------------------------------------
+
+Info wanted:
+
+        I'd like to finish the lightwave -> off conversion, and only
+need to get a description of each of the texture "chunks", and how
+the information is used to 1) take a 2D texture and slap it on a polygon
+(from what I've seen, all the information is in 3D, but since textures are
+ 2D, I dunno...)  2) for the 3D textures, it would be nice to have the
+equations that the chunks are used in, otherwise I'd have to wing it...
+
+Hardware access desired:
+
+        Pixcon 1.03 was the last version that was fully tested on
+an SGI platform with/without multiple processors.  While I was optimizing
+the multiscan/multframe code in Pixcon, I changed jobs, and lost access.
+I eventually finished the new multi routines, but have been unable to test
+them for SillyGee's, as well as any other new code that I've added.  If
+someone has an SGI w/ a few cycles to spare, I'm looking either for someone
+to test/debug Pixcon or allow me access...
+-----------------------------------------------------------------------
+
+Acknowledgements:
+
+Since the IJPEGG requests code change documentation, this section acknowledges
+that the IJPEGG jpeg library is used by Pixcon, and has been slightly altered
+to:
+        1) not exit when an image is not found
+        2) to return the image as a bitmap
+
+I am required to state that
+    "The Graphics Interchange Format(c) is the Copyright property of
+    CompuServe Incorporated.  GIF(sm) is a Service Mark property of
+    CompuServe Incorporated."
+
+-----------------------------------------------------------------------
+
+Special thanx for the following people:
+
+Independent JPEG Group for providing the jpeg library on the net...
+
+Sam Leffler and SGI for making the Iris .rgb spec and the tiff library
+        available on the net, and for the template for the copyright notice
+        below, with the names changed to protect the innocent :)
+
+Thomas Meyer who wrote an ilbm decoder from which I based mine on.
+
+Allen Hastings who made available a document explaining some of
+        the lightwave 3d object format (I'm still looking for
+        docs on how the texture chunks are used...)
+
+Ken Musgrave for the initial sbfast code (he's changing the name to
+        quad-tracing, but I'm not...)
+
+Ken Perlin for providing the noise function
+
+Compuserve Inc for providing the GIF 89a document on the net
+
+-----------------------------------------------------------------------

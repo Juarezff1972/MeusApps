@@ -1,0 +1,987 @@
+
+Setpember 25, 1990
+
+     NetWare C Interface - DOS README File
+==============================================
+
+
+This file contains important information concerning Novell's NetWare
+C Interface - DOS.  Information about the following topics is included
+in this file:
+
+       How To Get Assistance
+       Installing the NetWare C Interface - DOS Libraries
+       New Features
+       Additions and Changes to Existing Services
+       Diskette Content Listing
+       Information on Building the Libraries from the Source Code
+       The Example Make Files for Building the Libraries
+       Corrections to the Documentation
+
+How To Get Assistance
+______________________
+
+If you encounter problems installing or using the NetWare C Interface
+libraries, please read this file and the NetWare C Interface - DOS
+manuals first.  If you still have questions or need assistance, you may
+obtain help from Novell Development Products Division (DPD) Direct
+Connect telephone support program.  Support engineers are available
+during normal business days from 8 a.m. to 6 p.m. Central time.
+
+With the purchase of a new Professional Development Series product,
+you may register for 30 days of free telephone support.  Please provide
+the serial number of your new product as well as registration
+information to the technical support operator.  You must be registered
+before your call can be directed to a software support engineer.  The
+Technical Support number is:
+
+       1-800-SAY-HELP (1-800-729-4357)
+
+You may FAX your questions to the following number and you will
+receive a faxed response within 48 hours:
+
+       (512) 345-7478
+
+Support is also available on CompuServe's NetWire forum.  After
+logging on to CompuServe simply type GO NovC to get to the
+NetWare Developer's forum.
+
+
+
+                               Novell, Inc.
+                       Development Products Division
+                          5918 W. Courtyard Drive
+                            Austin, Texas 78730
+                              (512) 346-8380
+
+
+Education Methods
+__________________
+
+   A regular newsletter, Professional Development Series Bullets,
+is compiled by the Technical Support department of the
+Development Products Division.  It contains information regarding
+both current and new products.  The newsletter is sent to all
+registered users of DPD products and is also available on
+NetWire.
+
+   To access the Bullets from NetWire, Novell's forum on
+CompuServe, type GO NOVA at the ! prompt.  Choose the library
+option.  Choose library 16 for New Uploads.  Please note that if
+the files are not updated in 30 days, they will be moved to DL 5
+(DPD).  If you do not see the files you need in DL 16, look in DL
+5.
+
+   The naming convention for the current issue is PDSXXX.ARC,
+where XXX are the first three characters of the month.  All back
+issues are in PDSBAK.ARC.
+
+   The Professional Developers' Forum (PDF) meets in a different
+city in the country every month.  It is your opportunity to
+discuss today's development challenges and understand Novell's
+product strategy and implementation.  Information on the PDF is
+sent to all registered users of DPD products once a year, and
+updates are included in the Bullets.
+
+
+
+
+Installing the NetWare C Interface - DOS Libraries
+___________________________________________________
+We have included an installation program to load the libraries and
+source files onto your hard drive or network drive. Before you start
+the installation program make a backup of each diskette provided in
+the NetWare C Interface - DOS package.  The DOS DISKCOPY
+program can be used to make an exact duplicate on another diskette.
+
+ To run the install program type:
+
+       INSTALL <SOURCE-DISK> <DESTINATION-DIR> [/O]
+
+The optional switch, /O, allows the program to overwrite existing files
+on your disk.  If you are upgrading from version 1.1, you should use the
+/O option.  For example:
+
+       INSTALL A: C:\NWAPI /O
+
+If either of the parameters are not supplied, the program will prompt
+for them.
+
+       Enter source drive (Default A:):
+
+       Enter destination path (Default C:\NWAPI\):
+
+After you have entered the Source Drive and Destination Path, the
+INSTALL program will recap the information entered and ask you if
+you want to continue:
+
+       You are installing the files on A: to C:\NWAPI\
+
+       Existing files will be overwritten.
+
+       Do you want to continue?
+
+Press Y for YES if you want to continue or press N for NO if you
+want to exit the INSTALL program.
+
+You will next be prompted for the compilers you will be using:
+
+       Do you want to install the WATCOM libraries? Y
+
+Type Y if you want to copy the libraries which support that compiler.
+
+Next you will be asked which memory models you want libraries for:
+
+       Do you want to install the SMALL model libraries? Y
+
+For each memory model you respond to with a Y, the INSTALL
+program will copy the library for the selected compilers for that
+memory model.
+
+Then you will be asked if you want to copy the VAP libraries for the
+compilers and memory models you have designated:
+
+       Do you want to install the VAP libraries? Y
+
+If you answer with Y, the VAP libraries for the selected compilers and
+memory models will be copied to your destination directory.
+
+Finally, the INSTALL program will ask if you want to install the
+source code for the C Interface libraries:
+
+       Do you want to install the SOURCE code?
+
+When you have answered the questions, the INSTALL program will
+recap your choices and give you the option of continuing or aborting
+the installation process:
+
+       You are installing the following ...
+
+              WATCOM Libraries
+              SMALL Memory Model
+              VAP Libraries
+              NetWare C Interface Source Code
+
+       Do you want to continue?
+
+If you answer with a Y, indicating that you want to proceed with
+installation of the libraries, you will be prompted to insert the correct
+diskette for the libraries you have seleted.  For example:
+
+       Insert WATCOM-DOS in drive A:
+
+       Labelled as Disk 1 of 9
+
+When you have the correct disk inserted in the drive, press any key to
+continue.  When the files have been copied you will be prompted for
+the next diskette.  If you place the incorrect diskette in the drive, the
+program will prompt you again for the diskette required.
+
+If you had chosen to install all memory models for the WATCOM C
+compiler on C:\NWAPI, the directory structure would be as follows:
+
+   \NWAPI\                      - Main directory
+   \NWAPI\WATC\                 - Contains Novell libraries for WATCOM
+   \NWAPI\INC\                  - Contains the NetWare C Interface Headers
+   \NWAPI\SOURCE\               - Contains all SOURCE code directories
+   \NWAPI\SOURCE\ACCTC\         - Accounting Services
+   \NWAPI\SOURCE\AFP\           - Apple File Protocol
+   \NWAPI\SOURCE\BINDERY\       - Bindery Services
+   \NWAPI\SOURCE\COMMUNIC\      - IPX/SPX
+   \NWAPI\SOURCE\DIAGNOST\      - Diagnostics
+   \NWAPI\SOURCE\DIRECTRY\      - Directory Services
+   \NWAPI\SOURCE\FSERVER\       - File Server Services
+   \NWAPI\SOURCE\FSERVICE\      - File Services
+   \NWAPI\SOURCE\MACROS\        - Assembler Macros
+   \NWAPI\SOURCE\MISC\          - Miscellaneous Functions
+   \NWAPI\SOURCE\MSGSERVE\      - Message Services
+   \NWAPI\SOURCE\PRNTSERV\      - Print Services
+   \NWAPI\SOURCE\PSERVER\       - Print Server Services
+   \NWAPI\SOURCE\CLIENT\        - 386 Client APIs
+   \NWAPI\SOURCE\QSERVE\        - Queue Management Services
+   \NWAPI\SOURCE\SAP\           - Service Advertising Protocol Services
+   \NWAPI\SOURCE\SERIALIZ\      - Serialization Functions
+   \NWAPI\SOURCE\SYNCHRON\      - Synchronization Services
+   \NWAPI\SOURCE\TTSS\          - Transaction Tracking System Services
+   \NWAPI\SOURCE\VAP\           - Value Added Process Functions
+   \NWAPI\SOURCE\WRKSTN\        - Workstation Services
+
+Most compilers require that you indicate where INCLUDE files (the
+.h header files) and LIB or library files are located by placing the path
+where they may be found in an environment variable.  For example, if
+you are using the WATCOM C compiler and the current INCLUDE
+path is C:\CNC10, you would need to modify the "INCLUDE"
+environment variable as follows:
+
+       INCLUDE=C:\CNC10\H;C:\NWAPI\INC
+
+The "LIB" environment variable would need to be changed as follows:
+
+       LIB=C:\CNC10\LIB;C:\NWAPI\WATC
+
+The compiler will then be able to search for and find the header files
+included in your programs and the libraries with which to link your
+code.
+
+In order to compile a small memory model program that uses
+functions from the NetWare C Interface, you would issue a command
+line such as:
+
+       WCC /zp1 /s /ms PROGRAM.C SNIT.LIB
+
+The memory model conventions used in the NetWare C Interface
+libraries are as follows:
+
+       ?NIT.LIB and ?NITV.LIB
+              - where '?' would be 'S' (indicating the small model)
+              - where '?' would be 'M' (indicating the medium model)
+                ( 'P' for the Lattice library)
+              - where '?' would be 'C' (indicating the  compact model)
+                ( 'D' for the Lattice library)
+              - where '?' would be 'L' (indicating the large model)
+
+The ?NITV.LIB files are the VAP versions of the libraries.  These are
+used when building VAPs for NetWare 2.1x.
+
+New Features
+_____________
+
+This version of the NetWare C Interface - DOS provides two new
+services: Name Spaces and Print Server Services.  Each of these is
+dicussed in the manuals.  Following are brief descriptions of each.
+
+Name Spaces Services allow a workstation on one operating system
+(DOS, OS/2, UNIX, Macintosh) to create files using its own naming
+convention on a server running under a different operating system that
+uses a completely different convention for naming files.  (Naming
+conventions deal with allowable length of file names, legal characters,
+case sensitivity/insensitivity, and so on.)
+
+Print Server Services control the transfer of print jobs from a queue
+to a specific network printer.  These services can also inform clients
+when a print job has finished printing, when a printer needs attention,
+and so on.  You can also use Print Server Services to add or delete
+printers from your network.  One important new feature offered with
+Print Server Services is the ability to specify a printer attached to a
+workstation as a network printer.  Note that in this situation, the
+workstation does not need to be a Print Server or a File Server in
+order for network users to access the attached printer.
+
+Additions and Changes to Existing Services
+___________________________________________
+
+Diagnostics Services - The BeginDiagnostics function has a new
+parameter, a byte pointer called componentList that receives all of the
+components associated with the target node.  A new function,
+FindComponentOffset, provides a fast and easy method of obtaining
+the offset value required by the majority of Diagnostics functions as
+their componentNumber parameter.  The function searches the
+component list returned by an IPX Configuration Response Packet
+(or the component list returned by the BeginDiagnostics function) and
+returns the requested offset value.
+
+Directory Services and File Services - These two services have had
+numerous functions added to take advantage of running NetWare 386.
+Among other enhancements, these services have greatly expanded file
+and directory access security.  For more information, see the chapters
+for each of these services in the NetWare C Interface - DOS reference
+manuals and the NetWare System Interface Technical Overview.
+
+Miscellaneous Services - The Miscellaneous Services include three new
+functions: GetNetworkSerialNumber, VerifyNetworkSerialNumber, and
+IsV3Supported.  The first two of these functions obtain and verify the
+network's serial number along with the vendor's application number.
+(The source of these functions resides in the SERIALIZ subdirectory.)
+Use the IsV3Supported function to determine if NetWare 386 v3.0 is
+installed on the server before issuing v3.0 function calls to that server.
+
+Service Advertising Protocol - The code for the General Query
+function was not implemented because the simplest method for
+locating a server is to search the file server's bindery.  This method
+can easily generate a list of servers and has the advantage of making
+sure that no servers are missed as might be the case with the General
+Broadcast Query method.  For more information on the calls needed
+to generate a list of servers, refer to the Bindery section of Volume I
+of the NetWare C Interface - DOS reference manual.
+
+
+Diskette Contents Listing
+__________________________
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        WATCOM C v8.0 Libraries
+        S, M, L, C models
+        Disk 1 of 9
+Volume Label:   WATCOM-DOS
+
+        README.DOC
+        INSTALL.EXE
+
+        COMPILE.BAT    - example batch file for compile
+        API1         ---|
+        API2            | make files used by COMPILE.BAT
+        CLIENT          |
+        PRNTSERV        |
+        HELP.BAT        - help file for COMPILE.BAT
+        BLDLIBS.BAT     - example batch file to link all OBJs into LIBs
+        APINIT.CMD   ---| command files used by BLDLIBS.BAT
+        APINITV.CMD  ---|
+        SETUP.DOC     - explains the setup assumed by the example batch files
+
+        WATC\SNIT.LIB
+        WATC\MNIT.LIB
+        WATC\LNIT.LIB
+        WATC\CNIT.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        WATCOM C v8.0 VAP Libraries
+        S, M, L, C models
+        Disk 2 of 9
+Volume Label:   WATCOM-VAP
+
+        WATC\SNITV.LIB
+        WATC\MNITV.LIB
+        WATC\LNITV.LIB
+        WATC\CNITV.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Borland Turbo C++ v1.0 Libraries
+        S, M, L, C models
+        Disk 3 of 9
+Volume Label:   BORLAND-DOS
+
+        TURC\SNIT.LIB
+        TURC\MNIT.LIB
+        TURC\LNIT.LIB
+        TURC\CNIT.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Borland Turbo C++ v1.0 VAP Libraries
+        S, M, L, C models
+        Disk 4 of 9
+Volume Label:   BORLAND-VAP
+
+        TURC\SNITV.LIB
+        TURC\MNITV.LIB
+        TURC\LNITV.LIB
+        TURC\CNITV.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Microsoft C v6.0 Libraries
+        S, M, L, C models
+        Disk 5 of 9
+Volume Label:   MSC-DOS
+
+        MSC\SNIT.LIB
+        MSC\MNIT.LIB
+        MSC\LNIT.LIB
+        MSC\CNIT.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Microsoft C v6.0 VAP Libraries
+        S, M, L, C models
+        Disk 6 of 9
+Volume Label:   MSC-VAP
+
+        MSC\SNITV.LIB
+        MSC\MNITV.LIB
+        MSC\LNITV.LIB
+        MSC\CNITV.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Lattice C v6.0.5 Libraries
+        S, P, L, D models
+        Disk 7 of 9
+Volume Label:   LATC-DOS
+
+        LATC\SNIT.LIB
+        LATC\PNIT.LIB
+        LATC\LNIT.LIB
+        LATC\DNIT.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Lattice C v6.0.5 VAP Libraries
+        S, P, L, D models
+        Disk 8 of 9
+Volume Label:   LATC-VAP
+
+        LATC\SNITV.LIB
+        LATC\PNITV.LIB
+        LATC\LNITV.LIB
+        LATC\DNITV.LIB
+
+Label:  NetWare C Interface - DOS
+        Version:  1.2
+        Source, include and macro files
+        Disk 9 of 9
+Volume Label:   C-SOURCE
+
+
+        \SOURCE\ACCNTG\ACCTINST.C
+        \SOURCE\ACCNTG\GETACCTS.C
+        \SOURCE\ACCNTG\SBTACTCH.C
+        \SOURCE\ACCNTG\SBTACTHD.C
+        \SOURCE\ACCNTG\SBTACTNT.C
+                                        Total:  5 Files
+        \SOURCE\AFP\AFPDIREN.C
+        \SOURCE\AFP\AFPSFILE.C
+        \SOURCE\AFP\AFPSUPP .C
+        \SOURCE\AFP\ATMPDIRH.C
+        \SOURCE\AFP\CONVHAN .ASM
+        \SOURCE\AFP\CREATEDI.C
+        \SOURCE\AFP\CREATEFI.C
+        \SOURCE\AFP\DELETEFI.C
+        \SOURCE\AFP\ETRIDHAN.C
+        \SOURCE\AFP\GETBASEI.C
+        \SOURCE\AFP\GETFILEI.C
+        \SOURCE\AFP\GFILEINA.C
+        \SOURCE\AFP\OPENFORK.C
+        \SOURCE\AFP\RENAME  .C
+        \SOURCE\AFP\SETFILEI.C
+                                        Total:  15 Files
+        \SOURCE\BINDERY\BINDERY .C
+        \SOURCE\BINDERY\CRTEOBJ .C
+        \SOURCE\BINDERY\CRTEPROP.C
+        \SOURCE\BINDERY\DELOBJ  .C
+        \SOURCE\BINDERY\DELPROP .C
+        \SOURCE\BINDERY\GETACCES.C
+        \SOURCE\BINDERY\GOBDSKSP.C
+        \SOURCE\BINDERY\MEMBACT .C
+        \SOURCE\BINDERY\MEMBER  .C
+        \SOURCE\BINDERY\OBJNAME .C
+        \SOURCE\BINDERY\OBJNUMB .C
+        \SOURCE\BINDERY\OBJSRTY .C
+        \SOURCE\BINDERY\PROPSRTY.C
+        \SOURCE\BINDERY\READPROP.C
+        \SOURCE\BINDERY\RENAMOBJ.C
+        \SOURCE\BINDERY\SCANOBJ .C
+        \SOURCE\BINDERY\SCANPROP.C
+        \SOURCE\BINDERY\WRTEPROP.C
+                                        Total:  18 Files
+        \SOURCE\COMMUNIC\_IPXPACK.ASM
+        \SOURCE\COMMUNIC\IPXDATAA.ASM
+        \SOURCE\COMMUNIC\IPXEVENT.C
+        \SOURCE\COMMUNIC\IPXFUN00.ASM
+        \SOURCE\COMMUNIC\IPXFUN01.ASM
+        \SOURCE\COMMUNIC\IPXFUN02.ASM
+        \SOURCE\COMMUNIC\IPXFUN08.ASM
+        \SOURCE\COMMUNIC\IPXFUN0A.ASM
+        \SOURCE\COMMUNIC\IPXINIT .ASM
+        \SOURCE\COMMUNIC\IPXPACK .C
+        \SOURCE\COMMUNIC\IPXPROCA.ASM
+        \SOURCE\COMMUNIC\IPXSCHED.ASM
+        \SOURCE\COMMUNIC\SPXABTCN.ASM
+        \SOURCE\COMMUNIC\SPXCONN .C
+        \SOURCE\COMMUNIC\SPXESTCN.ASM
+        \SOURCE\COMMUNIC\SPXINIT .ASM
+        \SOURCE\COMMUNIC\SPXLSNCN.ASM
+        \SOURCE\COMMUNIC\SPXLSSPK.ASM
+        \SOURCE\COMMUNIC\SPXREQ  .ASM
+                                        Total:  19 Files
+        \SOURCE\CONNECT\ATTACH  .C
+        \SOURCE\CONNECT\ATTACH2 .C
+        \SOURCE\CONNECT\CONNINFO.C
+        \SOURCE\CONNECT\DETCHSRV.C
+        \SOURCE\CONNECT\GETCONN .C
+        \SOURCE\CONNECT\GETLADDR.C
+        \SOURCE\CONNECT\GETPADDR.ASM
+        \SOURCE\CONNECT\LOGAREA .C
+        \SOURCE\CONNECT\LOGOUT  .C
+        \SOURCE\CONNECT\LOSERVER.C
+        \SOURCE\CONNECT\OBJCONN .C
+        \SOURCE\CONNECT\SERVERRQ.ASM
+        \SOURCE\CONNECT\SERVREQ .ASM
+                                        Total:  13 Files
+        \SOURCE\DIAGNOST\DIAG   .C
+        \SOURCE\DIAGNOST\OFFSET .C
+                                        Total:   2 File
+        \SOURCE\DIRECTRY\ADDTRST .C
+        \SOURCE\DIRECTRY\CHGEHNDL.C
+        \SOURCE\DIRECTRY\DELDIR  .C
+        \SOURCE\DIRECTRY\DELTRST .C
+        \SOURCE\DIRECTRY\CRTEDIR .C
+        \SOURCE\DIRECTRY\CRTPRMHD.C
+        \SOURCE\DIRECTRY\CRTTMPHD.C
+        \SOURCE\DIRECTRY\DELHNDL .C
+        \SOURCE\DIRECTRY\FULLPATH.C
+        \SOURCE\DIRECTRY\GDIRPATH.C
+        \SOURCE\DIRECTRY\GDRVINFO.ASM
+        \SOURCE\DIRECTRY\GETSRCH .ASM
+        \SOURCE\DIRECTRY\GETRIGHT.C
+        \SOURCE\DIRECTRY\GETTRUST.C
+        \SOURCE\DIRECTRY\GETVINFO.ASM
+        \SOURCE\DIRECTRY\GHANDLE .ASM
+        \SOURCE\DIRECTRY\GVOLINFO.C
+        \SOURCE\DIRECTRY\MAP     .C
+        \SOURCE\DIRECTRY\MAPVOL  .C
+        \SOURCE\DIRECTRY\MAPVOL2 .C
+        \SOURCE\DIRECTRY\MODMAXRT.C
+        \SOURCE\DIRECTRY\RENAMDIR.C
+        \SOURCE\DIRECTRY\RESTHNDL.C
+        \SOURCE\DIRECTRY\SAVEHNDL.C
+        \SOURCE\DIRECTRY\SCANDIR .C
+        \SOURCE\DIRECTRY\SCANTRST.C
+        \SOURCE\DIRECTRY\SETDIR  .C
+        \SOURCE\DIRECTRY\SETPATH .C
+        \SOURCE\DIRECTRY\SETSRCH .ASM
+        \SOURCE\DIRECTRY\VOLINFO .C
+                                        Total:  31 Files
+        \SOURCE\FSERVER\CHECKVER.C
+        \SOURCE\FSERVER\CHKCONSL.C
+        \SOURCE\FSERVER\CLRCONN .C
+        \SOURCE\FSERVER\CONUSEST.C
+        \SOURCE\FSERVER\DISABLOG.C
+        \SOURCE\FSERVER\DISABTTS.C
+        \SOURCE\FSERVER\DOWNSERV.C
+        \SOURCE\FSERVER\DRVMAPTB.C
+        \SOURCE\FSERVER\DSKCHNST.C
+        \SOURCE\FSERVER\ENABLOG .C
+        \SOURCE\FSERVER\ENABLTTS.C
+        \SOURCE\FSERVER\DISKUTIL.C
+        \SOURCE\FSERVER\FSLANIOS.C
+        \SOURCE\FSERVER\FSMSCINF.C
+        \SOURCE\FSERVER\FSYSSTAT.C
+        \SOURCE\FSERVER\GCONOPFL.C
+        \SOURCE\FSERVER\GCONSEMA.C
+        \SOURCE\FSERVER\GCONTSKI.C
+        \SOURCE\FSERVER\GCONUSFL.C
+        \SOURCE\FSERVER\GETDATE .ASM
+        \SOURCE\FSERVER\GLGRCCON.C
+        \SOURCE\FSERVER\GLOGRECI.C
+        \SOURCE\FSERVER\GPRECLKF.C
+        \SOURCE\FSERVER\GPRLCOFI.C
+        \SOURCE\FSERVER\GSEMAINF.C
+        \SOURCE\FSERVER\LANDCONF.C
+        \SOURCE\FSERVER\LOGINSTA.C
+        \SOURCE\FSERVER\PATHENTR.C
+        \SOURCE\FSERVER\PHSDSKST.C
+        \SOURCE\FSERVER\RDDSKCHS.C
+        \SOURCE\FSERVER\SERVDATE.C
+        \SOURCE\FSERVER\SERVINFO.C
+        \SOURCE\FSERVER\SERVINF1.C
+        \SOURCE\FSERVER\SERVINF2.C
+        \SOURCE\FSERVER\SERVNAME.ASM
+        \SOURCE\FSERVER\VERSTR  .C
+                                        Total:  36 Files
+        \SOURCE\FSERVICE\ERASEFIL.C
+        \SOURCE\FSERVICE\FILECOPY.ASM
+        \SOURCE\FSERVICE\FSREQ   .ASM
+        \SOURCE\FSERVICE\GETEATTR.ASM
+        \SOURCE\FSERVICE\PURGEFIL.C
+        \SOURCE\FSERVICE\PURGSALV.C
+        \SOURCE\FSERVICE\RSTORFIL.C
+        \SOURCE\FSERVICE\SCANFILE.C
+        \SOURCE\FSERVICE\SETEATTR.ASM
+        \SOURCE\FSERVICE\SETFILE .C
+                                        Total:  10 Files
+        \SOURCE\MISC\_FNDPVE .C
+        \SOURCE\MISC\ALGDRVPT.C
+        \SOURCE\MISC\ALLCNITB.C
+        \SOURCE\MISC\AZLENSTR.ASM
+        \SOURCE\MISC\CHDIR   .ASM
+        \SOURCE\MISC\CONUPPER.C
+        \SOURCE\MISC\DOSCLOSE.ASM
+        \SOURCE\MISC\DOSOPEN .ASM
+        \SOURCE\MISC\DOSERROR.C
+        \SOURCE\MISC\DOSGTVER.ASM
+        \SOURCE\MISC\ENVIRON .C
+        \SOURCE\MISC\ENVSEG  .ASM
+        \SOURCE\MISC\GDLFSO  .C
+        \SOURCE\MISC\GETDIR  .ASM
+        \SOURCE\MISC\GETDRIVE.C
+        \SOURCE\MISC\GETFLVER.ASM
+        \SOURCE\MISC\GETPATH .C
+        \SOURCE\MISC\GETSHREV.ASM
+        \SOURCE\MISC\GMAXSO  .C
+        \SOURCE\MISC\GPTHEVAR.C
+        \SOURCE\MISC\GSOFDL  .C
+        \SOURCE\MISC\INTSWAP .ASM
+        \SOURCE\MISC\ISSEARCH.C
+        \SOURCE\MISC\ISWHITES.C
+        \SOURCE\MISC\LENAZSTR.ASM
+        \SOURCE\MISC\LONGSWAP.ASM
+        \SOURCE\MISC\LSTRCAT .ASM
+        \SOURCE\MISC\LSTRCMP .ASM
+        \SOURCE\MISC\LSTRCPY .ASM
+        \SOURCE\MISC\MAPSTR  .C
+        \SOURCE\MISC\MEMFETCH.ASM
+        \SOURCE\MISC\MEMSTORE.ASM
+        \SOURCE\MISC\NITBFPTR.C
+        \SOURCE\MISC\RELTFULL.C
+        \SOURCE\MISC\RENFILE .C
+        \SOURCE\MISC\SHELLREQ.ASM
+        \SOURCE\MISC\TUTILS.C
+                                        Total:  35 Files
+        \SOURCE\MSGSERVE\BRODCAST.C
+        \SOURCE\MSGSERVE\CONSOLBR.C
+        \SOURCE\MSGSERVE\GETBROD .ASM
+        \SOURCE\MSGSERVE\LOGMSG  .C
+        \SOURCE\MSGSERVE\MESSAGE .C
+        \SOURCE\MSGSERVE\PIPES   .C
+        \SOURCE\MSGSERVE\SETBROD .C
+
+                                        Total:   7 Files
+        \SOURCE\PRNTSERV\APNDSPOL.C
+        \SOURCE\PRNTSERV\BANNER  .C
+        \SOURCE\PRNTSERV\CAPFLAG .C
+        \SOURCE\PRNTSERV\CAPSTAT .C
+        \SOURCE\PRNTSERV\CNCLSPOL.C
+        \SOURCE\PRNTSERV\DEFLTPRN.C
+        \SOURCE\PRNTSERV\DELQUE  .C
+        \SOURCE\PRNTSERV\DELQUE2 .C
+        \SOURCE\PRNTSERV\DISABLPD.ASM
+        \SOURCE\PRNTSERV\ENABLEPD.ASM
+        \SOURCE\PRNTSERV\GETPDFLT.ASM
+        \SOURCE\PRNTSERV\GETPRNTR.ASM
+        \SOURCE\PRNTSERV\GTCAPINF.ASM
+        \SOURCE\PRNTSERV\LPTCAP  .ASM
+        \SOURCE\PRNTSERV\LPTCAPTR.C
+        \SOURCE\PRNTSERV\MODLST  .ASM
+        \SOURCE\PRNTSERV\PRCONNRQ.ASM
+        \SOURCE\PRNTSERV\PRNSRVRQ.ASM
+        \SOURCE\PRNTSERV\PRNTSTAT.C
+        \SOURCE\PRNTSERV\QUEFILE .C
+        \SOURCE\PRNTSERV\QUESPOL .C
+        \SOURCE\PRNTSERV\SCAPPRNJ.ASM
+        \SOURCE\PRNTSERV\SETPDFLT.ASM
+        \SOURCE\PRNTSERV\SETQUEID.ASM
+        \SOURCE\PRNTSERV\SPECCAP .C
+        \SOURCE\PRNTSERV\SPOLFLAG.C
+                                        Total:  26 Files
+        \SOURCE\QSERVE\ABORTJOB.C
+        \SOURCE\QSERVE\ATSERVER.C
+        \SOURCE\QSERVE\CHJOBENT.C
+        \SOURCE\QSERVE\CHJOBPOS.C
+        \SOURCE\QSERVE\CHSVRRIT.C
+        \SOURCE\QSERVE\CLSABTQ .C
+        \SOURCE\QSERVE\CLSSTRTQ.C
+        \SOURCE\QSERVE\CREATEQU.C
+        \SOURCE\QSERVE\CRTEQJOB.C
+        \SOURCE\QSERVE\DESTRQUE.C
+        \SOURCE\QSERVE\DETACHSV.C
+        \SOURCE\QSERVE\FINSHJOB.C
+        \SOURCE\QSERVE\GETQUE  .C
+        \SOURCE\QSERVE\GJOBLIST.C
+        \SOURCE\QSERVE\GTJOBSIZ.C
+        \SOURCE\QSERVE\JQUEFILS.C
+        \SOURCE\QSERVE\READQSTA.C
+        \SOURCE\QSERVE\REMOVJOB.C
+        \SOURCE\QSERVE\RJOBENTY.C
+        \SOURCE\QSERVE\RSVRSTAT.C
+        \SOURCE\QSERVE\RTSVRRIT.C
+        \SOURCE\QSERVE\SERVEJOB.C
+        \SOURCE\QSERVE\SETQSTAT.C
+        \SOURCE\QSERVE\SETSVRST.C
+                                        Total:  25 Files
+        \SOURCE\SAP\ADVERTIS.C
+        \SOURCE\SAP\LOAD_DS .ASM
+        \SOURCE\SAP\QUERY   .C
+                                        Total:   3 Files
+        \SOURCE\SERIALIZ\GETSER  .C
+        \SOURCE\SERIALIZ\VERFYSER.C
+                                        Total:   2 Files
+        \SOURCE\SYNCHRON\CLRRELRQ.ASM
+        \SOURCE\SYNCHRON\EXAMSMPH.ASM
+        \SOURCE\SYNCHRON\LOCK    .C
+        \SOURCE\SYNCHRON\LOCKREQ .ASM
+        \SOURCE\SYNCHRON\LOGREQ  .ASM
+        \SOURCE\SYNCHRON\OPENSMPH.ASM
+        \SOURCE\SYNCHRON\PHYSRREQ.ASM
+        \SOURCE\SYNCHRON\SEMAPHOR.C
+        \SOURCE\SYNCHRON\SEMPHREQ.ASM
+        \SOURCE\SYNCHRON\SETCLRRQ.ASM
+        \SOURCE\SYNCHRON\SYNCFILE.C
+        \SOURCE\SYNCHRON\SYNCPHYS.C
+        \SOURCE\SYNCHRON\SYNCLOGI.C
+                                        Total:  13 Files
+        \SOURCE\TTSS\AVAILTRN.ASM
+        \SOURCE\TTSS\EABRTRAN.ASM
+        \SOURCE\TTSS\EBEGTRAN.ASM
+        \SOURCE\TTSS\EENDTRAN.ASM
+        \SOURCE\TTSS\ESTATRAN.ASM
+        \SOURCE\TTSS\GETDFTTL.ASM
+        \SOURCE\TTSS\SETDFTTL.ASM
+        \SOURCE\TTSS\TTLGET  .ASM
+        \SOURCE\TTSS\TTSGETST.C
+        \SOURCE\TTSS\TTLSET  .ASM
+                                        Total:  10 Files
+        \SOURCE\VAP\ABSADDR .ASM
+        \SOURCE\VAP\ALLOCSEG.ASM
+        \SOURCE\VAP\ATTACHFS.ASM
+        \SOURCE\VAP\CHNGPROC.ASM
+        \SOURCE\VAP\CLRSCRN .ASM
+        \SOURCE\VAP\CONDISP .ASM
+        \SOURCE\VAP\CONERR  .ASM
+        \SOURCE\VAP\CONMSG  .ASM
+        \SOURCE\VAP\CONQUERY.ASM
+        \SOURCE\VAP\CONREAD .ASM
+        \SOURCE\VAP\CREAPROC.ASM
+        \SOURCE\VAP\DLAYPROC.ASM
+        \SOURCE\VAP\DOCONERR.ASM
+        \SOURCE\VAP\EXTNDSEG.ASM
+        \SOURCE\VAP\GETCONID.ASM
+        \SOURCE\VAP\GETFSERV.ASM
+        \SOURCE\VAP\GETINTV .ASM
+        \SOURCE\VAP\GETPRCID.ASM
+        \SOURCE\VAP\GETSCRN .ASM
+        \SOURCE\VAP\GETVAPH .ASM
+        \SOURCE\VAP\INITCOMP.ASM
+        \SOURCE\VAP\INSTR   .ASM
+        \SOURCE\VAP\KILLPROC.ASM
+        \SOURCE\VAP\OUTSTR  .ASM
+        \SOURCE\VAP\PASSTHRU.ASM
+        \SOURCE\VAP\PRINTSTR.ASM
+        \SOURCE\VAP\READKBRD.ASM
+        \SOURCE\VAP\SEGASDAT.ASM
+        \SOURCE\VAP\SEGTOCOD.ASM
+        \SOURCE\VAP\SETINTV .ASM
+        \SOURCE\VAP\SEGTODAT.ASM
+        \SOURCE\VAP\SEGTOPTR.ASM
+        \SOURCE\VAP\SETHWINT.ASM
+        \SOURCE\VAP\SETSCRN .ASM
+        \SOURCE\VAP\SETXERR .ASM
+        \SOURCE\VAP\SLEEPROC.ASM
+        \SOURCE\VAP\SPWNPROC.ASM
+        \SOURCE\VAP\WAKEPROC.ASM
+                                        Total:  38 Files
+        \SOURCE\WRKSTN\_PRCONRQ.ASM
+        \SOURCE\WRKSTN\CONN_ID .C
+        \SOURCE\WRKSTN\EOJ     .ASM
+        \SOURCE\WRKSTN\EOJFLAG .ASM
+        \SOURCE\WRKSTN\GCONNID .C
+        \SOURCE\WRKSTN\GETFLVER.ASM
+        \SOURCE\WRKSTN\GETWSOS .ASM
+        \SOURCE\WRKSTN\LOCDISKS.ASM
+        \SOURCE\WRKSTN\SERVUSE .ASM
+        \SOURCE\WRKSTN\SETERROR.ASM
+        \SOURCE\WRKSTN\TABLEREQ.ASM
+        \SOURCE\WRKSTN\WSENV1  .C
+        \SOURCE\WRKSTN\WSENV2  .ASM
+                                        Total:  13 Files
+        \SOURCE\CLIENT\CLRVOLRE.C
+        \SOURCE\CLIENT\CONVHNDL.C
+        \SOURCE\CLIENT\DATEADJ .C
+        \SOURCE\CLIENT\DELTRUST.C
+        \SOURCE\CLIENT\FILNSBUF.C
+        \SOURCE\CLIENT\GETDIREN.C
+        \SOURCE\CLIENT\GETDIRIN.C
+        \SOURCE\CLIENT\GETDSINF.C
+        \SOURCE\CLIENT\GETNSDS .C
+        \SOURCE\CLIENT\GETNSENT.C
+        \SOURCE\CLIENT\GETNSINF.C
+        \SOURCE\CLIENT\GETOBJRE.C
+        \SOURCE\CLIENT\GETVOLUS.C
+        \SOURCE\CLIENT\GRIGHT  .C
+        \SOURCE\CLIENT\IV3S    .C
+        \SOURCE\CLIENT\MOVENTRY.C
+        \SOURCE\CLIENT\NCPR    .ASM
+        \SOURCE\CLIENT\NCPCR   .C
+        \SOURCE\CLIENT\NWMLPP  .C
+        \SOURCE\CLIENT\NWMWP   .C
+        \SOURCE\CLIENT\OPENSTRM.C
+        \SOURCE\CLIENT\PSALV   .C
+        \SOURCE\CLIENT\RECSALV .C
+        \SOURCE\CLIENT\SCANPHYS.C
+        \SOURCE\CLIENT\SCANSALV.C
+        \SOURCE\CLIENT\SCDIR   .C
+        \SOURCE\CLIENT\SCFILE  .C
+        \SOURCE\CLIENT\SCVOLRES.C
+        \SOURCE\CLIENT\SDR     .C
+        \SOURCE\CLIENT\SEFT    .C
+        \SOURCE\CLIENT\SETDIRRE.C
+        \SOURCE\CLIENT\SETENTRY.C
+        \SOURCE\CLIENT\SETVOLRE.C
+        \SOURCE\CLIENT\ST      .C
+
+                                        Total:  34 Files
+        \SOURCE\PSERVER\ABORT   .C
+        \SOURCE\PSERVER\ADDNOTFY.C
+        \SOURCE\PSERVER\ADDQUEUE.C
+        \SOURCE\PSERVER\ADDSERVE.C
+        \SOURCE\PSERVER\ATTACHPS.C
+        \SOURCE\PSERVER\CANCEL  .C
+        \SOURCE\PSERVER\CHGNOTFY.C
+        \SOURCE\PSERVER\CHGQUEUE.C
+        \SOURCE\PSERVER\DELNOTFY.C
+        \SOURCE\PSERVER\DELQUEUE.C
+        \SOURCE\PSERVER\DELSERVE.C
+        \SOURCE\PSERVER\DOWN    .C
+        \SOURCE\PSERVER\EJECT   .C
+        \SOURCE\PSERVER\ESR     .ASM
+        \SOURCE\PSERVER\GETNOTFY.C
+        \SOURCE\PSERVER\GETPRINT.C
+        \SOURCE\PSERVER\GETQUEUE.C
+        \SOURCE\PSERVER\GETREMOT.C
+        \SOURCE\PSERVER\GETSERVE.C
+        \SOURCE\PSERVER\JSTATUS .C
+        \SOURCE\PSERVER\LOGINPS .C
+        \SOURCE\PSERVER\MARK    .C
+        \SOURCE\PSERVER\MOUNT   .C
+        \SOURCE\PSERVER\PSINFO  .C
+        \SOURCE\PSERVER\PSREQ   .C
+        \SOURCE\PSERVER\PSTATUS .C
+        \SOURCE\PSERVER\REWIND  .C
+        \SOURCE\PSERVER\SETMODE .C
+        \SOURCE\PSERVER\SETREMOT.C
+        \SOURCE\PSERVER\START   .C
+        \SOURCE\PSERVER\STOP    .C
+        \SOURCE\PSERVER\USEREMOT.C
+                                        Total:  32 Files
+        \SOURCE\MACROS\TCPP10  .MAC
+        \SOURCE\MACROS\LAT605  .MAC
+        \SOURCE\MACROS\MSC60   .MAC
+        \SOURCE\MACROS\WAT80   .MAC
+                                        Total:   4 Files
+                            # Sub-directories:   22
+
+
+
+        \INC\DIAG    .H
+        \INC\NAT     .H
+        \INC\NDT     .H
+        \INC\NIT     .H
+        \INC\NITERROR.H
+        \INC\NITQ    .H
+        \INC\NPT     .H
+        \INC\NTT     .H
+        \INC\NVT     .H
+        \INC\NWACCT  .H
+        \INC\NWBINDRY.H
+        \INC\NWCONN  .H
+        \INC\NWCONSOL.H
+        \INC\NWDIR   .H
+        \INC\NWFILE  .H
+        \INC\NWLOCAL .H
+        \INC\NWMISC  .H
+        \INC\NWMSG   .H
+        \INC\NWPRINT .H
+        \INC\NWSYNC  .H
+        \INC\NWTTS   .H
+        \INC\NWWRKENV.H
+        \INC\NXT     .H
+        \INC\PROLOG  .H
+        \INC\SAP     .H
+                                Total:  25 Files
+
+
+Information on Building the Libraries from the Source Code
+-----------------------------------------------------------
+
+The following gives the compiler switches necessary for compiling the source
+code prior to building a library.  Refer to your compiler and linker manuals
+for additional information.
+
+     WATCOM C:  /zdp /ze /w3 /ols /s /ml   (/ms for small, etc.)
+          NOTE!!!: The following files must be compiled with the optimization
+              turned off:
+                     PSREQ.C
+                     ATTACHPS.C
+               The correct switch settings are then:
+                     /zdp /ze /w3 /od /s /ml  (/ms for small, etc.)
+
+      Turbo C++: -c -G -K -O -V -y- -v-     (-ms for small, etc.)
+                              (Note: these may also be put in the
+                               .CFG file for TURBO C++)
+     Microsoft C:  /DMSC /c /J /Zp /Gs /Al    (/As for small, etc.)
+     Lattice C:    -ml -C -cbcdfimnu -k0 -v   (-ms for small, etc.)
+
+     When compiling the VAP source files, add the DVAP option:
+
+          WATCOM C:  /DVAP /zdp /ze /w3 /ols /s /ml
+          Turbo C:  -DVAP -ml
+          Microsoft C:  /DVAP /DMSC /c /J /Zp /Gs /Al
+          Lattice C:  -DVAP -ml -C -cbcdfimnu -k0 -v
+
+
+        To assemble the .asm files, first copy the appropriate .MAC file to
+        your include subdirectory.  The macro files for the compilers are
+        named as follows:
+           Turbo C+++      TCPP10.MAC
+           LATTICE         LAT605.MAC
+           Microsoft       CMSC60.MAC
+           WATCOM          WAT80.MAC
+
+     Then assemble as follows:
+              masm /MX <filename>                    (small memory model)
+              masm /DLProg /MX <filename>                  (medium)
+              masm /DLData /MX <filename>                  (compact)
+              masm /DLProg /DLData /MX <filename> (large)
+
+       For VAP .asm files, add the extra DVAP option.  For example:
+
+              masm /DLProg /DVAP /MX <filename>   (medium)
+
+
+The Example Make Files for Building the Libraries
+___________________________________________________
+
+On diskette 1 of 9, we have included example BATCH and MAKE files.  The MAKE
+files were used with the PolyMake utility.  These files are provided as a
+template and you should modify them for use with the MAKE utility of your
+choice.  You may also need to change the paths in the make files to reflect
+your development environment.  The files are provided as is and Novell takes no
+responsibility for their accuracy or usefulness.  Please read the SETUP.DOC
+file for more information.
+
+
+
+
+Corrections To The Documentation
+_________________________________
+
+NetWare System Technical Overview -- P. 3-12
+
+     The read/write security level of the property OLD_PASSWORDS
+     should be 4 not 3.
+
+NetWare System Technical Overview -- P. 4-43
+
+     IPXScheduleSpecialEvent is not a supported call.
+
+NetWare C Interface - DOS -- P. 8-147
+
+    In the function prototype for SetEntry(), the last function parameter
+    should read: void *entry.  Since the final function parameter can be of
+    type NWFILE_ENTRY or NWDIR_ENTRY, you will need to
+    typecast the appropriate data type.
+
+NetWare C Interface - DOS -- P. 15-27
+
+    GetPrinterStatus is supported for NetWare 2.1x, but not for Netware 386.
+
+NetWare C Interface - DOS -- P. 15-42, 15-49
+
+   In structure SET_CAPTURE_FLAGS, the members:
+     BYTE flushCaptureOnDeviceClose;
+     int flushCaptureTimeoutCount;
+   should be reversed and appear as follows:
+     int flushCaptureTimeoutCount;
+     BYTE flushCaptureOnDeviceClose;
+
+NetWare C Interface - DOS -- P. A-2
+
+    INVALID_CONNECTION_ID 0x101 should be added to the list of
+    error codes.
+
+
+Corrections to Include File DIAG.H
+__________________________________
+
+Note:
+
+     On diskettete 9 of 9, containing the source files and include files for
+the libraries, you will find file DIAG.H under directory \INC.  You should
+edit this file and add the following function prototype:
+
+     int FindComponentOffset (BYTE *componentList, BYTE componentID);
+
+
+

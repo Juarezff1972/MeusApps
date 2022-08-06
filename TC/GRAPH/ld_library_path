@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Print a reminder about shared libs:
+DIR=`cd lib ; pwd`
+echo
+echo "******Be sure to add" ${DIR}" to your LD_LIBRARY_PATH variable"
+echo
+sleep 2
+
+
+
+#### NOTES:
+# One Mesa user reports having to run the "ldconfig -v" command to make
+# Linux aware of the shared libs.

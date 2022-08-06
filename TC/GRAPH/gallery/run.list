@@ -1,0 +1,66 @@
+list
+frame_count  1
+object_count 6
+
+sbfast {					// define floor
+	shade palex sbfast.ilm
+	3d_texture cave_floor.3dt
+	scale 157.240997
+	tr_matrix	1.000000 0.000000 0.000000 40.000000
+			0.000000 0.000000 1.000000 -173.500000
+			0.000000 -1.000000 0.000000 0.000000
+			0.000000 0.000000 0.000000 1.000000
+	back 1000.000000
+	octaves 100.000000
+	h 0.900000
+	lacunarity 2.100000
+	displacement default_alt
+}
+
+sbfast {					// define ceiling
+	shade palex sbfast.ilm
+	3d_texture cave_ceiling.3dt
+	scale 157.240997
+	tr_matrix	1.000000 0.000000 0.000000 -40.000000
+			0.000000 0.000000 -1.000000 176.500000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 0.000000 1.000000
+	back 1000.000000
+	octaves 100.000000
+	h 0.900000
+	lacunarity 2.100000
+	displacement default_alt
+}
+
+polygon {					// define x-wing
+	shade phong white.ilm
+	file x_wing.spg
+	raycast
+	shadow 0 0 1 -150
+	scale 0.3
+	tr_matrix	-1.000000 0.000000 0.000000 0.000000
+			0.000000 0.000000 1.000000 -45.000000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 0.000000 1.000000
+}
+
+camera {					// define camera
+	location 0 -43.5 0
+	coa	0, -43.5 -1
+}
+
+light {						// define light source
+	type far
+	direction 0 0 -1
+	ambient 0.5 0.5 0.5
+	diffuse 1 1 1
+}
+
+geosphere {					// define fog in background
+	shade palex bgwhite.ilm
+	luminate
+	rotate_y 180
+	translate 0 -43.5 0
+	axis 1000 1000 1000
+}
+

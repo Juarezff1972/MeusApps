@@ -1,0 +1,25 @@
+quark {
+   name base
+   children 2
+
+   shell {
+      name us
+      file shell2.sp
+      shade pphong us.ilm
+      raycast
+      2d_texture us.tes
+      scale 1.01
+   }
+
+   neutron {
+	name earth
+	file globe.spg
+	shade phong globe.ilm
+	scale 0.1
+	raycast
+//	transparent
+	rotate_y 102
+	rotate_x 25
+   }
+
+}

@@ -1,0 +1,55 @@
+neutron {
+	name back
+	bound bplane 0 0 1 	0 0 -20
+	file rear.spg
+	scale 2
+	shade bw
+
+	children 6
+
+		electron {
+			name camera1
+			origin 0 0 40
+		}
+
+		neutron {
+			name front
+			bound bplane 0 0 -1	0 0 20
+			file front.spg
+			scale 2
+			shade bw
+		}
+
+		neutron {
+			name floor
+			bound bplane 0 1 0 	0 -20 0
+			file floor.spg
+			shade bw
+			scale 2
+		}
+
+		neutron {
+			name ceiling
+			bound bplane 0 -1 0	0 20 0
+			file top.spg
+			shade bw
+			scale 2
+		}
+
+		neutron {
+			name left
+			bound bplane 1 0 0	-20 0 0
+			file left.spg
+			shade bw
+			scale 2
+		}
+
+		neutron {
+			name right
+			bound bplane -1 0 0 	20 0 0
+			file right.spg
+			shade bw
+			scale 2
+		}
+
+}

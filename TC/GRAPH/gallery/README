@@ -1,0 +1,317 @@
+
+Hi :)
+
+The following is a list of the example scripts and directions on how to
+render the pictures they represent :)
+
+Test machine specs:
+
+    100 MHz DX4 Cyrix,    16MB RAM,  16MB swap, Linux 1.2,      gcc/g++ 1.6.3
+    166 MHz P5 Intel,     64MB RAM,  64MB swap, Linux 1.2.13,   gcc/g++ 2.7.2
+    166 MHz P5 Intel,     64MB RAM,     ???   , DOS 6.22,       watcom 11.0
+    200 MHz P6 Intel,     32MB RAM,     ???   , Linux ?????,    ???
+    200 MHz R4400 Mips,  128MB RAM, 168MB swap, IRIX 5.3,       cc/CC 5.3
+     75 MHz R8000 Mips,  256MB RAM, 256MB swap, IRIX 6.01,      cc/CC 6.01
+    194 MHz R10000 Mips,   4GB RAM, 4.4GB swap, IRIX 6.2,       cc/CC 5.2
+
+
+--------------------------------------------------------------------------
+                        P I C T U R E S
+--------------------------------------------------------------------------
+
+-------------------
+* aquamarine.list *
+-------------------
+
+This script renders one of my fractal planets with a moon using 3D texture
+shaders.
+
+To render this file, execute
+
+   DOS
+        "render -l aquamari.lis"
+   LINUX/IRIX
+        "render -l aquamarine.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     221 seconds        (2)             (2)
+        166 MHz P5(L) -             (2)          18 seconds     15.7 seconds
+        166 MHz P5(D)               (2)            (2)          18.3 seconds
+        200 MHz P6 -                (2)          27 seconds        (2)
+        200 MHz R4400 Mips -     74 seconds      41 seconds        (2)
+         75 MHz R8000 Mips -     34 seconds      15 seconds        (2)
+  (4)   194 MHz R10000 Mips -       (2)          14 seconds        (2)
+
+-----------------
+* barfland.list *
+-----------------
+
+This script renders a 101 x 101 surface patch (spatch) mesh which converts
+the mesh to 1/2 million polygons and renders the scene with 3D texture
+shaders.  Note: due to a bug, previous versions needed about 45 megs
+to render -> current version only needs 15 megs :)
+
+To render this file, execute
+
+   DOS
+        "render -l barfland.lis"
+   LINUX/IRIX
+        "render -l barfland.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -         (1)             (2)            (2)
+        166 MHz P5(L) -             (2)          54 seconds     46.2 seconds
+        166 MHz P5(D) -             (2)             (2)         52.1 seconds
+        200 MHz P6 -                (2)          99 seconds        (2)
+        200 MHz R4400 Mips -    222 seconds     168 seconds        (2)
+         75 MHz R8000 Mips -    115 seconds      72 seconds        (2)
+  (4)   194 MHz R10000 Mips -       (2)              (5)           (2)
+
+------------------
+* barfland2.list *
+------------------
+
+This script raycreeps the algorithm that created the mesh in
+barfland.list.  It renders about twice the speed, but with much
+better detail, while using a fraction of the memory.
+
+To render this file, execute
+
+   DOS
+        "render -l barflan2.lis"
+   LINUX
+        "render -l barfland2.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        166 MHz P5(L) -           (2)           122 seconds   110.1 seconds
+        166 MHz P5(D) -           (2)              (2)        130.2 seconds
+
+-------------
+* box1.list *
+-------------
+
+This script renders a plywood box using ~60 polygons with 3D texture
+shaders. A 2D texture picture is rendered as well to reduce the
+monotony...
+
+To render this file, execute
+
+   DOS
+        "render -f a -l kirk.lis"       // generates the 2D texture needed
+        "rename a0000.rgb kirk.rgb"     // rename the texture
+        "render -l box1.lis"
+
+   LINUX/IRIX
+        "render -f a -l kirk.list"      // generates the 2D texture needed
+        "mv a.00000.rgb kirk.rgb"       // rename the texture
+        "render -l box1.list"
+
+Render Time: (box1.list only)   ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     86 seconds          (2)            (2)
+        166 MHz P5(L) -             (2)          8 seconds      5.3 seconds
+        166 MHz P5(D) -             (2)             (2)         4.9 seconds
+        200 MHz P6 -                (2)          9 seconds         (2)
+        200 MHz R4400 Mips -    25 seconds      22 seconds         (2)
+         75 MHz R8000 Mips -    13 seconds       9 seconds         (2)
+  (4)   194 MHz R10000 Mips -       (2)          7 seconds         (2)
+
+-------------
+* box2.list *
+-------------
+
+This script is an example of using 3D texture shaders to reduce the
+geometrical complexity of a scene.  This script is similar to "box1.list"
+except that it uses a 3D texture shader that simulates lots of polygons
+with only 5 polygons.
+
+To render this file, execute
+
+   DOS
+        "render -f a -l kirk.lis"       // generates the 2D texture needed
+        "rename a0000.rgb kirk.rgb"     // rename the texture
+        "render -l box2.lis"
+
+   LINUX/IRIX
+        "render -f a -l kirk.list"      // generates the 2D texture needed
+        "mv a.00000.rgb kirk.rgb"       // rename the texture
+        "render -l box2.list"
+
+Render Time: (box2.list only)   ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     90 seconds         (2)             (2)
+        166 MHz P5(L) -             (2)          8 seconds      5.9 seconds
+        166 MHz P5(D) -             (2)            (2)          6.0 seconds
+        200 MHz P6 -                (2)          9 seconds         (2)
+        200 MHz R4400 Mips -    29 seconds      24 seconds         (2)
+         75 MHz R8000 Mips -    14 seconds      11 seconds         (2)
+  (4)   194 MHz R10000 Mips -       (2)          7 seconds         (2)
+
+--------------
+* chase.list *
+--------------
+
+This script is an example of using the polygon free "SBFAST" terrain
+primitive with 3D texture shaders and some Star Wars polygonal objects
+thrown in.  This is also an example of using pre-rendered backgrounds
+to speed up rendering.
+
+To render this file, execute
+
+   DOS
+        "render -f a -l sbfast2.lis"    // this generates the background
+        "rename a0000.rgb sbfast2.rgb"    // rename the background
+        "render -l chase.lis"
+
+   LINUX/IRIX
+        "render -f a -l sbfast2.list"   // this generates the background
+        "mv a.00000.rgb sbfast2.rgb"    // rename the background
+        "render -l chase.list"
+
+Render Time: (chase.list only)  ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     38 seconds         (2)             (2)
+        166 MHz P5(L) -             (2)          5 seconds      3.1 seconds
+        166 MHz P5(D) -             (2)            (2)          3.9 seconds
+        200 MHz P6 -                (2)          4 seconds         (2)
+        200 MHz R4400 Mips -    12 seconds      15 seconds         (2)
+         75 MHz R8000 Mips -     7 seconds       7 seconds         (2)
+  (4)   194 MHz R10000 Mips -       (2)          4 seconds         (2)
+
+-------------
+* kirk.list *
+-------------
+
+This script is an example of rendering fractal planets and moons with
+a Captain Kirk going on a rampage, taking on the Klingons, Romulans, and
+the Mushroom folk.... (hehehe)  It is also used by "box1.list" and "box2.list"
+as a 2D texture...
+
+To render this file, execute
+
+   DOS
+        "render -l kirk.lis"
+   LINUX/IRIX
+        "render -l kirk.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     203 seconds          (2)         (2)
+        166 MHz P5(L) -              (2)         19 seconds     16.3
+        166 MHz P5(D) -              (2)             (2)        18.6
+        200 MHz P6 -                 (2)         22 seconds      (2)
+        200 MHz R4400 Mips -     70 seconds      47 seconds      (2)
+         75 MHz R8000 Mips -     33 seconds      18 seconds      (2)
+  (4)   194 MHz R10000 Mips -        (2)         15 seconds      (2)
+
+------------
+* run.list *
+------------
+
+This script is an example of rendering multiple "SBFAST" primitives,
+in this case, I created a "cave" environment with a ceiling and a floor.
+This is just one frame in the animation "run".
+
+To render this file, execute
+
+   DOS
+        "render -l run.lis"
+
+   LINUX/IRIX
+        "render -l run.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     1150 seconds        (2)            (2)
+        166 MHz P5(L) -             (2)         113 seconds     104.8 seconds
+        166 MHz P5(D) -             (2)             (2)         126.8 seconds
+        200 MHz P6 -                (2)         140 seconds        (2)
+        200 MHz R4400 Mips -     429 seconds    235 seconds        (2)
+         75 MHz R8000 Mips -     170 seconds    106 seconds        (2)
+  (4)   194 MHz R10000 Mips -       (2)          98 seconds        (2)
+
+----------------
+* sbfast2.list *
+----------------
+
+This script creates an "SBFAST" landscape to be used as a background for
+"chase.list".
+
+To render this file, execute
+
+   DOS
+        "render -l sbfast2.lis"
+   LINUX/IRIX
+        "render -l sbfast2.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     910 seconds          (2)           (2)
+        166 MHz P5(L) -             (2)          70 seconds     67.2 seconds
+        166 MHz P5(D) -             (2)              (2)        80.8 seconds
+        200 MHz R4400 Mips -    299 seconds     163 seconds        (2)
+         75 MHz R8000 Mips -    119 seconds      69 seconds        (2)
+  (4)   194 MHz R10000 Mips -       (2)          65 seconds        (2)
+
+---------------
+* shadow.list *
+---------------
+
+This script demostrates the use of a "projected" light source to get
+real shadow effects (ie double zbuffer).
+
+To render this file, execute
+
+   DOS
+        "render -l shadow.lis"
+   LINUX/IRIX
+        "render -l shadow.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -     22 seconds         (2)             (2)
+        166 MHz P5(L) -             (2)         2 seconds       1.4 seconds
+        166 MHz P5(D) -             (2)            (2)          1.5 seconds
+        200 MHz P6 -                (2)         2 seconds          (2)
+        200 MHz R4400 Mips -     7 seconds      6 seconds          (2)
+         75 MHz R8000 Mips -     5 seconds      3 seconds          (2)
+  (4)   194 MHz R10000 Mips -       (2)         2 seconds          (2)
+
+----------------
+* stars.list *
+----------------
+
+This script creates a star field to be used as a background for the
+"earth" animation.
+
+To render this file, execute
+
+   DOS
+        "render -l stars.lis"
+   LINUX/IRIX
+        "render -l stars.list"
+
+Render Time:                    ver 1.01        ver 1.04        ver 1.05
+
+        100 MHz DX4 Cyrix -         (2)             (2)            (2)
+        166 MHz P5(L) -             (2)             (2)         10.2 seconds
+        166 MHz P5(D) -             (2)             (2)         11.7 seconds
+        200 MHz R4400 Mips -        (2)         26 seconds         (2)
+         75 MHz R8000 Mips -        (2)         10 seconds         (2)
+  (4)   194 MHz R10000 Mips -       (2)          9 seconds         (2)
+
+
+
+Footnotes:
+
+(1)     Unknown (not enough memory/swapspace)
+(2)     Not benchmarked at this time
+(4)     Test were done w/ -O0 optimizations due to the fact that
+                the compiler was buggy
+(5)     Unable to render due to SEG faults.  Suspect the compiler...
+(L)     166 P5 under Linux/gcc
+(D)     166 P5 under Dos/watcom
+

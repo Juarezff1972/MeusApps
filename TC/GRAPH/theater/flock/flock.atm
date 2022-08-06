@@ -1,0 +1,197 @@
+
+
+
+
+quark {
+	name base
+	children 7
+
+		flight {
+			name leader1
+			bound bsphere 1.5
+			orientation_mx	0 0 1
+					0 1 0
+					-1 0 0
+			children 1
+
+				boidbait {
+					name boidleader1
+					children 1
+		
+						neutron {
+							name leader1_1
+							file ncc1701b.spg
+							shade bw
+							rotate_x -90
+							scale 0.24
+						}
+
+				}
+
+		}
+
+		boid {
+			name boid1
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	0 0 -1
+					0 1 0
+					1 0 0
+			velocity_range 2 6
+			max_turn_radius 30
+			origin 5 0 0
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid1_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+
+		boid {
+			name boid2
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	0 0 1
+					0 1 0
+					-1 0 0
+			velocity_range 2 6
+			max_turn_radius 30
+			origin -5 0 0
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid2_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+		boid {
+			name boid3
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	-1 0 0
+					0 0 1
+					0 1 0
+			velocity_range 2 6
+			max_turn_radius 30
+			origin 0 5 0
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid3_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+		boid {
+			name boid4
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	-1 0 0
+					0 0 -1
+					0 -1 0
+			velocity_range 2 6
+			max_turn_radius 30
+			origin 0 -5 0
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid4_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+		boid {
+			name boid5
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	1 0 0
+					0 1 0
+					0 0 1
+			velocity_range 2 6
+			max_turn_radius 30
+			origin 0 0 5
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid5_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+		boid {
+			name boid6
+			bound bsphere 1.5
+			velocity 3.5
+			orientation_mx	-1 0 0
+					0 1 0
+					0 0 -1
+			velocity_range 2 6
+			max_turn_radius 30
+			origin 0 0 -5
+			red_alert 2
+			yellow_alert 4 0.5
+			leader_range 4 12
+			boid_range 4 8
+
+			children 1
+
+				neutron {
+					name boid6_1
+					file klingon.spg
+					shade bw
+					rotate_x -90
+					scale 0.24
+				}
+
+		}
+
+}
+

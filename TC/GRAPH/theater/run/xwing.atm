@@ -1,0 +1,64 @@
+
+
+
+
+quark {
+	name base
+
+	children 1
+
+		flight {
+			name flight_stick
+//			axis_x -1 0 0
+//			axis_y 0 1 0
+//			axis_z 0 0 -1
+			orientation_mx	-1 0 0
+					 0 1 0
+					0 0 -1
+
+			children 1
+
+				neutron {
+					name xwing
+					bound bsphere 6
+					file x_wing.spg
+					shade phong white.ilm
+					shadow
+					raycast
+					scale 0.3
+					rotate_local_x -90
+
+					children 1
+
+						electron {
+							name camera1
+							origin 0 1.5 0
+							coa 0 1.5 1
+							up 0 1 0
+
+							children 2
+
+								photon {
+									name light1
+									type far
+									direction 0 0 1
+									ambient 0.5 0.5 0.5
+									diffuse 1 1 1
+
+
+								}
+
+								buckey {
+									name backgd
+									shade palex bgwhite.ilm
+									luminate
+									scale 1000
+								}
+
+						}
+
+				}
+
+		}
+
+}

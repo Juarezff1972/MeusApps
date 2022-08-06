@@ -1,0 +1,17 @@
+
+
+This animation is an example of using the "SBFAST" primitive and the
+"flight" animation module, shown by Ken Musgrave at SIGGRAPH '95.
+It creates the script for a 430 frame (14 seconds) animation.
+
+To generate the animation, enter:
+
+	"anitroll run.cnt run.lst"
+	"mv run.lst ../../gallery"  // should be move to the graph/gallery dir
+	"cd ../../gallery"
+	"pixcon -l run.lst"
+
+Note:  These frames are very detailed and computation intensive.
+	You may want to render smaller frames using the "-x", "-y"
+	options, or save the animation to a file, then play back
+	using "mflip" or "movie".  See the MANUAL for details.

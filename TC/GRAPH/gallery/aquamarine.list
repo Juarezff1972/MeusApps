@@ -1,0 +1,61 @@
+list
+frame_count 1
+object_count 7
+
+light {						// declare a light source
+	type far
+	direction 0 0 -1
+	ambient 0.3 0.3 0.3
+	diffuse 0.7 0.7 0.7
+	fatt 0 0 0
+}
+
+camera {					// declare the camera
+	location 0 -10000 40000
+	coa 0 -10000 0
+	up 0 1 0
+}
+
+geosphere {					// define the "atmosphere" of the planet
+	shade palex cloud2.ilm
+	transparent
+	3d_texture cloud2.3dt
+	translate 0 -10000 0
+	scale 10200
+}
+
+polygon {					// define the upper half of the star field
+	shade alex stars.ilm
+	file stars.spg
+	transparent
+	raycast
+	3d_texture stars.3dt
+	translate 0 -9900 40000
+}
+
+
+polygon {					// define the lower half of the star field
+	shade alex stars.ilm
+	file stars.spg
+	transparent
+	raycast
+	3d_texture stars.3dt
+	translate 0 -10100 40000
+}
+
+
+geosphere {					// define the moon
+	shade palex celeste.ilm
+	3d_texture moon.3dt
+	translate 2000 1000 -4000
+	scale 4000
+}
+
+geosphere {					// define the planet
+	shade palex celeste.ilm
+	3d_texture planet2.3dt
+	translate 0 -10000 0
+	scale 10000
+}
+
+

@@ -1,0 +1,29 @@
+list
+frame_count 1
+object_count 3
+
+light {						// define light source
+	type far
+	direction 0 0 -1
+	ambient 0.5 0.5 0.5
+	diffuse 1 1 1
+	fatt 0 0 0
+}
+
+camera {					// define camera
+	location 0 -90 90
+	coa 0 0 90
+	up 0 0 1
+}
+
+sbfast {					// define terrain
+	shade palex sbfast.ilm
+	3d_texture terrain2.3dt
+	scale 157.240997
+	back 1000
+	octaves 100
+	h 0.9
+	lacunarity 2.1
+	displacement default_alt
+}
+

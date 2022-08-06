@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Make an IRIX 5 DSO
+
+# First argument is name of output library
+# Rest of arguments are object files
+
+LIBRARY=$1
+
+shift 1
+OBJECTS=$*
+
+DIRNAME=`dirname $LIBRARY`
+
+
+ld -shared -all -o ${LIBRARY} ${OBJECTS}
+
+# You may want to add the following to the ld line:
+#   -soname <path>$LIBNAME
+#
+# where LIBNAME=`basename $LIBRARY` and <path> is where you're going to
+# put Mesa's libraries.  This may solve problems with the runtime
+# loader/linker (rld) not being able to find the library.
+# For example:  -soname /usr/local/lib/$LIBNAME
