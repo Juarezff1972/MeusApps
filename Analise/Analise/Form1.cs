@@ -321,6 +321,10 @@
             string aux = "";
             int i;
 
+            if (tam > entrada.Length) return false;
+
+            if ((cnt + tam - 1) >= entrada.Length) return false;
+
             for (i = 0; i < tam; i++)
             {
                 aux += entrada[cnt + i];
@@ -1349,8 +1353,8 @@
         /// <param name="z">The z<see cref="double"/>.</param>
         internal void calc3d(double x, double y, double z)
         {
-            x = (-1) * x;
-            z -= 350.0;
+            x = -x;
+            z -= AreaX+30;
 
             if (z == 0)
                 z = 1;
@@ -1359,8 +1363,8 @@
             sy = 1200.0 * y / z;
             sx += 399.0;
             sy += 299.0;
-            sx *= (319.0 / 799.0);
-            sy *= (199.0 / 599.0);
+            sx *= ((AreaX-1.0) / 799.0);
+            sy *= ((AreaY-1.0) / 599.0);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1374,7 +1378,7 @@
         {
             //unsigned offst;
 
-            if (((x > 0) && (x < 320)) && ((y > 0) && (y < 200)))
+            if (((x > 0) && (x < AreaX)) && ((y > 0) && (y < AreaY)))
             {
                 bmp.SetPixel(x, y, cor);
             }
@@ -1405,10 +1409,10 @@
         internal void sombra(int x, int y)
         {
             Color cor;
-            x -= ((200 - y) / 3);
-            calc3d(((double)x - 160.0) / 1.5, -90.0, (double)y - 200.0);
-            if (sy > 199)
-                sy = 199;
+            x -= (((int)AreaY - y) / 3);
+            calc3d(((double)x - ((AreaX/2.0)-1.0)) / 1.5, -180.0, (double)y - AreaY);
+            if (sy > (AreaY-1))
+                sy = (AreaY-1);
             cor = bmp.GetPixel((int)sx, (int)sy);
 
             if (compCor(cor, Color.Red))
@@ -1456,20 +1460,20 @@
             double f, tmp;
             //uint glitch;
             f = ff(x * scale);
-            tmp = ((199.0 - ((f / scale) / 3.0)) - 99.0);
+            tmp = (((AreaY-1.0) - ((f / scale) / 3.0)) - ((AreaY / 2.0) - 1));
 
-            if (Math.Abs(f / 3.0) <= 99)
+            if (Math.Abs(f / 3.0) <= ((AreaY / 2) - 1))
             {
                 if (_ == 1)
-                    vline((int)x + 159, (int)tmp, 100, cor);
+                    vline((int)x + (((int)AreaX/2)-1), (int)tmp, ((int)AreaY/2), cor);
                 else
                 {
-                    putpixel((int)x + 159, (int)tmp, cor);
-                    sombra((int)x + 159, (int)tmp);
+                    putpixel((int)x + (((int)AreaX / 2) - 1), (int)tmp, cor);
+                    sombra((int)x + (((int)AreaX / 2) - 1), (int)tmp);
                 }
             }
 
-            putpixel((int)x + 159, 100, Color.FromArgb(255, cor.R / 2, cor.G / 2, cor.B / 2));
+            putpixel((int)x + (((int)AreaX / 2) - 1), ((int)AreaY /2), Color.FromArgb(255, cor.R / 2, cor.G / 2, cor.B / 2));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1926,9 +1930,13 @@
         {
             int j;
             double x, y;
-            double startval = -158.0, endval = 158.0;
+            double startval = -((AreaX / 2.0) - 2.0), endval = (AreaX / 2.0) - 2.0;
             Color floor = Color.Red;
             bool checker = false;
+            int hAreaX;
+            int hAreaY;
+            hAreaX = (int)AreaX / 2;
+            hAreaY = (int)AreaY / 2;
 
             if (inicio > final)
             {
@@ -1939,29 +1947,29 @@
 
             if ((sinal(inicio) == -1) && (sinal(final) <= 0))
             {
-                startval = -158.0;
+                startval = -(AreaX / 2.0) - 2.0;
                 endval = 0.0;
             }
 
             if ((sinal(inicio) >= 0) && (sinal(final) == 1))
             {
                 startval = 0.0;
-                endval = 158.0;
+                endval = (AreaX/2.0)-2.0;
             }
 
-            for (xx = -360.0; xx <= 0.0; xx = xx + 1.0)
+            for (xx = -(AreaX+40.0); xx <= 0.0; xx++)
             {
-                if (((long)((xx + 160.0) / 30.0) % 2) == 0)
+                if (((long)((xx + (AreaX/2.0)) / 30.0) % 2) == 0)
                     checker = false;
                 else
                     checker = true;
 
-                for (yy = -400.0; yy <= 100.0; yy = yy + 1.0)
+                for (yy = -AreaY*2.0; yy <= (AreaY/2); yy++)
                 {
                     if (((long)yy % 40) == 0)
                         checker = !checker;
 
-                    calc3d(xx / 1.5, -90.0, yy - 90.0);
+                    calc3d(xx / 1.5, -180.0, yy - 90.0);
 
                     if (checker == false)
                         floor = Color.Red;
@@ -1970,43 +1978,43 @@
                         floor = Color.Cyan;
 
                     putpixel((int)sx, (int)sy, floor);
-                    putpixel(320 - (int)sx, (int)sy, floor);
+                    putpixel((int)AreaX - (int)sx, (int)sy, floor);
                 }
             }
 
             pictureBox1.Refresh();
 
-            for (j = 0; j <= 299; j++)
+            for (j = 0; j <= ((int)(AreaY+100) -1); j++)
             {
-                putpixel(158, j, Color.DarkGray);
-                sombra(158, j);
-                sombra(158, -j);
-                putpixel(159, j, Color.Gray);
-                sombra(159, j);
-                sombra(159, -j);
-                putpixel(160, j, Color.White);
-                sombra(160, j);
-                sombra(160, -j);
-                putpixel(161, j, Color.Gray);
-                sombra(161, j);
-                sombra(161, -j);
-                putpixel(162, j, Color.DarkGray);
-                sombra(162, j);
-                sombra(162, -j);
+                putpixel(hAreaX-2, j, Color.DarkGray);
+                sombra(hAreaX - 2, j);
+                sombra(hAreaX - 2, -j);
+                putpixel(hAreaX - 1, j, Color.Gray);
+                sombra(hAreaX - 1, j);
+                sombra(hAreaX - 1, -j);
+                putpixel(hAreaX, j, Color.White);
+                sombra(hAreaX, j);
+                sombra(hAreaX, -j);
+                putpixel(hAreaX +1, j, Color.Gray);
+                sombra(hAreaX + 1, j);
+                sombra(hAreaX + 1, -j);
+                putpixel(hAreaX + 2, j, Color.DarkGray);
+                sombra(hAreaX + 2, j);
+                sombra(hAreaX + 2, -j);
             }
 
-            for (j = 0; j <= 319; j++)
+            for (j = 0; j <= (AreaX-1); j++)
             {
-                putpixel(j, 98, Color.DarkGray);
-                sombra(j, 98);
-                putpixel(j, 99, Color.Gray);
-                sombra(j, 99);
-                putpixel(j, 100, Color.White);
-                sombra(j, 100);
-                putpixel(j, 101, Color.Gray);
-                sombra(j, 101);
-                putpixel(j, 102, Color.DarkGray);
-                sombra(j, 102);
+                putpixel(j, hAreaY-2, Color.DarkGray);
+                sombra(j, hAreaY - 2);
+                putpixel(j, hAreaY - 1, Color.Gray);
+                sombra(j, hAreaY - 1);
+                putpixel(j, hAreaY, Color.White);
+                sombra(j, hAreaY);
+                putpixel(j, hAreaY +1, Color.Gray);
+                sombra(j, hAreaY + 1);
+                putpixel(j, hAreaY + 2, Color.DarkGray);
+                sombra(j, hAreaY + 2);
             }
 
             for (x = startval; x <= endval; x = x + 0.01)
@@ -2178,15 +2186,17 @@
         {
             int i;
             bool isParsable;
-            double number;
             string prc;
+            int hAreaX;
 
             AreaX = 640;
             AreaY = 400;
 
-            bmp = new Bitmap(320, 200);
+            hAreaX = ((int)AreaX / 2) - 1;
+
+            bmp = new Bitmap((int)AreaX, (int)AreaY);
             pictureBox1.Image = bmp;
-            isParsable = double.TryParse(precTxt.Text, out number);
+            isParsable = double.TryParse(precTxt.Text, out double number);
             if (isParsable)
                 number = Math.Abs(number);
             else
@@ -2197,7 +2207,8 @@
             prec = number;
 
             func = "";
-            funcao.Text = funcao.Text.ToUpper().Trim();
+            funcao.Text = funcao.Text.ToUpper().Trim()+"+0";
+            funcao.Text = funcao.Text.Replace("+0+0", "+0");
             for (i = 0; i < funcao.Text.Length; i++)
             {
                 if (funcao.Text.Substring(i, 1) == "X")
@@ -2220,22 +2231,22 @@
                     inicio = -final;
             }
 
-            if (inicio > 159.0)
-                inicio = 159.0;
+            if (inicio > hAreaX)
+                inicio = hAreaX;
 
-            if (inicio < -159.0)
-                inicio = -159.0;
+            if (inicio < -hAreaX)
+                inicio = -hAreaX;
 
-            if (final > 159.0)
-                final = 159.0;
+            if (final > hAreaX)
+                final = hAreaX;
 
-            if (final < -159.0)
-                final = -159.0;
+            if (final < -hAreaX)
+                final = -hAreaX;
 
             if (Math.Abs(inicio) >= Math.Abs(final))
-                scale = Math.Abs(inicio / 158.0);
+                scale = Math.Abs(inicio / (hAreaX - 1));
             else
-                scale = Math.Abs(final / 158.0);
+                scale = Math.Abs(final / (hAreaX - 1));
 
             drawfunc(inicio, final);
 
@@ -2274,22 +2285,22 @@
                         inicio = -final;
                 }
 
-                if (inicio > 159.0)
-                    inicio = 159.0;
+                if (inicio > hAreaX)
+                    inicio = hAreaX;
 
-                if (inicio < -159.0)
-                    inicio = -159.0;
+                if (inicio < -hAreaX)
+                    inicio = -hAreaX;
 
-                if (final > 159.0)
-                    final = 159.0;
+                if (final > hAreaX)
+                    final = hAreaX;
 
-                if (final < -159.0)
-                    final = -159.0;
+                if (final < -hAreaX)
+                    final = -hAreaX;
 
                 if (Math.Abs(inicio) >= Math.Abs(final))
-                    scale = Math.Abs(inicio / 158.0);
+                    scale = Math.Abs(inicio / (hAreaX - 1));
                 else
-                    scale = Math.Abs(final / 158.0);
+                    scale = Math.Abs(final / (hAreaX - 1));
 
                 drawfunc(inicio, final);
 
@@ -2321,22 +2332,22 @@
                         inicio = -final;
                 }
 
-                if (inicio > 159.0)
-                    inicio = 159.0;
+                if (inicio > hAreaX)
+                    inicio = hAreaX;
 
-                if (inicio < -159.0)
-                    inicio = -159.0;
+                if (inicio < -hAreaX)
+                    inicio = -hAreaX;
 
-                if (final > 159.0)
-                    final = 159.0;
+                if (final > hAreaX)
+                    final = hAreaX;
 
-                if (final < -159.0)
-                    final = -159.0;
+                if (final < -hAreaX)
+                    final = -hAreaX;
 
                 if (Math.Abs(inicio) >= Math.Abs(final))
-                    scale = Math.Abs(inicio / 158.0);
+                    scale = Math.Abs(inicio / (hAreaX - 1));
                 else
-                    scale = Math.Abs(final / 158.0);
+                    scale = Math.Abs(final / (hAreaX - 1));
 
                 drawfunc(inicio, final);
 

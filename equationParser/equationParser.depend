@@ -12,3 +12,16 @@
 	<dos.h>
 	<dir.h>
 
+1619115855 source:d:\onedrive\programação\projetos\coyote\meusapps\equationparser\main.cpp
+	<iostream>
+	<string.h>
+	<conio.h>
+	<stdio.h>
+	<ctype.h>
+	<process.h>
+	<malloc.h>
+	<stdlib.h>
+	<windows.h>
+	<dos.h>
+	<dir.h>
+
