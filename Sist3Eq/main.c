@@ -66,8 +66,8 @@ void Det (void)
 	unsigned char t, i, s, g;
 	char *c;
 	z = 1;
-	printf("\nEtapa 1");
-	MostraMatriz();
+	//printf("\nEtapa 1");
+	//MostraMatriz();
 	for (t = 0; t < n; t++)
 	{
 		if (a[t][0] == 0 && a[t][1] == 0 && a[t][2] == 0 && t != n)
@@ -89,8 +89,8 @@ void Det (void)
 			while (a[2][0] == 0 && a[2][1] == 0 && a[2][2] == 0);
 		}
 	}
-	printf("\nEtapa 2");
-	MostraMatriz();
+	//printf("\nEtapa 2");
+	//MostraMatriz();
 	rsp = true;
 	for (t = 0; t < n; t++)
 	{
@@ -106,8 +106,8 @@ void Det (void)
 				vai = true;
 			}
 		}
-		printf("\nEtapa 3");
-		MostraMatriz();
+		//printf("\nEtapa 3");
+		//MostraMatriz();
 		if (vai)
 		{
 			//while (a[t][t] == 0 && a[t][t - 1] != 0)
@@ -119,8 +119,8 @@ void Det (void)
 					a[g][s] = x;
 				}
 			}
-			printf("\nEtapa 4");
-			MostraMatriz();
+			//printf("\nEtapa 4");
+			//MostraMatriz();
 			while ( (a[t][t] == 0) && (a[t][t - 1] != 0))
 				if (a[t][t] == 0)
 				{
@@ -130,19 +130,19 @@ void Det (void)
 				{
 					z = 1 / a[t][t];
 				}
-			printf("z = %.64f \n", z);
+			//printf("z = %.64f \n", z);
 			for (s = 0; s < n + 1; s++)
 			{
 				a[t][s] = z * a[t][s];
 			}
-			printf("\nEtapa 5");
-			MostraMatriz();
+			//printf("\nEtapa 5");
+			//MostraMatriz();
 			for (i = 0; i < n; i++)
 			{
 				if (i != t)
 				{
 					z = -a[i][t];
-					printf(">>>a = %.32f || z = %.32f \n", a[i][t], z);
+					//printf(">>>a = %.32f || z = %.32f \n", a[i][t], z);
 					for (s = 0; s < n + 1; s++)
 					{
 						if (z != 0.0)
@@ -152,8 +152,8 @@ void Det (void)
 					}
 				}
 			}
-			printf("\nEtapa 6");
-			MostraMatriz();
+			//printf("\nEtapa 6");
+			//MostraMatriz();
 		}
 		if (!vai)
 		{
