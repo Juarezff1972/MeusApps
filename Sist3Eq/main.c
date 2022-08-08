@@ -54,7 +54,7 @@ void MostraMatriz()
 		printf("| ");
 		for(j = 0; j <= n; j++)
 		{
-			printf("%.5f\t\t", a[i][j]);
+			printf("%.32f\t\t", a[i][j]);
 		}
 		printf("|\n");
 	}
@@ -110,7 +110,7 @@ void Det (void)
 		MostraMatriz();
 		if (vai)
 		{
-			while (a[t][t] == 0 && a[t][t - 1] != 0)
+			//while (a[t][t] == 0 && a[t][t - 1] != 0)
 			{
 				for (s = 1; s <= n + 1; s++)
 				{
@@ -130,7 +130,7 @@ void Det (void)
 				{
 					z = 1 / a[t][t];
 				}
-			printf("z = %f \n", z);
+			printf("z = %.64f \n", z);
 			for (s = 0; s < n + 1; s++)
 			{
 				a[t][s] = z * a[t][s];
@@ -142,7 +142,7 @@ void Det (void)
 				if (i != t)
 				{
 					z = -a[i][t];
-					printf(">>>a = %f || z = %f \n", a[i][t], z);
+					printf(">>>a = %.32f || z = %.32f \n", a[i][t], z);
 					for (s = 0; s < n + 1; s++)
 					{
 						if (z != 0.0)
@@ -195,7 +195,7 @@ void resposta (void)
 	printf ("\n");
 	for (i = 0; i < n; i++)
 	{
-		printf ("X[%d] = %.5f\n", i, a[i][n]);
+		printf ("X[%d] = %g\n", i, a[i][n]);
 	}
 }
 /////////////////////////////////////////////////////////////////////////
